@@ -27,9 +27,6 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 
 # Part 3 - Presenting Git
 - 👉 [Click here](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/Git-Presenting-Git)
-- take inspiration [here]https://rogerdudler.github.io/git-guide/)
-## Exercise with git
-Let's 
 
 # Part 4 - Setting up your group TP's repository
 - 👉 [Click here](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/Git-Setting-up-git-for-TPs)
