@@ -4,7 +4,7 @@ Welcome in the very first lab of MICRO-315
 # Part 1 - Integrated Development Environment (IDE)
 Click on one the links accordingly to you computer's configuration
 - 👉 [❖ Windows](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/Installing-the-IDE-%E2%9D%96-Windows)
-- 👉 [🍎 MacOS](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/Installing-the-IDE-%F0%9F%8D%8E-Linux)
+- 👉 [🍎 MacOS](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/Installing-the-IDE-%F0%9F%8D%8E-MacOS)
 - 👉 [🐧 Linux](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/Installing-the-%F0%9F%90%A7-Linux)
 
 The IDE now freshly installed, let's start by quickly presenting IDE which we will use throuhought this whole semester.
