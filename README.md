@@ -12,7 +12,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - 👉 [🗔 User Interface](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/IDE-%7C-%F0%9F%97%94-User-Interface)
 
 # Part 2 - Presenting the EPuck2
-- 👉 [Click here](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/EPuck2-%7C-Presenting-the-EPuck2)
+- 👉 [Click here](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/EPuck2-Presenting-the-EPuck2)
 ## Demo program 1
 - open in VSCode EPuck2 the folder under Workplace_EPuck2/Lib
 - run the task `Make ST`
