@@ -22,8 +22,12 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - 👉 [Click here](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/Git-Setting-up-git-for-TPs)
 
 # Part 5 - STM32F4 Microcontroller and GPIO configuration
-```C
-/ LED7 - GPIOD 11
+
+## `Task1`
+>Use a simple delay function to make **LED7** blink in a while loop at 1 Hz
+
+```c
+// LED7 - GPIOD 11
 #define LED7_PORT GPIOD
 #define LED7_PIN 11
 // Enable GPIOD peripheral clock
@@ -39,9 +43,4 @@ LED7_PORT->PUPDR &= ~(3 << (LED7_PIN * 2));
 // Output highest speed : OSPEEDRy = 11
 LED7_PORT->OSPEEDR |= (3 << (LED7_PIN * 2));
 ```
----
-># `Task1`
->
->Use a simple delay function to make **LED7** blink in a while loop at 1 Hz
 
-bonjour
