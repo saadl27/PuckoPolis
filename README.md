@@ -12,18 +12,8 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - 👉 [🗔 User Interface](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/IDE-%F0%9F%97%94-User-Interface)
 
 # Part 2 - Presenting the EPuck2
-- 👉 [Click here](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/EPuck2-Presenting-the-EPuck2)
-## Demo program 1
-- open in VSCode EPuck2 the folder under Workplace_EPuck2/Lib
-- run the task `Make ST`
-- go in the **Run and Debug** and click on `Start Debugging` OR press `F5`
-- run the task `Run ST`
-
-## Demo program 2
-- still in the folder Workplace_EPuck2/Lib
-- run the task `Make e-puck2_main-processor`
-- go in the **Run and Debug** and click on `Start Debugging` OR press `F5`
-- run the task `Run EPuckMonitor`
+- 👉 [Presenting the EPuck2](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/EPuck2-Presenting-the-EPuck2)
+- 👉 [Testing the EPuck2](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/EPuck2-Testing-the-EPuck2)
 
 # Part 3 - Introduction Git
 - 👉 [Click here](https://github.com/epfl-mobots/MICRO-315-TPs-Student/wiki/Git-Introduction-to-Git)
