@@ -19,7 +19,8 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - 👉 [Click here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Introduction-to-Git)
 
 # Part 4 - Setting up your group TP's repository
-- 👉 [Click here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs)
+- Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs) to set up git for the TPs
+- Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Working-in-groups) to learn how to work in group using Git
 
 # Part 5 - STM32F4 Microcontroller and GPIO configuration
 
