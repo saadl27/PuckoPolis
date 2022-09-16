@@ -28,12 +28,12 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Working-in-groups) to learn how to work in group using Git
 
 # Part 5 - STM32F4 Microcontroller and GPIO configuration
-## Preparation 
+## 🔌 Preparation 
 - Make sure you are in the right branch (TP1_Exercise), if not you must do a **checkout TP1_Exercise**
 - Open the folder TPs with VSCode Epuck2
 - Run the task `Link Librairy ST to workspace`
 
-## Building the Project
+## 🔨 Building the Project
 - Building the code consists of compiling the **\*.c** and **\*.s** files to create object files, **\**.o*, and then
 linking the object files to create the **blinky.elf** file. We will see in more details in TP2 the different
 steps of the build process. The generated **.elf** file contains the data necessary to program the device
@@ -76,7 +76,9 @@ are errors in your code, they will be displayed in this console.
   > Try to find out the meaning of the words text, data, bss, dec.<br>
   > Estimate the size of your code in percentage of total Flash and RAM available with this microcontroller.
 
-## Programming the EPuck2 robot
+## 🐞 Programming the EPuck2 robot
 - Now that you have built your code and created an **.elf** file that can be loaded on the microcontroller, you can program the device. To program the robot e-puck2, plug the USB cable (there is no need to turn on the e-puck2 using the dedicated button since the programmer MCU will automatically power the main MCU) 
-- Then, you have to specify the port on which the gdb server is connected, click [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Presenting-the-EPuck2) for more info
-  
+- First you must specify the port to which the gdb-server is connected, click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Presenting-the-EPuck2#identify-the-ports) for more info
+
+## 🐛 Debugging the EPuck2 robot
+- click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%90%9B-Debugging) for more info
