@@ -1,11 +1,23 @@
 # Introduction
-Welcome in the very first lab of MICRO-315
+- Welcome in the very first lab of MICRO-315
+- `Goal`: learn how to program and debug the e-puck2 robot and familiarize with the STM32F4 microcontroller family
+- `⏱ Duration`: 4 hours
 
 ## Goals
 - This practical work shows all the necessary steps to program the e-puck2 miniature mobile robot in C, using the standard library provided by ST.
 - The main goal is to gain knowledge of the STM32F4 microcontroller and refresh some concepts about peripherals such as GPIOs and TIMERs.
 - The second goal and not the least is to present the tools that will be used throughought every labs of this semester
 
+## Methodology
+To achieve the main goal, we will go through the following steps:
+  - Installing and getting familiar with the IDE (Integrated Development Environment): [Part 1](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-1---integrated-development-environment-ide)
+  - Getting familiar with e-puck2 robot: [Part 2](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-2---presenting-the-epuck2-robot)
+  - Understand the basic of the version control tool *Git*, *MANDATORY* for this course: [Part 3](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-3---git-introduction)
+  - Setup the git repository for your group: [Part 4](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-4---setting-up-your-group-tps-repository)
+  - Getting used to program an e-puck2: use the on board debugger interface for programming and debugging [Part 5.1](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#-tutorial-for-programming-the-epuck2-robot)
+  - Writing a first LED blinking program, first with *NOP* loops, then using timers
+  - Change the LED's blinking sequence using the selector
+  
 # Part 1 - Integrated Development Environment (IDE)
 Click on one the links accordingly to your computer's configuration
 - 👉 [❖ Windows](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Installing-the-IDE-%E2%9D%96-Windows)
