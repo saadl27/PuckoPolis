@@ -39,25 +39,22 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs) to set up git for the TPs
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Working-in-groups) to learn how to work in group using Git
 
-# Part 5 - STM32F4 Microcontroller and GPIO configuration
-## 🔌 Preparation 
+# Part 5 - Tutorial for programming the EPuck2 robot
+## 5.0 🔌 Preparation 
 - Make sure you are in the right branch (TP1_Exercise), if not you must do a **checkout TP1_Exercise**
 - Open the folder TPs with VSCode Epuck2
 - Run the task `Link Librairy ST to workspace`
 
-## 🏫 Tutorial for programming the EPuck2 robot
-### 🔨 Building the Project
-- Building the code consists of compiling the **\*.c** and **\*.s** files to create object files, **\**.o*, and then
-linking the object files to create the **blinky.elf** file. We will see in more details in TP2 the different
-steps of the build process. The generated **.elf** file contains the data necessary to program the device
-and additional information that lets you debug at the source code level. The additional files **.list**,
-**.size** and **.mem** are generated containing the disassembly output and the memory layout table with
-symbol address and size.
+## 5.1 🔨 Building the Project
+- Building the code consists of compiling the **\*.c** and **\*.s** files to create object files, **\*.o**, and then linking the object files to create the **blinky.elf** file
+- More detail on the steps of the build process will be given during TP2
+- The generated **.elf** file contains the data necessary to program the device and additional information that lets you debug at the source code level
+- The additional files **.list**, **.size** and **.mem** are generated containing the disassembly output and the memory layout table with symbol address and size.
+- 👉 To compile the project
   1. Run the task **Make TP1**
   2. Observe the progress of the compilation in the Build Console tabular (as in Listing 1).
-  3. When Done is displayed, your code is built and you are ready to program the device. If there
-are errors in your code, they will be displayed in this console.
-      ```
+  3. When Done is displayed, your code is built and you are ready to program the device. If there are errors in your code, they will be displayed in this console.
+      ```yml
       > Compiling gpio.c
       > Compiling main.c   
       ar> Compiling timer.c
@@ -86,26 +83,26 @@ are errors in your code, they will be displayed in this console.
       > Done
       ```
   > `Home Task 1`<br>
-  > Try to find out the meaning of the words text, data, bss, dec.<br>
+  > Try to find out the meaning of the words **text**, **data**, **bss**, **dec**.<br>
   > Estimate the size of your code in percentage of total Flash and RAM available with this microcontroller.
 
-### 🐞 Programming the EPuck2 robot
-- Now that you have built your code and created an **.elf** file that can be loaded on the microcontroller, you can program the device. To program the robot e-puck2, plug the USB cable (there is no need to turn on the e-puck2 using the dedicated button since the programmer MCU will automatically power the main MCU) 
-- First you must specify the port to which the gdb-server is connected, click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Presenting-the-EPuck2#identify-the-ports) for more info
+## 5.2 🐞 Programming and debugging the EPuck2 robot
+- Now that you have built your code and created an **.elf** file that can be loaded on the microcontroller, you can program the device:
+  - Plug the USB cable (no need to turn on the e-puck2 using the dedicated button since the programmer MCU will automatically power the main MCU) 
+  - Specify the port to which the EPuck2's gdb-server is connected, click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Presenting-the-EPuck2#identify-the-ports) for more info
+  - To "program" the EPuck2, click on `Run and Debug`
+- 💡 click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%90%9B-Debugging) for more info about programming and debugging
 
-### 🐛 Debugging the EPuck2 robot
-- click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%90%9B-Debugging) for more info
 
----
-## 🏫 STM32F4 Microcontroller and GPIO configuration
-### Blink a LED automatically
+# Part 6 - STM32F4 Microcontroller and GPIO configuration
+## 6.1 Blink a LED automatically
 > `Task 1`
 > Use a simple delay function to make **LED7** blink in a while loop at 1 Hz.
 > Hints:
 >   - Consult the electrical schema of the e-puck2 to find the **LED7** IO pin.
 >   - Use the functions declared in *TP1_blinky/blinky/gpio.c* to modify the state of the pin on which the LED is connected, and create a function that generate a time delay using assembly nop instructions
 
-### Blink only the Front LED
+## 6.2 Blink only the Front LED
 > `Task 2`
 > Modify your code to blink only the 5mm red **FRONT_LED**.
 > Hints:
@@ -117,7 +114,7 @@ are errors in your code, they will be displayed in this console.
 >   <sup> Don’t forget to pause the debugger to be able to change the register value from the EmbSys Registers</sup>
 
 
-### Blink only the 4 Body LEDs
+## 6.3 Blink only the 4 Body LEDs
 > `Task 3`
 > Modify your code to blink only the 4 green **BODY_LEDs**.
 > Hints:
@@ -126,7 +123,7 @@ are errors in your code, they will be displayed in this console.
 >   - Can you explain why this output topology is used for **BODY_LED** and not the same than
 the **LED7** one for example?
 
-### Blink many LEDs automatically with a circular pattern
+## 6.4 Blink many LEDs automatically with a circular pattern
 > `Task 4`
 > Blink the **LED1** → **LED3** → **LED5** → **LED7** with a circular pattern, with ON1→ON3→ON5→ON7→OFF1→OFF3→OFF5→OFF7 or ON1→OFF1→ON3→OFF3→ON5→OFF5→ON7→OFF7 sequence depending of the Selector state.
 > Hints:
@@ -135,6 +132,4 @@ the **LED7** one for example?
 > - Have a look on the comment close to the selector on the schema. Can you explain it?
 > - Define different LED sequences depending on the Selector state
 
-
----
-## 🏫 Timer Interrupt Tutorial
+# Part 7 - Timer Interrupt Tutorial
