@@ -116,7 +116,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 >    - Adapt your code for this Output topology
 >    - Take the opportunity to use the oscilloscope to measure the influence of 2 extreme values of **OSPEEDR** configuration for this GPIO and take a plot of both for rising and falling edges
 <p float="left">
-  <img src="https://github.com/EPFL-MICRO-315/TPs-Student/pictures/TestPoint.jpg" alt="drawing" width="900"/>
+  <img src="https://github.com/EPFL-MICRO-315/TPs-Student/blob/TP1_Exercise/pictures/TestPoint.jpg" alt="drawing" width="900"/>
 </p>
 - 💡 Don’t forget to pause the debugger to be able to change the register value from the EmbSys Registers
 
