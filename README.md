@@ -12,7 +12,7 @@
 To achieve the main goal, we will go through the following steps:
   - Installing and getting familiar with the IDE (Integrated Development Environment): [Part 1](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-1---integrated-development-environment-ide)
   - Getting familiar with e-puck2 robot: [Part 2](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-2---presenting-the-epuck2-robot)
-  - Understand the basic of the version control tool *Git*, *MANDATORY* for this course: [Part 3](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-3---git-introduction)
+  - Understand the basic of the version control tool *Git*, *MANDATORY* for this course: [Part 3](https://githusameb.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-3---git-introduction)
   - Setup the git repository for your group: [Part 4](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-4---setting-up-your-group-tps-repository)
   - Getting used to program an e-puck2: use the on board debugger interface for programming and debugging [Part 5.1](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#-tutorial-for-programming-the-epuck2-robot)
   - Writing a first LED blinking program, first with *NOP* loops, then using timers
@@ -90,28 +90,35 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - Now that you have built your code and created an **.elf** file that can be loaded on the microcontroller, you can program the device:
   - Plug the USB cable (no need to turn on the e-puck2 using the dedicated button since the programmer MCU will automatically power the main MCU) 
   - Specify the port to which the EPuck2's gdb-server is connected, click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Presenting-the-EPuck2#identify-the-ports) for more info
-  - To "program" the EPuck2, click on `Run and Debug`
+  - Program the EPuck2 by clicking on `Run and Debug`
 - 💡 click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%90%9B-Debugging) for more info about programming and debugging
 
 
 # Part 6 - STM32F4 Microcontroller and GPIO configuration
+- Firt read through all this documentation page
+  - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-Presenting-the-STM32)
 ## 6.1 Blink a LED automatically
 > `Task 1`
-> Use a simple delay function to make **LED7** blink in a while loop at 1 Hz.
-> Hints:
->   - Consult the electrical schema of the e-puck2 to find the **LED7** IO pin.
+>- Use a simple delay function to make **LED7** blink in a while loop at 1 Hz
+>- Hints:
+>   - Consult the electrical schema of the e-puck2 to find the **LED7** IO pin
 >   - Use the functions declared in *TP1_blinky/blinky/gpio.c* to modify the state of the pin on which the LED is connected, and create a function that generate a time delay using assembly nop instructions
-
+- 💡 keep in mind it is possible to watch the stgate of the register when the code is running in the EPuck2 !
 ## 6.2 Blink only the Front LED
 > `Task 2`
-> Modify your code to blink only the 5mm red **FRONT_LED**.
-> Hints:
->   - Consult the electrical schema of the e-puck2 to find the **FRONT_LED** IO pin. If the LED doesn’t blink, compare the LED driving topology with the previous one and try to play with the **PUPDR** and **OTYPER** GPIO registers from the EmbSys Registers tabular. 
->   - Use the oscilloscope to measure the voltage level on the FRONT_LED test point, under the marked **FL** on the transparent cover (Fig. 11). **You can connect the GND to the screw that holds the cover**.
->   Describe the influence of both registers and try to explain the situation. Adapt your code for this Output topology.
->   Take the opportunity to use the oscilloscope to measure the influence of 2 extreme values of **OSPEEDR** configuration for this GPIO and take a plot of both for rising and falling edges.
->   
->   <sup> Don’t forget to pause the debugger to be able to change the register value from the EmbSys Registers</sup>
+>- Modify your code to blink only the 5mm red **FRONT_LED**
+>- Hints:
+>    - Consult the electrical schema of the e-puck2 to find the **FRONT_LED** IO pin
+>    - If the LED doesn’t blink, compare the LED driving topology with the previous one and try to play with the **PUPDR** and **OTYPER** GPIO registers from the EmbSys Registers tabular
+>    - Use the oscilloscope to measure the voltage level on the FRONT_LED test point, under the marked **FL** on the transparent cover (see below)
+>    - 💡 **You can connect the GND to the screw that holds the cover**
+>    - Describe the influence of both registers and try to explain the situation
+>    - Adapt your code for this Output topology
+>    - Take the opportunity to use the oscilloscope to measure the influence of 2 extreme values of **OSPEEDR** configuration for this GPIO and take a plot of both for rising and falling edges
+<p float="left">
+  <img src="https://github.com/EPFL-MICRO-315/TPs-Student/pictures/TestPoint.jpg" alt="drawing" width="900"/>
+</p>
+- 💡 Don’t forget to pause the debugger to be able to change the register value from the EmbSys Registers
 
 
 ## 6.3 Blink only the 4 Body LEDs
