@@ -97,6 +97,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 # Part 6 - STM32F4 Microcontroller and GPIO configuration
 - Firt read through all this documentation page
   - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-Presenting-the-STM32)
+
 ## 6.1 Blink a LED automatically
 > `Task 1`
 >- Use a simple delay function to make **LED7** blink in a while loop at 1 Hz
@@ -104,6 +105,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 >   - Consult the electrical schema of the e-puck2 to find the **LED7** IO pin
 >   - Use the functions declared in *TP1_blinky/blinky/gpio.c* to modify the state of the pin on which the LED is connected, and create a function that generate a time delay using assembly nop instructions
 - 💡 keep in mind it is possible to watch the stgate of the register when the code is running in the EPuck2 !
+
 ## 6.2 Blink only the Front LED
 > `Task 2`
 >- Modify your code to blink only the 5mm red **FRONT_LED**
@@ -116,27 +118,33 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 >    - Adapt your code for this Output topology
 >    - Take the opportunity to use the oscilloscope to measure the influence of 2 extreme values of **OSPEEDR** configuration for this GPIO and take a plot of both for rising and falling edges
 <p float="left">
-  <img src="https://github.com/EPFL-MICRO-315/TPs-Student/blob/TP1_Exercise/pictures/TestPoint.jpg" alt="drawing" width="900"/>
+  <img src="https://github.com/EPFL-MICRO-315/TPs-Student/blob/TP1_Exercise/pictures/TestPoint.jpg" alt="drawing" width="700"/>
 </p>
 - 💡 Don’t forget to pause the debugger to be able to change the register value from the EmbSys Registers
 
-
 ## 6.3 Blink only the 4 Body LEDs
 > `Task 3`
-> Modify your code to blink only the 4 green **BODY_LEDs**.
-> Hints:
+>- Modify your code to blink only the 4 green **BODY_LEDs**
+>- Hints:
 >   - Consult the electrical schema of the e-puck2 to find the **BODY_LED** IO pin
->   - If the LEDs don’t blink, check in detail all characteristics of this GPIO (port, pins, topology).
->   - Can you explain why this output topology is used for **BODY_LED** and not the same than
-the **LED7** one for example?
+>   - If the LEDs don’t blink, check in detail all characteristics of this GPIO (port, pins, topology)
+>   - Can you explain why this output topology is used for **BODY_LED** and not the same than the **LED7** one for example?
 
 ## 6.4 Blink many LEDs automatically with a circular pattern
 > `Task 4`
-> Blink the **LED1** → **LED3** → **LED5** → **LED7** with a circular pattern, with ON1→ON3→ON5→ON7→OFF1→OFF3→OFF5→OFF7 or ON1→OFF1→ON3→OFF3→ON5→OFF5→ON7→OFF7 sequence depending of the Selector state.
-> Hints:
-> - Consult the electrical schema of the e-puck2 to find the **LED1**, **LED3**, **LED5** and the **Selector** IO pins.
-> - Create a function that returns the Selector states. You must obviously configure the correct pins in the correct way to be able to read the Selector state. You can then visualize the state of the Selector by looking at the IDR register of the related pins with the EmbSys Registers tabular.
-> - Have a look on the comment close to the selector on the schema. Can you explain it?
-> - Define different LED sequences depending on the Selector state
+>- Blink the **LED1** → **LED3** → **LED5** → **LED7** with the following circular pattern sequence depending on the Selector state:
+>    - ON1→ON3→ON5→ON7→OFF1→OFF3→OFF5→OFF7 or
+>    - ON1→OFF1→ON3→OFF3→ON5→OFF5→ON7→OFF7
+>- Hints:
+>    - Consult the electrical schema of the e-puck2 to find the **LED1**, **LED3**, **LED5** and the **Selector** IO pins
+>    - Create a function that returns the Selector states
+>        - You must obviously configure the correct pins in the correct way to be able to read the Selector state
+>        - You can then visualize the state of the Selector by looking at the IDR register of the related pins with the register tab when debugging
+>    - Have a look on the comment close to the selector on the schema, can you explain it?
+>    - Define different LED sequences depending on the Selector state
+- 💡 The e-puck2 is equipped with a selector that you can use to configure different modes
+  <p float="left">
+    <img src="https://github.com/EPFL-MICRO-315/TPs-Student/blob/TP1_Exercise/pictures/Selector.png" alt="drawing" width="700"/>
+  </p>
 
 # Part 7 - Timer Interrupt Tutorial
