@@ -95,8 +95,9 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 
 
 # Part 6 - STM32F4 Microcontroller and GPIO configuration
-- First read through all this documentation page
+- First read up to the end of those 2 documentation pages
   - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-Presenting-the-STM32)
+  - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-GPIO)
 
 ## 6.1 Blink a LED automatically
 > `Task 1`
@@ -169,7 +170,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - When the ISR returns, the processor's registers are restored and the execution of the main program continues.
 - In the timer interrupt you have to manually clear the update interrupt flag **UIF** in the timer status register **SR** (see *TIM6/TIM7* status register (TIMx_SR)* Reference Manual page 708)
 
-## 7.3 Toogle LED7 with TIM7 at 1Hz
+## 7.3 Toggle LED7 with TIM7 at 1Hz
 > `Task 6`
 >- Write a code that toggles the LED 7 of the e-puck2 robot using timer 7 implemented in the file *timer.c*
 >- Hint:
