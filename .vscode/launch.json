@@ -6,8 +6,8 @@
     "configurations": [
         {
             "name": "BMP launch to main",
-            "cwd": "${workspaceRoot}/build",
-            "executable": "${workspaceRoot}/build/blinky.elf",
+            "cwd": "${workspaceRoot}/src",
+            "executable": "${workspaceRoot}/src/blinky.elf",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "bmp",
@@ -22,8 +22,8 @@
         },
         {
             "name": "BMP launch to reset (PC=0)",
-            "cwd": "${workspaceRoot}/build",
-            "executable": "${workspaceRoot}/build/blinky.elf",
+            "cwd": "${workspaceRoot}/src",
+            "executable": "${workspaceRoot}/src/blinky.elf",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "bmp",
@@ -38,8 +38,8 @@
         },
         {
             "name": "BMP attach",
-            "cwd": "${workspaceRoot}/build",
-            "executable": "${workspaceRoot}/build/blinky.elf",
+            "cwd": "${workspaceRoot}/src",
+            "executable": "${workspaceRoot}/src/blinky.elf",
             "request": "attach",
             "type": "cortex-debug",
             "servertype": "bmp",
