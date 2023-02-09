@@ -12,9 +12,9 @@
 To achieve the main goal, we will go through the following steps:
   - Installing and getting familiar with the IDE (Integrated Development Environment): [Part 1](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-1---integrated-development-environment-ide)
   - Getting familiar with e-puck2 robot: [Part 2](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-2---presenting-the-epuck2-robot)
-  - Understand the basic of the version control tool *Git*, *MANDATORY* for this course: [Part 3](https://githusameb.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-3---git-introduction)
+  - Understand the basic of the version control tool *Git*, *MANDATORY* for this course: [Part 3](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-3---git-introduction)
   - Setup the git repository for your group: [Part 4](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-4---setting-up-your-group-tps-repository)
-  - Getting used to program an e-puck2: use the on board debugger interface for programming and debugging [Part 5.1](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#-tutorial-for-programming-the-epuck2-robot)
+  - Getting used to program an e-puck2: use the on board debugger interface for programming and debugging [Part 5](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-5---tutorial-for-programming-the-epuck2-robot)
   - Writing a first LED blinking program, first with *NOP* loops, then using timers
   - Change the LED's blinking sequence using the selector
   
@@ -22,7 +22,7 @@ To achieve the main goal, we will go through the following steps:
 Click on one the links accordingly to your computer's configuration
 - 👉 [❖ Windows](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Installing-the-IDE-%E2%9D%96-Windows)
 - 👉 [🍎 MacOS](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Installing-the-IDE-%F0%9F%8D%8E-MacOS)
-- 👉 [🐧 Linux](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Installing-the-%F0%9F%90%A7-Linux)
+- 👉 [🐧 Linux](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Installing-the-IDE-%F0%9F%90%A7-Linux)
 
 The IDE now freshly installed, let's start by quickly presenting IDE which we will use throuhought this whole semester.
 - 👉 [🛠 Tools](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%9B%A0-Tools)
@@ -43,7 +43,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 ## 5.0 🔌 Preparation 
 - Make sure you are in the right branch (TP1_Exercise), if not you must do a **checkout TP1_Exercise**
 - Open the folder TPs with VSCode Epuck2
-- Run the task `Link Librairy ST to workspace`
+- Run the task `Link Library ST to workspace`
 
 ## 5.1 🔨 Building the Project
 - Building the code consists of compiling the **\*.c** and **\*.s** files to create object files, **\*.o**, and then linking the object files to create the **blinky.elf** file
@@ -95,9 +95,8 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 
 
 # Part 6 - STM32F4 Microcontroller and GPIO configuration
-- First read up to the end of those 2 documentation pages
+- First read through all this documentation page
   - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-Presenting-the-STM32)
-  - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-GPIO)
 
 ## 6.1 Blink a LED automatically
 > `Task 1`
@@ -170,7 +169,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - When the ISR returns, the processor's registers are restored and the execution of the main program continues.
 - In the timer interrupt you have to manually clear the update interrupt flag **UIF** in the timer status register **SR** (see *TIM6/TIM7* status register (TIMx_SR)* Reference Manual page 708)
 
-## 7.3 Toggle LED7 with TIM7 at 1Hz
+## 7.3 Toogle LED7 with TIM7 at 1Hz
 > `Task 6`
 >- Write a code that toggles the LED 7 of the e-puck2 robot using timer 7 implemented in the file *timer.c*
 >- Hint:
