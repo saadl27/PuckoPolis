@@ -1,7 +1,0 @@
-ST 
-*.o
-*.d
-*.elf
-*.list
-*.mem
-*.size
