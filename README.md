@@ -38,6 +38,7 @@ The IDE now freshly installed, let's start by quickly presenting the IDE which w
 # Part 4 - Setting up your group TP's repository
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs) to set up git for the TPs
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Working-in-groups) to learn how to work in group using Git
+- Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Asking-for-support) to check how to ask for support
 
 # Part 5 - Tutorial for programming the EPuck2 robot
 ## 5.0 🔌 Preparation 
