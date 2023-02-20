@@ -1,6 +1,6 @@
 # Introduction
 - Welcome in the very first lab of MICRO-315
-- `Goal`: learn how to program and debug the e-puck2 robot and familiarize with the STM32F4 microcontroller family
+- `Goal`: learn how to program and debug the e-puck2 robot and familiarize with the STM32F4 microcontroller family and Git
 - `⏱ Duration`: 4 hours
 
 ## Goals
@@ -10,11 +10,11 @@
 
 ## Methodology
 To achieve the main goal, we will go through the following steps:
-  - Installing and getting familiar with the IDE (Integrated Development Environment): [Part 1](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-1---integrated-development-environment-ide)
-  - Getting familiar with e-puck2 robot: [Part 2](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-2---presenting-the-epuck2-robot)
-  - Understand the basic of the version control tool *Git*, *MANDATORY* for this course: [Part 3](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-3---git-introduction)
-  - Setup the git repository for your group: [Part 4](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-4---setting-up-your-group-tps-repository)
-  - Getting used to program an e-puck2: use the on board debugger interface for programming and debugging [Part 5](https://github.com/EPFL-MICRO-315/TPs-Student/tree/TP1_Exercise#part-5---tutorial-for-programming-the-epuck2-robot)
+  - Installing and getting familiar with the IDE (Integrated Development Environment): [Part 1](#part-1---integrated-development-environment-ide)
+  - Getting familiar with e-puck2 robot: [Part 2](#part-2---presenting-the-epuck2-robot)
+  - Understand the basic of the version control tool *Git*, *MANDATORY* for this course: [Part 3](#part-3---git-introduction)
+  - Setup the git repository for your group: [Part 4](#part-4---setting-up-your-group-tps-repository)
+  - Getting used to program an e-puck2: use the on board debugger interface for programming and debugging [Part 5](#part-5---tutorial-for-programming-the-epuck2-robot)
   - Writing a first LED blinking program, first with *NOP* loops, then using timers
   - Change the LED's blinking sequence using the selector
   
@@ -24,7 +24,7 @@ Click on one the links accordingly to your computer's configuration
 - 👉 [🍎 MacOS](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Installing-the-IDE-%F0%9F%8D%8E-MacOS)
 - 👉 [🐧 Linux](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Installing-the-IDE-%F0%9F%90%A7-Linux)
 
-The IDE now freshly installed, let's start by quickly presenting IDE which we will use throuhought this whole semester.
+The IDE now freshly installed, let's start by quickly presenting the IDE which we will use throuhought the semester.
 - 👉 [🛠 Tools](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%9B%A0-Tools)
 - 👉 [🗔 User Interface](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%97%94-User-Interface)
 
@@ -33,7 +33,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - 👉 [Testing the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Testing-the-EPuck2)
 
 # Part 3 - Git introduction
-- 👉 [Click here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Introduction-to-Git)
+- 👉 [Introduction to Git](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Introduction-to-Git)
 
 # Part 4 - Setting up your group TP's repository
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs) to set up git for the TPs
@@ -41,8 +41,8 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 
 # Part 5 - Tutorial for programming the EPuck2 robot
 ## 5.0 🔌 Preparation 
-- Make sure you are in the right branch (TP1_Exercise), if not you must do a **checkout TP1_Exercise**
 - Open the folder TPs with VSCode Epuck2
+- Make sure you are in the right branch (TP1_Exercise), if not you must do a **git checkout TP1_Exercise**
 - Run the task `Link Library ST to workspace`
 
 ## 5.1 🔨 Building the Project
@@ -96,8 +96,8 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 
 # Part 6 - STM32F4 Microcontroller and GPIO configuration
 - First read up to the end of those 2 documentation pages
-  - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-Presenting-the-STM32)
-  - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-GPIO)
+  - click 👉 [Presenting the STM32](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-Presenting-the-STM32)
+  - click 👉 [STM32 GPIO](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-GPIO)
 
 ## 6.1 Blink a LED automatically
 > `Task 1`
@@ -119,7 +119,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 >    - Adapt your code for this Output topology
 >    - Take the opportunity to use the oscilloscope to measure the influence of 2 extreme values of **OSPEEDR** configuration for this GPIO and take a plot of both for rising and falling edges
 <p float="left">
-  <img src="https://github.com/EPFL-MICRO-315/TPs-Student/blob/TP1_Exercise/pictures/TestPoint.jpg" alt="drawing" width="700"/>
+  <img src="pictures/TestPoint.jpg" alt="drawing" width="700"/>
 </p>
 - 💡 Don’t forget to pause the debugger to be able to change the register value from the EmbSys Registers
 
@@ -145,7 +145,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 >    - Define different LED sequences depending on the Selector state
 - 💡 The e-puck2 is equipped with a selector that you can use to configure different modes
   <p float="left">
-    <img src="https://github.com/EPFL-MICRO-315/TPs-Student/blob/TP1_Exercise/pictures/Selector.png" alt="drawing" width="700"/>
+    <img src="pictures/Selector.png" alt="drawing" width="700"/>
   </p>
 
 # Part 7 - Timer Interrupt Tutorial
@@ -154,7 +154,7 @@ The IDE now freshly installed, let's start by quickly presenting IDE which we wi
 - It is then in the interrupt routine generated by the timer that you will have to change the state of the LED.
 - First read through all this documentation page
   - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-Timer)
-- The configuration of the timer will be done in the file *TP1_blinky/blinky/timer.c
+- The configuration of the timer will be done in the file *TP1_blinky/blinky/timer.c*
 
 ## 7.1 Configure TIM7 to have interrupts at 1Hz
 > `Task 5`
