@@ -90,7 +90,7 @@ The IDE now freshly installed, let's start by quickly presenting the IDE which w
 ## 5.2 🐞 Programming and debugging the EPuck2 robot
 - Now that you have built your code and created an **.elf** file that can be loaded on the microcontroller, you can program the device:
   - Plug the USB cable (no need to turn on the e-puck2 using the dedicated button since the programmer MCU will automatically power the main MCU) 
-  - Specify the port to which the EPuck2's gdb-server is connected, click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Presenting-the-EPuck2#identify-the-ports) for more info
+  - Specify the port to which the EPuck2's gdb-server is connected, click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Communicating-with-the-EPuck2#identify-the-ports) for more info
   - Program the EPuck2 by clicking on `Run and Debug`
 - 💡 click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%90%9B-Debugging) for more info about programming and debugging
 
