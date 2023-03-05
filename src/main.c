@@ -1,7 +1,7 @@
 #include <stm32f4xx.h>
 #include <system_clock_config.h>
-#include <gpio.h>
-#include <main.h>
+#include "gpio.h"
+#include "main.h"
 
 // Init function required by __libc_init_array
 void _init(void) {}

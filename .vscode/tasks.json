@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Make",
+            "label": "Make TP1 Exercise",
             "type": "shell",
             "command": "${config:make_path} -j",
             "group": {
@@ -17,7 +17,7 @@
             }
         },
         {
-            "label": "Clean",
+            "label": "Clean TP1 Exercise",
             "type": "shell",
             "command": "${config:make_path} clean",
             "group": {
@@ -26,6 +26,15 @@
             },
             "options": {
                 "cwd": "${workspaceFolder}/src/"
+            }
+        },
+        {
+            "label": "Link Librairy ST to TP1 Exercise",
+            "type": "shell",
+            "command": "if [ -d \"ST\" ]; then echo -n -e '\\033[1;32m'Link ST already present !; echo '\\033[0m'; echo ; else ln -s ${config:workplace}/Lib/ST ${workspaceFolder}/. ; fi",
+            "group": {
+                "kind": "build",
+                "isDefault": true
             }
         }
     ]

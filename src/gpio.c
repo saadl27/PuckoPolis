@@ -1,6 +1,5 @@
 #include <stm32f407xx.h>
-#include <gpio.h>
-#include <main.h>
+#include "gpio.h"
 
 void gpio_config_output_opendrain(GPIO_TypeDef *port, unsigned int pin)
 {

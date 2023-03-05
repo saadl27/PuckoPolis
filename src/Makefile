@@ -13,7 +13,7 @@ INCDIR = . ../ST
 
 #external .a lib files
 LIBS = 
-LIBDIR = ./
+LIBDIR = 
 
 #external .o files
 LIB_OBJS =
@@ -23,7 +23,6 @@ LDSCRIPT = ../ST/STM32F407VGTx_FLASH.ld
 DEFS = -DSTM32F4 -DSTM32F407xx
 
 OBJS = $(CSRC:.c=.o) $(ASMSRC:.s=.o) 
-
 IINCDIR = $(patsubst %,-I%,$(INCDIR))
 LLIBDIR = $(patsubst %,-L%,$(LIBDIR))
 
@@ -101,6 +100,6 @@ $(PROJECT).mem: $(PROJECT).elf
 
 .PHONY: flash
 flash: all
-	arm-none-eabi-gdb --command=../../debug.gdb --command=../../flash.gdb blinky.elf
+	arm-none-eabi-gdb --command=../../debug.gdb --command=../../flash.gdb $(PROJECT).elf
 
 -include $(CSRC:%.c=%.d)
