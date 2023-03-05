@@ -261,7 +261,7 @@ To understand how the code is generated, it is important to understand how the c
 >   - Use a timer frequency of about **100kHz**
 >   - The speed will be given by the counter value you will assign to the **ARR** register
 >   - The bigger **ARR** is, the slower the motor will turn
->   - Fordbid speed above 13cm/s
+>   - Forbid speed above 13cm/s
 >   - add motor.c in the **makefile** on the line listing the .c files to be compiled
 >- Hint: Test these functions with a simple demo that moves forward for 10 cm, turns 180 degrees, and comes back to the starting point
 

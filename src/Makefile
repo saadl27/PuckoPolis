@@ -97,6 +97,6 @@ $(PROJECT).mem: $(PROJECT).elf
 
 .PHONY: flash
 flash: all
-	arm-none-eabi-gdb --command=../../debug.gdb --command=../../flash.gdb blinky.elf
+	arm-none-eabi-gdb --command=../../debug.gdb --command=../../flash.gdb $(PROJECT).elf
 
 -include $(CSRC:%.c=%.d)

@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stm32f4xx.h>
-#include <gpio.h>
-#include <motor.h>
+#include "gpio.h"
+#include "motor.h"
 
 #define TIMER_CLOCK         84000000
 #define TIMER_FREQ          100000 // [Hz]
