@@ -1,6 +1,6 @@
 #include <stm32f4xx.h>
 #include "gpio.h"
-#include "main.h"  ## Here only for internal use of BODY_LED but a call-back will be preferable!!
+#include "main.h"  // Here only for internal use of BODY_LED but a call-back will be preferable!!
 
 #define TIMER_CLOCK         84000000    // APB1 clock
 #define PRESCALER_TIM7      8400        // timer frequency: 10kHz
