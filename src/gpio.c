@@ -51,6 +51,30 @@ void gpio_config_output_pushpull(GPIO_TypeDef *port, unsigned int pin)
     port->MODER = (port->MODER & ~(3 << (pin * 2))) | (1 << (pin * 2));
 }
 
+void gpio_config_output_af_pushpull(GPIO_TypeDef *port, unsigned int pin, uint8_t af_number)
+{
+    // Alternate function number
+    if(pin < 8){
+        //set on the AFRL register (pin 0 to 7)
+        port->AFR[0] |= (af_number << (pin * 4));
+    }else{
+        //set on the AFRH register (pin 8 to 15)
+        port->AFR[1] |= (af_number << ((pin - 8) * 4));
+    }
+
+    // Output type pushpull : OTy = 0
+    port->OTYPER &= ~(1 << pin);
+
+    // Output data low : ODRy = 0
+    port->ODR &= ~(1 << pin);
+
+    // Floating, no pull-up/down : PUPDRy = 00
+    port->PUPDR &= ~(3 << (pin * 2));
+
+    // Alternate function mode : MODERy = 10
+    port->MODER = (port->MODER & ~(3 << (pin * 2))) | (2 << (pin * 2));
+}
+
 void gpio_set(GPIO_TypeDef *port, unsigned int pin)
 {
     port->BSRR = (1 << pin);

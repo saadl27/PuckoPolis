@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "TP2 Exercise: Make",
+            "label": "TP2 Solution: Make",
             "type": "shell",
             "command": "${config:make_path} -j",
             "group": {
@@ -20,7 +20,7 @@
             }
         },
         {
-            "label": "TP2 Exercise: Clean",
+            "label": "TP2 Solution: Clean",
             "type": "shell",
             "command": "${config:make_path} clean",
             "group": {
@@ -35,7 +35,7 @@
             }
         },
         {
-            "label": "TP2 Exercise:(Link Library ST)",
+            "label": "TP2 Solution:(Link Library ST)",
             "type": "shell",
             "command": "if [ -d \"ST\" ]; then echo -n -e '\\033[0;91m'Link ST already present !; echo '\\033[0m'>>/dev/null; else ln -s ${config:workplace}/Lib/ST . ; echo -n -e '\\033[1;32m'Link ST done !; echo '\\033[0m'>>/dev/null; fi; echo '\n'",
             "group": {

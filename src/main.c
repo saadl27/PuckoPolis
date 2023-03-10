@@ -27,11 +27,40 @@ int main(void)
 {
     SystemClock_Config();
 
-    // Enable GPIOD and GPIOE peripheral clock
+    // Enable GPIOD and GPIOB peripheral clock for the LEDs
     RCC->AHB1ENR    |= RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIODEN;
 
+    //config the GPIO for PWM (alternate function 2)
+    gpio_config_output_af_pushpull(FRONT_LED, 2);
+    //config the timer with a given duty_cycle
+    timer4_PWM_start(0);
+
+    // BODY_LED init
+    gpio_config_output_pushpull(BODY_LED);
+
+    init_selector();
+    motor_init();
+
+    //waits before moving to let us position the robot before it moves
+    delay(SystemCoreClock/8);
+
+    //move 20cm forward at 5cm/s 
+    motor_set_position(20, 20, 5, 5);
+    while(motor_position_reached() != POSITION_REACHED);
+    //clockwise rotation of 180° 
+    motor_set_position(PERIMETER_EPUCK/2, PERIMETER_EPUCK/2, -5, 5);
+    while(motor_position_reached() != POSITION_REACHED);
+    //move 20cm forward at 5cm/s 
+    motor_set_position(20, 20, 5, 5);
+    while(motor_position_reached() != POSITION_REACHED);
+    //counterclockwise rotation of 180°
+    motor_set_position(PERIMETER_EPUCK/2, PERIMETER_EPUCK/2, 5, -5);
+    while(motor_position_reached() != POSITION_REACHED);
+
     while (1) {
-        
+        delay(SystemCoreClock/32);
+        gpio_toggle(BODY_LED);
+        timer4_set_duty_cycle(get_selector() / (float)MAX_VALUE_SELECTOR);
     }
 }
 
