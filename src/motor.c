@@ -12,6 +12,9 @@
 #define NB_OF_PHASES        4  //number of phases of the motors
 #define WHEEL_PERIMETER     13 // [cm]
 
+/*
+* GPIO port and pin to be able to control the motors
+*/
 #define MOTOR_RIGHT_A	GPIOE, 13
 #define MOTOR_RIGHT_B	GPIOE, 12
 #define MOTOR_RIGHT_C	GPIOE, 14
@@ -22,15 +25,16 @@
 #define MOTOR_LEFT_C	GPIOE, 11
 #define MOTOR_LEFT_D	GPIOE, 10
 
-#define MOTOR_RIGHT_TIMER		TIM6
-#define MOTOR_RIGHT_TIMER_EN	RCC_APB1ENR_TIM6EN
-#define MOTOR_RIGHT_IRQHandler	TIM6_DAC_IRQHandler
-#define MOTOR_RIGHT_IRQ			TIM6_DAC_IRQn
+//timers to use for the motors
+#define MOTOR_RIGHT_TIMER       TIM6
+#define MOTOR_RIGHT_TIMER_EN    RCC_APB1ENR_TIM6EN
+#define MOTOR_RIGHT_IRQHandler  TIM6_DAC_IRQHandler
+#define MOTOR_RIGHT_IRQ         TIM6_DAC_IRQn
 
-#define MOTOR_LEFT_TIMER		TIM7
-#define MOTOR_LEFT_TIMER_EN		RCC_APB1ENR_TIM7EN
-#define MOTOR_LEFT_IRQ			TIM7_IRQn
-#define MOTOR_LEFT_IRQHandler	TIM7_IRQHandler
+#define MOTOR_LEFT_TIMER        TIM7
+#define MOTOR_LEFT_TIMER_EN     RCC_APB1ENR_TIM7EN
+#define MOTOR_LEFT_IRQ          TIM7_IRQn
+#define MOTOR_LEFT_IRQHandler   TIM7_IRQHandler
 
 #define SPEED_CONTROL       0
 #define POSITION_CONTROL    1
@@ -55,6 +59,9 @@ static const uint8_t step_table[NSTEP_ONE_EL_TURN][NB_OF_PHASES] = {
     {1, 0, 0, 1},
 };
 
+/*
+*   Performs the init of the timers and of the gpios used to control the motors
+*/
 void motor_init(void)
 {
     // motor GPIO configuration
@@ -103,6 +110,10 @@ void motor_init(void)
     MOTOR_LEFT_TIMER->CR1 = TIM_CR1_CEN;    // enable timer
 }
 
+/*
+*   Updates the state of the gpios of the right motor given an array of 4 elements
+*   describing the state. For example step_table[0] which gives the first step.
+*/
 static void right_motor_update(const uint8_t *out)
 {
     // Right motor
@@ -112,6 +123,10 @@ static void right_motor_update(const uint8_t *out)
     out[3] ? gpio_set(MOTOR_RIGHT_D) : gpio_clear(MOTOR_RIGHT_D);
 }
 
+/*
+*   Updates the state of the gpios of the left motor given an array of 4 elements
+*   describing the state. For exeample step_table[0] which gives the first step.
+*/
 static void left_motor_update(const uint8_t *out)
 {
     // Left motor
@@ -121,6 +136,10 @@ static void left_motor_update(const uint8_t *out)
     out[3] ? gpio_set(MOTOR_LEFT_D) : gpio_clear(MOTOR_LEFT_D);
 }
 
+/*
+*   Stops the motors (all the gpio must be clear to 0) and set 0 to the ARR register of the timers to prevent
+*   the interrupts of the timers (because it never reaches 0 after an increment)
+*/
 void motor_stop(void)
 {
 	//Set to 0 each phase
@@ -132,7 +151,10 @@ void motor_stop(void)
 	MOTOR_LEFT_TIMER->ARR = 0;
 }
 
-uint8_t motor_position_reached(void)
+/*
+*   Sets the position to reach for each motor.
+*   The parameters are in cm for the positions and in cm/s for the speeds.
+*/uint8_t motor_position_reached(void)
 {
     if(state_motor == POSITION_CONTROL && position_right_reached && position_left_reached){
         return POSITION_REACHED;
@@ -160,6 +182,10 @@ void motor_set_position(float position_r, float position_l, float speed_r, float
 	state_motor = POSITION_CONTROL;
 }
 
+/*
+*   Sets the speed of the motors.
+*   The parameters are in cm/s for the speed.
+*/
 void motor_set_speed(float speed_r, float speed_l)
 {
 	int speed_r_step_s,speed_l_step_s;
@@ -191,7 +217,10 @@ void motor_set_speed(float speed_r, float speed_l)
     MOTOR_LEFT_TIMER->ARR = (TIMER_FREQ / abs(speed_l_step_s))-1;
 }
 
-// Motor right Interrupt Service Routine
+/*
+*   Motor right Interrupt Service Routine
+*   Performs a step of the motor and stops it if it reaches the position given in motor_set_position().
+*/
 void MOTOR_RIGHT_IRQHandler(void)
 {
     /*
@@ -234,7 +263,9 @@ void MOTOR_RIGHT_IRQHandler(void)
     MOTOR_RIGHT_TIMER->SR;	// Read back in order to ensure the effective IF clearing
 }
 
-// Motor left Interrupt Service Routine
+/*
+*   Motor left Interrupt Service Routine
+*/
 void MOTOR_LEFT_IRQHandler(void)
 {
 
