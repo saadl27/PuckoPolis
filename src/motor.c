@@ -12,6 +12,17 @@
 #define NB_OF_PHASES        4  //number of phases of the motors
 #define WHEEL_PERIMETER     13 // [cm]
 
+//timers to use for the motors
+#define MOTOR_RIGHT_TIMER       TIM6
+#define MOTOR_RIGHT_TIMER_EN    RCC_APB1ENR_TIM6EN
+#define MOTOR_RIGHT_IRQHandler  TIM6_DAC_IRQHandler
+#define MOTOR_RIGHT_IRQ         TIM6_DAC_IRQn
+
+#define MOTOR_LEFT_TIMER        TIM7
+#define MOTOR_LEFT_TIMER_EN     RCC_APB1ENR_TIM7EN
+#define MOTOR_LEFT_IRQ          TIM7_IRQn
+#define MOTOR_LEFT_IRQHandler   TIM7_IRQHandler
+
 /*
 * GPIO port and pin to be able to control the motors
 */
@@ -24,17 +35,6 @@
 #define MOTOR_LEFT_B	GPIOE, 8
 #define MOTOR_LEFT_C	GPIOE, 11
 #define MOTOR_LEFT_D	GPIOE, 10
-
-//timers to use for the motors
-#define MOTOR_RIGHT_TIMER       TIM6
-#define MOTOR_RIGHT_TIMER_EN    RCC_APB1ENR_TIM6EN
-#define MOTOR_RIGHT_IRQHandler  TIM6_DAC_IRQHandler
-#define MOTOR_RIGHT_IRQ         TIM6_DAC_IRQn
-
-#define MOTOR_LEFT_TIMER        TIM7
-#define MOTOR_LEFT_TIMER_EN     RCC_APB1ENR_TIM7EN
-#define MOTOR_LEFT_IRQ          TIM7_IRQn
-#define MOTOR_LEFT_IRQHandler   TIM7_IRQHandler
 
 #define SPEED_CONTROL       0
 #define POSITION_CONTROL    1
