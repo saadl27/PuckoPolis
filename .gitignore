@@ -1,7 +1,10 @@
-ST
+ST/
+e-puck2_main-processor/
 *.o
 *.d
 *.elf
 *.list
 *.mem
 *.size
+*.sizelib
+.DS_Store
