@@ -11,6 +11,8 @@
     - **test.o**:
         - created by the assembler
         - is an object file and contains machine language
+    - **test.d**:
+        - D source code file: contains all the information about the different includes within the .c file
 
 # Task 2: Assembly code description
 >### Code block 1
@@ -98,8 +100,8 @@ See [table 1](#table-1-optimization-and-warnings)
 - The effect of the different options are summed up in the [table below](#table-1-optimization-and-warnings)
 - ⚠ There are also several remarks that we would like to stress and which effect you should have observed or deducted during the compilation:
   - **Funroll** option:
-    - unrolls the loops only if the number of iterations is known in advance, which tends to decrease the size of the code, thus the execution speed
-    - However, this could be problematic, if for instance we measure a sensor value in this loop, or we have a waiting loop using for instance the instruction nop inside a loop. Therefore, option O3 and funroll-loops should be used with precaution, and only if it is required to have a very fast code
+    - unrolls the loops only if the number of iterations is known in advance, which tends to decrease the execution speed but increases the size of the code as a counterpart
+    - However, this could be problematic if for instance we measure a sensor value in this loop or we have a waiting loop using the nop instruction. Loops may also drastically increase the usage of registers and reduce performance, as well as potentially running out of available registers on the processor and thus needing additionnal spill code. Therefore, option O3 and funroll-loops should be used with precaution, and only if it is required to have a very fast code
     - Otherwise, this is too much risks for an embedded system
   - 💡 The **warning** do not influence the compilation, therefore, a code can compile with possible mistakes in the code, therefore, always take a look at the warnings and resolve them
   - 💡 The readability of the assembly code will be more or less facilitated by the degree of optimization
@@ -553,4 +555,4 @@ See [code block 2](#code-block-2)
 - The command argument **-ar** regroup several **.o** files in one archive
 - We can use it to make any type of archive, but it is generally used to create static library
 - This static library can then be given to other people with the **.h** files
-- Like that they cannot kwow how is done the implementation of the functions but they can use them
+- Like that they cannot know how is done the implementation of the functions but they can use them
