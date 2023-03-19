@@ -1,184 +1,353 @@
-# Introduction
-- Introduces the concept of a RTOS using ChibiOS as an example, utilization of the IMU
-- ChibiOS: a RTOS optimized for the execution speed and the size of the code, it contains a lot of drivers to use the peripherals of the STM32 families
-- `Goal`: Understand the RTOS main mechanisms and complete some functions to correct the offset of the IMU, convert the raw measurements into known units and turn on the leds depending on the orientation of the robot
-- `⏱ Duration`: 4 hours
+# Task 1: Thread sleep
+- The best practice to use when working with threads is to specify moments when the threads can sleep. This means another thread can wake up if needed without the need to interrupt another thread or to switch regularly between threads. This frees the resources of the microcontroller and thus guarantees better timing for the threads
+- **chThdSleepUntilWindowed()**: put the thread into sleep and tell ChibiOS ***to wake up the thread at the specified time***
+- **chThdSleepMilliseconds()**: put the thread into sleep ***during a specified amount of time in ms from the call***
+- The difference between **chThdSleepUntilWindowed()** and **chThdSleepMilliseconds()** is the way we choose the duration of the sleep:
+    - Using **chThdSleepMilliseconds()** on a thread which takes 100ms to complete one loop iteration and sleeping it for 500ms, it means the thread will run every 600ms (100ms computational time + 500ms sleep).   
+    But the computational time might not be stable, depending on executed code (conditional code, conditional waiting for example on sensors reading, ...) then the thread would not run at a stable period.
+    - Doing the same with **chThdSleepUntilWindowed()**, it is then possible to specify exactly **when** the thread should wake up, without knowing the computational time of the thread.  
+    The thing is to store the time at which the loop iteration begins as **reference time**, done by calling **chVTGetSystemTime()**, and use it in **chThdSleepUntilWindowed()** by speciying the reference time and until **when** (reference time + desired period time) the thread should sleep after this function call.
+    - For example the [code block 1](#code-block-1), tells the system to wake up the thread every 10ms, no matter how long the thread lasts. Of course we need to be sure the computational time of the thread is smaller than the period we choose, otherwise it will not happen every 10ms.
 
-## ⚠ ToDo before starting the Lab
-- to pull the TP3_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Fetching-Exercises-Solutions)
-- Don't forget to push this branch with the upstream enabled to your origin remote
-- Once on this branch `TP3_Exercise`, normaly the `e-puck2_main-processor` library has certainly not yet been installed. Then do it by running the `Link Library e-puck2_main-processor` task otherwise the code won't compile.
-    <p float="left">
-        <img src="pictures/linkLib.png" alt="drawing" width="200"/>
-    </p>
+>### Code block 1
+```c
+...
+  systime_t time;
 
-## Small tutorial on .gitignore use
-- The purpose of the .gitignore file is simply to tell to `ignore` (`untrack`) specific files or folders
-- In fact, you may have at some point committed "useless" files to your repository
-- Such files could be build generated, libraries or anything not relevant to be pushed on the remote
-- First of all those files takes place on the Github repository, which can greatly increase the downloading and uploading size per commit and unnecessarily polue everywhere (github.com and each local repositories)
+  while(1){
+      time = chVTGetSystemTime();
+      palTogglePad(GPIOD, GPIOD_LED_FRONT);
+      chThdSleepUntilWindowed(time, time + MS2ST(10));
+  }
+...
+```
 
->***
->⚠ From now on, you should `ALWAYS create a .gitignore and properly configure it`
->***
+- 💡 Note : **MS2ST()** macro converts milliseconds to system ticks, the unit used by the function **chThdSleepUntilWindowed()** for example
 
-- Fortunately this process is dead simple:
-    - the file `.gitignore` should be located directly in the root folder of your repository
-    - to ignore a precise folder named `src/func/test/`, simply add the folder path on a newline (simply `src/func/test/`)
-    - to ignore a precise file named `src/func/main.o`, simply add the folder path on a newline (simply `src/func/main.o`)
-    - to ignore any file ending with .elf (like `main.elf`), simply add `*.elf`
-- To ignore the ST and the e-puck2_main-processor librairies, and all the build files, one's .gitignore should look like:
-    - either to [gitignore's content for TP1 or TP2](#gitignores-content-for-tps-using-st-library) if your code is using `ST library`
-    - or to [gitignore's content for TP3 and following](#gitignores-content-for-tps-using-e-puck2_main-processor-library) if your code is using `e-puck2_main-processor` library
+# Task 2: LEDs not blinking
+- The two lines 155-156 used to create the threads are commented. Simply uncomment them
+>### Code block 2
+```c
+...
+    chThdCreateStatic(waThdFrontLed, sizeof(waThdFrontLed), NORMALPRIO, ThdFrontLed, NULL);
+    chThdCreateStatic(waThdBodyLed, sizeof(waThdBodyLed), NORMALPRIO, ThdBodyLed, NULL);
+...
+```
 
->***
->⚠ Your code should `NEVER use these 2 libraries simultaneously`. It is really 2 different worlds to use the low level of the STM32F4 microcontroller
->***
+# Task 3: Period of the threads using thread sleeps
+- [Figure 1](#figure-1) shows that the periods of the LED's commutations is the same as expected in the code. It is normal as the threads use sleep mechanisms. For most usages, timings obtained with threads are precise enough. Otherwise real interrupts must be used.
 
-- >#### .gitignore's content for TPs using ST library
-    >```bash
-    ># Normally required only for TP1 and TP2
-    >ST/
-    >*.o
-    >*.d
-    >*.elf
-    >*.list
-    >*.mem
-    >*.size
-    >*.sizelib
-    >
-    ># Normally required only for TP3 and following
-    ># But keep at less always e-puck2_main-processor if bad use of
-    ># Link Library e-puck2_main-processor task in TPs preceding TP3
-    >e-puck2_main-processor/
-    >
-    ># MacOS specific files but always use if another user can work under MacOS
-    >.DS_Store
-    >
-    ># Windows specific files but always use if another user can work under Windows
-    >Thumbs.db
-    >```
+>### Figure 1
+>Oscilloscope view of **BODY_LED** (yellow) and **FRONT_LED** (blue) using thread sleeps
+  <p float="left">
+    <img src="pictures/Thd_case1.PNG" alt="drawing" width="700"/>
+  </p>
 
-- >#### .gitignore's content for TPs using e-puck2_main-processor library
-    >```bash
-    ># Normally required only for TPs preceding TP3
-    ># But keep at less always ST if bad use of
-    ># "Link Library ST" task in TP3 or following
-    >ST/
-    >
-    ># Normally required only for TP3 and following
-    >e-puck2_main-processor/
-    >build/
-    >.dep/
-    >
-    ># MacOS specific files but always use if another user can work under MacOS
-    >.DS_Store
-    >
-    ># Windows specific files but always use if another user can work under Windows
-    >Thumbs.db
-    >```
-- for further details on .gitignore, have a look at [this page](https://git-scm.com/docs/gitignore)
+# Task 4: Period of the threads using delays
+- Here the difference is that the thread **ThdBodyLed** doesn't go to sleep, thus it uses nearly 100% of the computational time of the microcontroller
+- But more important is that without going to sleep, the other threads need to preempt it to be able to run
+- What is going on is that after the time configured in **chconf.h** on line 82 (see [code block 3](#code-block-3)), the thread **ThdBodyLed** is paused and the system switches the context in order to run the other threads, aka **ThdFrontLed**
+- [Figure 2](#figure-2) shows that the period of **ThdFrontLed** is now 40ms instead of 20ms. This is because each thread has the guarantee to run at least 20ms (defined in **CH_CFG_TIME_QUANTUM**) before being paused by a thread of same priority if needed
 
-# Part 1 - Read about RTOS and ChibiOS
-Read through ALL those 2 wiki pages:
+>### Code block 3
+```c
+82  #define CH_CFG_TIME_QUANTUM                 20
+```
 
-- [Generalities about RTOS](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/ChibiOS-Generalities-about-RTOS)
-- [Presenting ChibiOS](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/ChibiOS-Presenting-ChibiOS)
-# Part 2 - Multi-threaded blinky demo
-- The code provided to you does several things:
-    - initializes the system
-    - configures a serial port to send data to computer
-    - configures the I2C (used by the IMU)
-    - configures the IMU
-    - writes continuously at a given frequency to the serial port the measurements from the IMU
-- 💡 To monitor what the EPuck2 sends via UART to computer, you must use a serial terminal. Consult [STM32F407 UART communication - Serial Monitor](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Communicating-with-the-EPuck2#stm32f407-uart-communication---serial-monitor) for more details
-- 💡 You will find in the **main.c** file two threads:
-    - **ThdFrontLed** and **ThdBodyLed**
-- The goal here is to see how to achieve the same result as in the Lab1 (blink a led) but using the threads
-- It is much simpler because no timer has to be configured and the choice of frequency is very easy
-- You will also visualize on the oscilloscope the mechanisms used by ChibiOS to switch between the threads
+>### Figure 2
+>Oscilloscope view of **BODY_LED** (yellow) and **FRONT_LED** (blue) using delays
+  <p float="left">
+    <img src="pictures/Thd_case2.PNG" alt="drawing" width="700"/>
+  </p>
 
-> `Task 1`
->- Look at the two threads and understand what they do
->- What is the difference between **chThdSleepUntilWindowed()** and **chThdSleepMilliseconds()** ?
+# Task 5: Period of the threads with different priorities using delays
+- To increase the priority of a thread, simply change the priority in the function used to create the thread, as explained in the theory
+- For example set the priority one level higher by writing **NORMALPRIO+1**, as showed in the [code block 4](#code-block-4)
+>### Code block 4
+```c
+...
+chThdCreateStatic(waThdFrontLed, sizeof(waThdFrontLed), NORMALPRIO+1, ThdFrontLed, NULL);
+chThdCreateStatic(waThdBodyLed, sizeof(waThdBodyLed), NORMALPRIO, ThdBodyLed, NULL);
+...
+```
 
-> `Task 2`
->- Compile and run the code on the e-puck2
->- Why are the leds not blinking ?
->- Resolve the problem and verify that **BODY_LED** and **FRONT_LED** are blinking (**FRONT_LED** will blink too fast and will simply seem to be turned on)
+- Now the result on the oscilloscope is back to the correct one ([figure 3](#figure-3))
+- The period of **ThdFrontLed** is 20ms, which is correct
+- This is because the priority of this thread has been raised
+- Remember, the time quantum defined in **chconf.h** is used only for thread with same priorities in order to let them work alternately
+- If a thread has a higher priority (here **ThdFrontLed**), then it can pause a lower priority thread whenever it needs
 
-> `Task 3`
->- Use the oscilloscope with the two test points of the e-puck2 to visualize the signals sent to the leds
->- Is the frequency/period of the commutations correct ?
+>### Figure 3
+>Oscilloscope view of **BODY_LED** (yellow) and **FRONT_LED** (blue) using delays and different priorities
+  <p float="left">
+    <img src="pictures/Thd_case3.PNG" alt="drawing" width="700"/>
+  </p>
 
-> `Task 4`
->- Comment in the thread **ThdBodyLed** the first case (line 86) and uncomment the second case (lines 92-95)
->- What is the difference ?
->- How does change the period of the led controlled by the other thread ? Why ?
->- 💡 Hint : Look at **chconf.h** to understand what is happening
+# Task 6: Critical thread zones
+- Here the system is locked during the whole computational time of the thread **ThdBodyLed**, thus the system cannot work properly because the lock lasts during a very long time
+- Even the system tick cannot count properly with this system lock
+- This is why there is a very bad blinking of the **FRONT_LED** in this case ([figure 4](#figure-4))
+- **chSysLock()** should only be used during a little amount of time to not perturb the rest of the system, as said in the theory
 
-> `Task 5`
->- Increase the priority of **ThdFrontLed** by 1
->- What has changed now ? Why ?
+>### Figure 4
+>Oscilloscope view of **BODY_LED** (yellow) and **FRONT_LED** (blue) with system lock and delays
+  <p float="left">
+    <img src="pictures/Thd_case4.PNG" alt="drawing" width="700"/>
+  </p>
 
-## Critical thread zones
-- It would be useful to prevent the system to switch to another thread when we have critical zone that should imperatively be executed in one run
-    - e.g: when you have a strict timing to respect for some operations
-- For this purpose, ChibiOS let us **lock** and **unlock** the system with **chSysLock()** and **chSysUnlock()**
-- These functions are simply toggling the interrupts
-    - ⚠ -> we should be careful when using these functions because other threads or interrupts could be delayed if the system is locked during too much time
+# Task 7: Understanding of the code
+- No correction for this task.
 
-> `Task 6`
->- Comment the case 2 (lines 92-95) and uncomment the case 3 (lines 102-106) in the thread **ThdBodyLed**
->- What is the result ? Why should we not do this ?
+# Task 8: IMU_COMPUTE_OFFSET
+- Here is an example ([code block 5](#code-block-5)) of **imu_compute_offset** implementation: It uses the same way to wait for new data as in the main function
+- The types of variables to use are very important here. The goal is to select the ones that use the least space on the memory and that are enough to store the max possible value without an overflow. For example use of an **uint8_t** to store the number 300 will lead to a wrong result
+- Here the argument **nb_samples** is an **uint16_t** (unsigned integer 16 bits), so at least an **uint16_t** must be used inside the function when counting to **nb_samples**
+- For the temporary arrays declared on the beginning of the function, an **int32_t** must be used to sum a lot of measures which are signed.    
+Simply because **nb_samples** (uint16_t) can go up to $2^{16}-1$ and the raw measurement (int16_t) can go from $-2^{16}/2$ to $2^{16}/2-1$.  
+So making the calculation, the maximum value can reach $(2^{16}-1) * (2^{16}/2-1) < 2^{32}/2-1$ for the sum.    
+Thus **int32_t** is enough
+- The same method goes for the rest of the code.
 
-- ⚠ After having answered the questions, comment again the case 3 and uncomment the case 1 in order to have a working code for the rest of the practical exercise
+>### Code block 5
+```c
+//imu.c
+...
+void imu_compute_offset(messagebus_topic_t * imu_topic, uint16_t nb_samples){
 
-# Part 3 - Inertial Measurement Unit (IMU)
-## Introduction
-- In this part of the practical, you are going to use the IMU sensor **MPU 9250** to measure the acceleration and angular speeds of the robot e-puck2
-- All the interfaces to get values from this sensor are already coded. The code uses the files **imu.*** to read the data of the IMU inside a thread. The functions to interact with the IMU are located in the **mpu9250.*** files and finally the functions used to communicate over the I2C bus are located in the **i2c\_bus.*** files
+    //creates temporary array used to store the sum for the average
+    int32_t temp_acc_offset[NB_AXIS] = {0};
+    int32_t temp_gyro_offset[NB_AXIS] = {0};
 
-## MessageBus
-- In the first TPs, you have probably used for instance global variables to transfer data between an interrupt routine and another function
-- Here, a special mechanism is used to transfer the data between different threads which is called `Messagebus`
-- It uses lock mechanisms and advertises the threads that are waiting on data when new ones are available. If you look inside the thread **imu\_reader\_thd** you will find the function **messagebus\_topic\_publish()** which publishes the new values and in the main function, you will find the function **messagebus\_topic\_wait()** which pauses the thread until new values are available. There are other ways to do this like using semaphores, mutexes, inter-thread messages, etc but this is not the purpose of this practical exercise.
+    //sums nb_samples
+    for(uint16_t i = 0 ; i < nb_samples ; i++){
+        //waits for new measurements for IMU using MessageBus library
+        messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_values));
+        for(uint8_t j = 0 ; j < NB_AXIS ; j++){
+            temp_acc_offset[j] += imu_values.acc_raw[j];
+            temp_gyro_offset[j] += imu_values.gyro_raw[j];
+        }
+    }
+    //finishes the average by dividing the sums by nb_samples
+    //then stores the values to the good fields of imu_values to keep them
+    for(uint8_t j = 0 ; j < NB_AXIS ; j++){
+        temp_acc_offset[j]  /= nb_samples;
+        temp_gyro_offset[j] /= nb_samples;
 
-> `Task 7`
->- Take a look at the files and try to understand how the code configures and reads the IMU
->- For this you have really to explore all the libraries linked with the IMU (right click on the function call, then go to declaration, for instance)
+        imu_values.acc_offset[j] = temp_acc_offset[j];
+        imu_values.gyro_offset[j] = temp_gyro_offset[j];
+    }
+    //specific case for the z axis because it should not be zero but -1g
+    //deletes the standard gravity to have only the offset
+    imu_values.acc_offset[Z_AXIS] += (MAX_INT16 / RES_2G); //16384 = 1g with a scale of 2G
+}
+...
+```
 
-- futher reading on messagebus at [https://github.com/cvra/msgbus](https://github.com/cvra/msgbus) 
-## Processing the IMU's data
-- If you looked carefully at the **imu.c** file, you should have seen two empty functions which are **imu\_compute\_offset()** and **imu\_compute\_units()**
-- The first one is used to get a given amount of measurements from the IMU and to compute an averaged offset value for all the axis of the accelerometer and of the gyroscope in order to use them later to have measurements without offsets (the IMU is not perfectly calibrated)
-- The second function is used to compute and store the raw measurements into readable units ($m/s^2$ for the accelerations and $rad/s$ for the gyroscope rates).
+# Task 9: IMU_COMPUTE_UNITS
+- By looking at the implementation of the function **imu_start()** in the **imu.c** file, the range of the accelerometer is configured to 2G and the range of the Gyroscope to 250 DPS (Degrees Per Second)
+- Also by looking at the points **4.6** and **4.7** of the mpu9250's datasheet, the ranges are signed 16bit values. So received datas will be int16_t representing -2g to 2g for the accelerometer and -250 DPS to 250 DPS for the gyroscope
+- Thus by a simple rule of three, we can convert the raw values to $m/s^2$ for the accelerometer and to $rad/s$ for the gyroscope
+- The function does nothing else than substracting the offset found previously, converting the raw measurements to the good units and storing them into the imu_values structure
 
-> `Task 8`
->- Fill the function **imu\_compute\_offset()** to collect **nb\_samples** of measurements from the IMU, do an average of them and store them in the correct fields of the **imu\_values** structure declared at the beginning of the file **imu.c**
->- 💡 To read the IMU values, look at the main function and do the same
->- 💡 You can visualize the result by looking at what the e-puck2 is sending on the serial port [STM32F407 UART communication - Serial Monitor](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Communicating-with-the-EPuck2#stm32f407-uart-communication---serial-monitor)
->- 💡 Take care of which variable's type you will use for each variable in order to optimize the usage of memory. Use for example an **uint8\_t** variable if you only need to store numbers between 0 and 255
 
-> `Task 9`
->- Now fill the function **imu\_compute\_units()** to convert the raw measurements of the accelerometer and of the gyroscope into the good units
->- Store the converted values in the correct fields of the **imu\_values** structure
->- 💡 Don't forget to include the offset previously found to correct the raw measurement used
->- 💡 Look at the code to find how the IMU is configured and look at the function used to read the values (useful to deduce what is received from the IMU)
->- 💡 You can also find the [datasheet of the mpu9250](https://www.invensense.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf) to deduce what represent the raw values (points **4.6** and **4.7**)
->- 💡 Verify you obtain the good values on the terminal program.
+>### Code block 6
+```c
+//imu.c
+...
 
-## Showing the gravity direction
-- Finally, if you look in the **main.c** file, you will see a nearly empty function called **show\_gravity()** which will be used to turn on or off the leds **LED1**, **LED3**, **LED5**, **LED7** depending on the orientation of the robot
-- For example if the robot is leaning forward, the **LED1** should be turned on and the others off
-- The function already have some blocs used to measure the execution time of a portion of code. Don't hesitate to use them to measure how many $\mu s$ your function uses, especially if you use trigonometric functions, which have a big computational cost
+#define STANDARD_GRAVITY    9.80665f
+#define DEG2RAD(deg)        (deg / 180 * M_PI)
 
-> `Task 10`
->- Fill the function **show\_gravity()** to show the orientation of the robot with the four LEDs
->- If you use trigonometric functions, don't forget to include math.h
->- Measure the time used by different portions of your code, especially the trigonometric part to see the difference of computational time
->- 💡 You can visualize the **time** variable with the debugger by pausing the code after it received the counter value of the timer used, or you can add a print function using **chprintf()** like in the main function
->- 💡 To find the functions provided by **math.h**, you can simply google the name of the library and find a list of the functions definitions
+#define RES_2G              2.0f
+#define RES_250DPS          250.0f
+#define MAX_INT16           32768.0f
 
-# Inspiration for the wiki
->- From playembedded.org: [A detailed explanation of multithreading in ChibiOS/RT](https://www.playembedded.org/blog/explanation-multithreading-chibios)
+#define ACC_RAW2G           (RES_2G / MAX_INT16) //2G scale for 32768 raw value
+#define GYRO_RAW2DPS        (RES_250DPS / MAX_INT16) //250DPS (degrees per second) scale for 32768 raw value
+
+...
+
+ /**
+ * @brief   Computes the measurements of the imu into readable measurements
+ *      RAW accelerometer to m/s^2 acceleration
+ *      RAW gyroscope to rad/s speed
+ */
+void imu_compute_units(void){
+  for(uint8_t i = 0 ; i < NB_AXIS ; i++){
+    imu_values.acceleration[i] = ( (imu_values.acc_raw[i] - imu_values.acc_offset[i]) 
+                               * STANDARD_GRAVITY * ACC_RAW2G);
+    imu_values.gyro_rate[i] = ( (imu_values.gyro_raw[i] - imu_values.gyro_offset[i]) 
+                            * DEG2RAD(GYRO_RAW2DPS) );
+  }
+}
+
+...
+```
+
+# Task 10: SHOW_GRAVITY
+- Here two implementations are provided as examples:
+    1) Using trigonometric functions ([code block 7](#code-block-7)) 
+    2) A bit longer to write, using only conditions ([code block 8](#code-block-8))
+- The two are doing the exact same thing, turning on the led to which the robot is leaning the most
+- A simple threshold is used to not blink randomly the leds when the robot is perfectly horizontal because of the noise on the measurements
+- If you look at the code, you can see that for the trigonometric example, the time measured with the timer measures only the duration of the **atan2()** function when for the second example, the time measured is for the whole set of conditions. The results are quite explicit, as the difference is huge. Thus a code well optimized can be really fast compared to another not optimized code
+    - `Example 1 :` Time $[\mu s]$ for **atan2()** function : between **18 to 27 $\boldsymbol{\mu s}$** depending on the angle
+    - `Example 2 :` Time $[\mu s]$ for the whole set of conditions : always **2 $\boldsymbol{\mu s}$**
+- Note : Even if the `FPU` (Floating Point Unit) of the microcontroller is enabled in this code, the atan2() function doesn't use it. This is why is takes so much time to compute an arc tangent
+- It is possible to use an optimized version of the atan() function written in assembler and using the FPU by including **fastmath.h** and calling specific functions but these functions also remove a lot of error verifications
+
+>### Code block 7
+```c
+//main.c
+...
+
+void show_gravity(imu_msg_t *imu_values){
+
+    //we create variables for the led in order to turn them off at each loop and to 
+    //select which one to turn on
+    uint8_t led1 = 0, led3 = 0, led5 = 0, led7 = 0;
+    //threshold value to not use the leds when the robot is too horizontal
+    float threshold = 0.2;
+    //create a pointer to the array for shorter name
+    float *accel = imu_values->acceleration;
+    //variable to measure the time some functions take
+    //volatile to not be optimized out by the compiler if not used
+    volatile uint16_t time = 0;
+
+
+    /*
+    *   example 1 with trigonometry.
+    */
+
+    /*
+    * Quadrant:
+    *
+    *       BACK
+    *       ####
+    *    #    0   #
+    *  #            #
+    * #-PI/2 TOP PI/2#
+    * #      VIEW    #
+    *  #            #
+    *    # -PI|PI #
+    *       ####
+    *       FRONT
+    */
+
+    if(fabs(accel[X_AXIS]) > threshold || fabs(accel[Y_AXIS]) > threshold){
+
+        chSysLock();
+        //reset the timer counter
+        GPTD11.tim->CNT = 0;
+        //clock wise angle in rad with 0 being the back of the e-puck2 (Y axis of the IMU)
+        float angle = atan2(accel[X_AXIS], accel[Y_AXIS]);
+        //by reading time with the debugger, we can know the computational time of atan2 function
+        time = GPTD11.tim->CNT;
+        chSysUnlock();
+
+        //rotates the angle by 45 degrees (simpler to compare with PI and PI/2 than with 5*PI/4)
+        angle += M_PI/4;
+
+        //if the angle is greater than PI, then it has shifted on the -PI side of the quadrant
+        //so we correct it
+        if(angle > M_PI){
+            angle = -2 * M_PI + angle; 
+        }
+
+        if(angle >= 0 && angle < M_PI/2){
+            led5 = 1;
+        }else if(angle >= M_PI/2 && angle < M_PI){
+            led7 = 1;
+        }else if(angle >= -M_PI && angle < -M_PI/2){
+            led1 = 1;
+        }else if(angle >= -M_PI/2 && angle < 0){
+            led3 = 1;
+        }
+    }
+
+    //to see the duration on the console
+    chprintf((BaseSequentialStream *)&SD3, "time = %dus\n",time);
+    //we invert the values because a led is turned on if the signal is low
+    palWritePad(GPIOD, GPIOD_LED1, led1 ? 0 : 1);
+    palWritePad(GPIOD, GPIOD_LED3, led3 ? 0 : 1);
+    palWritePad(GPIOD, GPIOD_LED5, led5 ? 0 : 1);
+    palWritePad(GPIOD, GPIOD_LED7, led7 ? 0 : 1);
+
+}
+
+...
+```
+>### Code block 8
+```c
+//main.c
+...
+
+void show_gravity(imu_msg_t *imu_values){
+
+    //we create variables for the led in order to turn them off at each loop and to 
+    //select which one to turn on
+    uint8_t led1 = 0, led3 = 0, led5 = 0, led7 = 0;
+    //threshold value to not use the leds when the robot is too horizontal
+    float threshold = 0.2;
+    //create a pointer to the array for shorter name
+    float *accel = imu_values->acceleration;
+    //variable to measure the time some functions take
+    //volatile to not be optimized out by the compiler if not used
+    volatile uint16_t time = 0;
+
+    /*
+     *   example 2 with only conditions
+     */
+
+    chSysLock();
+    GPTD11.tim->CNT = 0;
+
+    //we find which led of each axis should be turned on
+    if(accel[X_AXIS] > threshold)
+        led7 = 1;
+    else if(accel[X_AXIS] < -threshold)
+        led3 = 1;
+
+    if(accel[Y_AXIS] > threshold)
+        led5 = 1;
+    else if(accel[Y_AXIS] < -threshold)
+        led1 = 1;
+
+    //if two leds are turned on, turn off the one with the smaller
+    //accelerometer value
+    if(led1 && led3){
+        if(accel[Y_AXIS] < accel[X_AXIS])
+            led3 = 0;
+        else
+            led1 = 0;
+    }else if(led3 && led5){
+        if(accel[X_AXIS] < -accel[Y_AXIS])
+            led5 = 0;
+        else
+            led3 = 0;
+    }else if(led5 && led7){
+        if(accel[Y_AXIS] > accel[X_AXIS])
+            led7 = 0;
+        else
+            led5 = 0;
+    }else if(led7 && led1){
+        if(accel[X_AXIS] > -accel[Y_AXIS])
+            led1 = 0;
+        else
+            led7 = 0;
+    }
+    time = GPTD11.tim->CNT;
+    chSysUnlock();
+
+    //to see the duration on the console
+    chprintf((BaseSequentialStream *)&SD3, "time = %dus\n",time);
+    //we invert the values because a led is turned on if the signal is low
+    palWritePad(GPIOD, GPIOD_LED1, led1 ? 0 : 1);
+    palWritePad(GPIOD, GPIOD_LED3, led3 ? 0 : 1);
+    palWritePad(GPIOD, GPIOD_LED5, led5 ? 0 : 1);
+    palWritePad(GPIOD, GPIOD_LED7, led7 ? 0 : 1);
+
+}
+
+...
+```
