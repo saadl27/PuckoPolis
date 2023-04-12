@@ -232,10 +232,12 @@ int main(void)
     serial_start();
     timer11_start();
     i2c_start();
-    imu_start();
 
     /** Inits the Inter Process Communication bus. */
     messagebus_init(&bus, &bus_lock, &bus_condvar);
+
+    /** imu_start needs the bus then must be called AFTER messagebus_init !! */
+    imu_start();
 
     chThdCreateStatic(waThdFrontLed, sizeof(waThdFrontLed), NORMALPRIO, ThdFrontLed, NULL);
     chThdCreateStatic(waThdBodyLed, sizeof(waThdBodyLed), NORMALPRIO, ThdBodyLed, NULL);

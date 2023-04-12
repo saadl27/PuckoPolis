@@ -351,3 +351,50 @@ void show_gravity(imu_msg_t *imu_values){
 
 ...
 ```
+# Task 11: Use library functions correctly
+1) Initially the code provided for `main.c` called the following functions in this order:
+   > ```c
+   > //main.c
+   > ...
+   > int main(void)
+   > {
+   > ...
+   >     i2c_start();
+   >     imu_start();
+   > 
+   >     /** Inits the Inter Process Communication bus. */
+   >     messagebus_init(&bus, &bus_lock, &bus_condvar);
+   > ...
+   > ```
+    - this code worked, although there is a potential error that will be explained later.
+2) Inverting fucntions calls
+   > ```c
+   > //main.c
+   > ...
+   > int main(void)
+   > {
+   > ...
+   >     imu_start();
+   >     i2c_start();
+   > 
+   >     /** Inits the Inter Process Communication bus. */
+   >     messagebus_init(&bus, &bus_lock, &bus_condvar);
+   > ...
+   > ```
+    - this code drives the microcontroller into the `panic_handler` routine, resulting in 4 red LEDs lit (as an error indicator) and the CPU locked in an infinite loop. This code prevents the system from going further in the cabbage and executing anything; that limits the problems.
+    - as observable in [Figure 5](#figure-5), the system arrives in this code following the `messagebus_advertise_topic()` call because the `bus` variable is not yet initialized, being only after the call of `messagebus_init()`
+
+    >### Figure 5
+    >Cause of **panic_handler** call
+        <p float="left">
+        <img src="pictures/panic_handler_cause.PNG" alt="drawing" width="700"/>
+        </p>
+3) Why this problem did not occur with the code intially provided - Answer to the point 1:
+    - The call of `messagebus_advertise_topic()` is made in the thread `imu_reader_thd`. This thread is set up by the function `imu_start()` but it is not necessarily started right after. However, depending on the code executed later (after `ìmu_start()`) this thread can be started:
+    1) In case `messagebus_init()` is called immediately after, it seems sufficient that the `bus` variable is initialized just before the thread starts and needs it. This explains that this problem does not occur, but it is not guaranteed and not correct.
+    2) In case `i2c_start()` is called between `imu_start()` and `messagebus_init()`, the `imu_reader_thd` thread is actually called before `messagebus_init()` has been able to initialize `bus` variable and this leads to access to an uninitiated structure, which is therefore forbidden.
+    `panic_handler` is reserved by Chibios as a callback function, called when a system halting error arrises (cf. e-puck2_main-processor/src/chconf.h)
+4) Summary
+    - It is important to understand and correctly use the functions of a library and even more so with a multi-threaded system where the notion of poorly managed call order can lead to relatively complex problems to understand and correct.
+    - The best is to take example of code of `e-puck2_main-processor/src/main.c` which is the demo code of the robot. This file is not used by your code but everything else is as a library.
+    - So do not hesitate to look at the order of the function calls in this file and for information, the `bus` structure is also used for example for `proximity sensors`, but not only that...
