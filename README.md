@@ -367,7 +367,7 @@ void show_gravity(imu_msg_t *imu_values){
    > ...
    > ```
     - this code worked, although there is a potential error that will be explained later.
-2) Inverting fucntions calls
+2) Inverting functions calls
    > ```c
    > //main.c
    > ...
