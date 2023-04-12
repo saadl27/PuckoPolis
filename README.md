@@ -93,8 +93,9 @@ Read through ALL those 2 wiki pages:
     - writes continuously at a given frequency to the serial port the measurements from the IMU
 - 💡 To monitor what the EPuck2 sends via UART to computer, you must use a serial terminal. Consult [STM32F407 UART communication - Serial Monitor](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Communicating-with-the-EPuck2#stm32f407-uart-communication---serial-monitor) for more details
 - 💡 You will find in the **main.c** file two threads:
-    - **ThdFrontLed** and **ThdBodyLed**
-- The goal here is to see how to achieve the same result as in the Lab1 (blink a led) but using the threads
+    - **ThdFrontLed**
+    - **ThdBodyLed**
+- The goal here is to see how to achieve the same result as in the TP1 (blink a led) but using threads
 - It is much simpler because no timer has to be configured and the choice of frequency is very easy
 - You will also visualize on the oscilloscope the mechanisms used by ChibiOS to switch between the threads
 
@@ -179,6 +180,13 @@ Read through ALL those 2 wiki pages:
 >- Measure the time used by different portions of your code, especially the trigonometric part to see the difference of computational time
 >- 💡 You can visualize the **time** variable with the debugger by pausing the code after it received the counter value of the timer used, or you can add a print function using **chprintf()** like in the main function
 >- 💡 To find the functions provided by **math.h**, you can simply google the name of the library and find a list of the functions definitions
+
+> `Task 11`
+>- Invert the order of 2 lines of code `i2c_start()` (146) and `imu_start()` (147) in `main.c` and start again your program.
+>- What do you see? In order to understand what is happening, you can pause your program and see the running code. Can you explain why the uC arrives in this code, ending in an infinite loop?
+>- 💡 Consult the `Call stack`
+>- Return these 2 lines as originally. Based on what you found previously, do you think the call of imu_start() is nevertheless made at the right place (or at the right time)? Can you explain?
+>- 💡 Consult the `main.c` in e-puck2_main-processor/src folder.
 
 # Inspiration for the wiki
 >- From playembedded.org: [A detailed explanation of multithreading in ChibiOS/RT](https://www.playembedded.org/blog/explanation-multithreading-chibios)
