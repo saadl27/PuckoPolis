@@ -381,8 +381,9 @@ void show_gravity(imu_msg_t *imu_values){
    >     messagebus_init(&bus, &bus_lock, &bus_condvar);
    > ...
    > ```
-    - this code drives the microcontroller into the `panic_handler` routine, resulting in 4 red LEDs lit (as an error indicator) and the CPU locked in an infinite loop. This code prevents the system from going further in the cabbage and executing anything; that limits the problems.
-    - as observable in [Figure 5](#figure-5), the system arrives in this code following the `messagebus_advertise_topic()` call because the `bus` variable is not yet initialized, being only after the call of `messagebus_init()`
+    - this code drives the microcontroller into the `panic_handler` routine, resulting in 4 red LEDs lit (as an error indicator) and the CPU locked in an infinite loop. This code prevents the system from going further in the cabbage and executing anything; that limits the problems;
+    - as can be seen in [Figure 5](#figure-5), the system arrives in this code following the `messagebus_advertise_topic()` call in the `imu_reader` thread because the `bus` variable is not yet initialised. Indeed, the latter is initialised through the `messagebus_init()` function which is called after `imu_start()` in `main.c`.
+    - adding a breakpoint in `messagebus_init()` and another one in `i2c_start()` enables to see that the program is able to reach the first function but not the second one. This means the panic handler, itself called in the `imu_reader` thread, is called at some point between the two functions.
 
     >### Figure 5
     >Cause of **panic_handler** call
