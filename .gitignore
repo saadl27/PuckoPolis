@@ -8,6 +8,7 @@ ST
 *.mem
 *.size
 *.sizelib
+src/build/
 
 # Normally required only for TP3 and following
 # But keep at less always e-puck2_main-processor if bad use of
