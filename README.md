@@ -5,7 +5,7 @@
 - `⏱ Duration`: 4 hours
 
 ## ⚠ ToDo before starting the Lab
-- to pull the TP3_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Fetching-Exercises-Solutions)
+- to pull the TP3_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Fetching-Exercises-Solutions)
 - Don't forget to push this branch with the upstream enabled to your origin remote
 - Once on this branch `TP3_Exercise`, normaly the `e-puck2_main-processor` library has certainly not yet been installed. Then do it by running the `Link Library e-puck2_main-processor` task otherwise the code won't compile.
     <p float="left">
@@ -82,8 +82,8 @@
 # Part 1 - Read about RTOS and ChibiOS
 Read through ALL those 2 wiki pages:
 
-- [Generalities about RTOS](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/ChibiOS-Generalities-about-RTOS)
-- [Presenting ChibiOS](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/ChibiOS-Presenting-ChibiOS)
+- [Generalities about RTOS](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/ChibiOS-Generalities-about-RTOS)
+- [Presenting ChibiOS](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/ChibiOS-Presenting-ChibiOS)
 # Part 2 - Multi-threaded blinky demo
 - The code provided to you does several things:
     - initializes the system
@@ -91,7 +91,7 @@ Read through ALL those 2 wiki pages:
     - configures the I2C (used by the IMU)
     - configures the IMU
     - writes continuously at a given frequency to the serial port the measurements from the IMU
-- 💡 To monitor what the EPuck2 sends via UART to computer, you must use a serial terminal. Consult [STM32F407 UART communication - Serial Monitor](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Communicating-with-the-EPuck2#stm32f407-uart-communication---serial-monitor) for more details
+- 💡 To monitor what the EPuck2 sends via UART to computer, you must use a serial terminal. Consult [STM32F407 UART communication - Serial Monitor](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Communicating-with-the-EPuck2#stm32f407-uart-communication---serial-monitor) for more details
 - 💡 You will find in the **main.c** file two threads:
     - **ThdFrontLed**
     - **ThdBodyLed**
@@ -158,7 +158,7 @@ Read through ALL those 2 wiki pages:
 > `Task 8`
 >- Fill the function **imu\_compute\_offset()** to collect **nb\_samples** of measurements from the IMU, do an average of them and store them in the correct fields of the **imu\_values** structure declared at the beginning of the file **imu.c**
 >- 💡 To read the IMU values, look at the main function and do the same
->- 💡 You can visualize the result by looking at what the e-puck2 is sending on the serial port [STM32F407 UART communication - Serial Monitor](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Communicating-with-the-EPuck2#stm32f407-uart-communication---serial-monitor)
+>- 💡 You can visualize the result by looking at what the e-puck2 is sending on the serial port [STM32F407 UART communication - Serial Monitor](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Communicating-with-the-EPuck2#stm32f407-uart-communication---serial-monitor)
 >- 💡 Take care of which variable's type you will use for each variable in order to optimize the usage of memory. Use for example an **uint8\_t** variable if you only need to store numbers between 0 and 255
 
 > `Task 9`
