@@ -1,104 +1,33 @@
 # Introduction
-- Welcome in the very first lab of MICRO-315
-- `Goal`: learn how to program and debug the e-puck2 robot and familiarize with the STM32F4 microcontroller family and Git
+- Welcome in lab 1 of MICRO-315
+- Please make sure you're confortable with all the tools covered in the introduction lab : `VSCode IDE`, `pyenv` and `git`
 - `⏱ Duration`: 4 hours
 
 ## Goals
 - This practical work shows all the necessary steps to program the e-puck2 miniature mobile robot in C, using the standard library provided by ST.
 - The main goal is to gain knowledge of the STM32F4 microcontroller and refresh some concepts about peripherals such as GPIOs and TIMERs.
-- The second goal and not the least is to present the tools that will be used throughought every labs of this semester
 
 ## Methodology
 To achieve the main goal, we will go through the following steps:
-  - Installing and getting familiar with the IDE (Integrated Development Environment): [Part 1](#part-1---integrated-development-environment-ide)
-  - Getting familiar with e-puck2 robot: [Part 2](#part-2---presenting-the-epuck2-robot)
-  - Understand the basic of the version control tool *Git*, *MANDATORY* for this course: [Part 3](#part-3---git-introduction)
-  - Setup the git repository for your group: [Part 4](#part-4---setting-up-your-group-tps-repository)
-  - Getting used to program an e-puck2: use the on board debugger interface for programming and debugging [Part 5](#part-5---tutorial-for-programming-the-epuck2-robot)
   - Writing a first LED blinking program, first with *NOP* loops, then using timers
   - Change the LED's blinking sequence using the selector
-  
-# Part 1 - Integrated Development Environment (IDE)
-Click on one the links accordingly to your computer's configuration
-- 👉 [❖ Windows](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Installing-the-IDE-%E2%9D%96-Windows)
-- 👉 [🍎 MacOS](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Installing-the-IDE-%F0%9F%8D%8E-MacOS)
-- 👉 [🐧 Linux](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Installing-the-IDE-%F0%9F%90%A7-Linux)
 
-The IDE now freshly installed, let's start by quickly presenting the IDE which we will use throuhought the semester.
-- 👉 [🛠 Tools](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%9B%A0-Tools)
-- 👉 [🗔 User Interface](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%97%94-User-Interface)
+## ⚠ TODO before starting the Lab
+- execute the command `git checkout reference/TP1_Exercise`
+  - all the files related to this lab should now be downloaded in your Workplace folder
+- Create a symbolic link to the ST library (won't compile otherwise) by running the `Link Library ST to workspace` task
+    <p float="left">
+        <img src="pictures/linkSTLibrary.png" alt="drawing" width="200"/>
+    </p>
 
-# Part 2 - Presenting the EPuck2 robot
-- 👉 [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Presenting-the-EPuck2)
-- 👉 [Testing the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Testing-the-EPuck2)
+# Part 1 - STM32F4 Microcontroller and GPIO configuration
+First read up to the end of those 2 documentation pages that will greatly help you for the rest of the lab
+  - 👉 [Presenting the STM32](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-Presenting-the-STM32)
+  - 👉 [STM32 GPIO](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-GPIO)
 
-# Part 3 - Git introduction
-- 👉 [Introduction to Git](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Introduction-to-Git)
-
-# Part 4 - Setting up your group TP's repository
-- Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs) to set up git for the TPs
-- Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Working-in-groups) to learn how to work in group using Git
-- Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Asking-for-support) to check how to ask for support
-
-# Part 5 - Tutorial for programming the EPuck2 robot
-## 5.0 🔌 Preparation 
-- Open the folder TPs with VSCode Epuck2
-- Make sure you are in the right branch (TP1_Exercise), if not you must do a **git checkout TP1_Exercise**
-- Run the task `Link Library ST to workspace`
-
-## 5.1 🔨 Building the Project
-- Building the code consists of compiling the **\*.c** and **\*.s** files to create object files, **\*.o**, and then linking the object files to create the **blinky.elf** file
-- More detail on the steps of the build process will be given during TP2
-- The generated **.elf** file contains the data necessary to program the device and additional information that lets you debug at the source code level
-- The additional files **.list**, **.size** and **.mem** are generated containing the disassembly output and the memory layout table with symbol address and size.
-- 👉 To compile the project
-  1. Run the task **Make TP1 Exercice**
-  2. Observe the progress of the compilation in the Build Console tabular (as in Listing 1).
-  3. When Done is displayed, your code is built and you are ready to program the device. If there are errors in your code, they will be displayed in this console.
-      ```yml
-      > Compiling gpio.c
-      > Compiling main.c   
-      ar> Compiling timer.c
-      m-none-eabi> Compiling stm32f4xx_ll_rcc.c
-      -gcc > Compiling system_clock_config.c
-      -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST gpio.c -o gpio.o
-      > Compiling system_stm32f4xx.c   
-      > Compiling startup_stm32f407xx.s
-      arm-none-eabi-gcc -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST main.c -o main.o
-      arm-none-eabi-gcc -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST timer.c -o timer.o
-      arm-none-eabi-gcc -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST ../ST/system_clock_config.c -o ../ST/system_clock_config.o
-      arm-none-eabi-gcc -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST ../ST/stm32f4xx_ll_rcc.c -o ../ST/stm32f4xx_ll_rcc.o
-      arm-none-eabi-gcc -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST ../ST/system_stm32f4xx.c -o ../ST/system_stm32f4xx.o
-      arm-none-eabi-gcc -x assembler-with-cpp -c -mcpu=cortex-m4 -mthumb -mno-thumb-interwork -I. -I../ST ../ST/startup_stm32f407xx.s -o ../ST/startup_stm32f407xx.o
-      > Linking blinky.elf
-      arm-none-eabi-gcc main.o gpio.o timer.o ../ST/system_clock_config.o ../ST/stm32f4xx_ll_rcc.o ../ST/system_stm32f4xx.o ../ST/startup_stm32f407xx.o   -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -nostartfiles -L./ -mthumb -mno-thumb-interwork -Wl,--no-warn-mismatch,--gc-sections,--script=../ST/STM32F407VGTx_FLASH.ld  -o blinky.elf
-      > Creating blinky.mem
-      > Creating blinky.list
-      > Creating blinky.size
-      arm-none-eabi-nm --numeric-sort --print-size blinky.elf > blinky.mem
-      arm-none-eabi-objdump -d blinky.elf > blinky.list
-      arm-none-eabi-nm --size-sort --print-size blinky.elf > blinky.size
-      arm-none-eabi-size blinky.elf
-         text    data     bss     dec     hex filename
-         1432       4    1540    2976     ba0 blinky.elf
-      > Done
-      ```
-  > `Home Task 1`<br>
-  > Try to find out the meaning of the words **text**, **data**, **bss**, **dec**.<br>
-  > Estimate the size of your code in percentage of total Flash and RAM available with this microcontroller.
-
-## 5.2 🐞 Programming and debugging the EPuck2 robot
-- Now that you have built your code and created an **.elf** file that can be loaded on the microcontroller, you can program the device:
-  - Plug the USB cable (no need to turn on the e-puck2 using the dedicated button since the programmer MCU will automatically power the main MCU) 
-  - Specify the port to which the EPuck2's gdb-server is connected, click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Communicating-with-the-EPuck2#identify-the-ports) for more info
-  - Program the EPuck2 by clicking on `Run and Debug` tab (in the left side bar)
-- 💡 click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/IDE-%F0%9F%90%9B-Debugging) for more info about programming and debugging
-
-
-# Part 6 - STM32F4 Microcontroller and GPIO configuration
-- First read up to the end of those 2 documentation pages
-  - click 👉 [Presenting the STM32](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-Presenting-the-STM32)
-  - click 👉 [STM32 GPIO](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-GPIO)
+For the rest of the lab, you will need the documentation from STM (user guide and data sheet) as well as from the epuck (electronic diagram, etc.). Make sure you fetch those from their respective wiki pages before starting: 
+- 👉 [Presenting the STM32](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-Presenting-the-STM32): STM documentation
+- 👉 [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Presenting-the-EPuck2): EPuck2 documentation
 
 ## 6.1 Blink a LED automatically
 > `Task 1`
@@ -154,7 +83,7 @@ The IDE now freshly installed, let's start by quickly presenting the IDE which w
 - To do so, we ask you to configure the timer **TIM7** to periodically count up and, when it reaches the value set in the **ARR** register, to update the counter with a reload value and generate an interrupt
 - It is then in the interrupt routine generated by the timer that you will have to change the state of the LED.
 - First read through all this documentation page
-  - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/STM32-Timer)
+  - click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-Timer)
 - The configuration of the timer will be done in the file *timer.c*
 
 ## 7.1 Configure TIM7 to have interrupts at 1Hz
