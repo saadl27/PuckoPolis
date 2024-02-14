@@ -40,8 +40,8 @@ For TP3 you have used `e-puck2_main-processor` as library but everything about I
 > In fact e-puck2_main-processor is a demo program written for the e-puck2 but it is configured as a "library" for your TPs and mini-project
 ***
 # Using the Bluetooth of the EPuck2
-1) read [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Presenting-the-EPuck2)
-2) read [EPuck2 - Bluetooth](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Bluetooth)
+1) read [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Presenting-the-EPuck2)
+2) read [EPuck2 - Bluetooth](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Bluetooth)
 
 ## Functions to communicate with ChibiOS
 - ChibiOS offers several functions to send or receive data
@@ -88,7 +88,7 @@ The synchronization between `CaptureImage` and `ProcessImage` works like as foll
 - 💡 Read more on semaphore at [https://www.chibios.org/dokuwiki/doku.php?id=chibios:documentation:books:rt:kernel_counter_semaphores](https://www.chibios.org/dokuwiki/doku.php?id=chibios:documentation:books:rt:kernel_counter_semaphores)
 
 # Camera
-- 👉 read [EPuck2 - Camera](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/EPuck2-Camera)
+- 👉 read [EPuck2 - Camera](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Camera)
 - For the practical session, you will need to extract the color of your choice to only use one color information for the line detection
 - As the line is black and the sheet is white, the choice of color should not change the result a lot
 - But it is sure you will have more information if you use the green for example, as it is coded with 6 bits instead of 5 for the others
