@@ -131,7 +131,7 @@ See [table 1](#table-1-optimization-and-warnings)
 >| O3 | Optimization 3 to increase the execution speed |
 >| funroll-loops | Unroll the loops, useless alone |
 >| funroll-loops O3 | Unroll the loops with optimization 3. Not usefull to set these two together as O3 already activates funroll-loops |
-Consult the [armclang Reference Guide](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/datasheets/armclang_reference_guide_100067_0608_00_en.pdf) and search inside for these options. For example for level of optimization: `-Olevel` or `1.58`
+Consult the [armclang Reference Guide](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/datasheets/armclang_reference_guide_100067_0608_00_en.pdf) and search inside for these options. For example for level of optimization: `-Olevel` or `1.58`
 
 # Task 7: PWM configuration MODER
 See [code block 3](#code-block-3)
