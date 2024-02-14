@@ -15,6 +15,9 @@ src/build/
 # Link Library e-puck2_main-processor task in TPs preceding TP3
 e-puck2_main-processor/
 e-puck2_main-processor
+build/
+.dep/
+*.a
 
 # MacOS specific files but always use if another user can work under MacOS
 .DS_Store
