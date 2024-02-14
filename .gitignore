@@ -1,10 +1,18 @@
-# Normally required only for TPs preceding TP3
-# But keep at less always ST if bad use of
-# "Link Library ST" task in TP3 or following
+# Normally required only for TP1 and TP2
 ST/
 ST
+*.o
+*.d
+*.elf
+*.list
+*.mem
+*.size
+*.sizelib
+src/build/
 
 # Normally required only for TP3 and following
+# But keep at less always e-puck2_main-processor if bad use of
+# Link Library e-puck2_main-processor task in TPs preceding TP3
 e-puck2_main-processor/
 e-puck2_main-processor
 build/
