@@ -25,7 +25,7 @@
     - Coding a simple frequency detection function in order to control the robot with chosen frequencies
 
 ## ⚠ ToDo before starting the Lab
-- To pull the TP5_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Fetching-Exercises-Solutions)
+- To pull the TP5_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Fetching-Exercises-Solutions)
 - Don't forget to push this branch with the upstream enabled to your origin remote
 - Once on the branch `TP5_Exercise`, link the `e-puck2_main-processor` library by running the task `Link Library e-puck2_main-processor`
     <p float="left">
@@ -161,9 +161,9 @@
 # Bibliography
 
 ### DSP Concepts
-- [Example of C optimization with DPS functions](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/datasheets/DSPConceptsM4Presentation.pdf)
+- [Example of C optimization with DPS functions](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/datasheets/DSPConceptsM4Presentation.pdf)
 - [Digital Signal Processing using Arm® Cortex®-M based
-Microcontrollers](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/datasheets/digital-signal-processing.pdf)
+Microcontrollers](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/datasheets/digital-signal-processing.pdf)
 
 ### PDM to PCM filter
-- [AN3998 - ST Application note - PDM audio software decoding on STM32 microcontrollers](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/datasheets/en.DM00040808.pdf)    
+- [AN3998 - ST Application note - PDM audio software decoding on STM32 microcontrollers](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/datasheets/en.DM00040808.pdf)
