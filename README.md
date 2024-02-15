@@ -63,8 +63,8 @@ To understand how the code is generated, it is important to understand how the c
   - executing the command in the VSCode EPuck2 internal terminal should not run in errors
     - in fact, this terminal was configured to add the arm-none-eabi toolchain to the **PATH** variables
   - ⚠ however executing this command from any other terminal might lead to errors:
-    ```
-    arm-none-eabi-gcc -save-temps=obj -mcpu=cortex-m4 -c test.c -o test.o
+    ```shell
+    $ arm-none-eabi-gcc -save-temps=obj -mcpu=cortex-m4 -c test.c -o test.o
 
     'arm-none-eabi-gcc' is not recognized as an internal or external command, an executable program or a batch file.
     ```
@@ -72,12 +72,12 @@ To understand how the code is generated, it is important to understand how the c
     - We have to add the path to the folder containing the executable files in the **PATH** environment variable
     - the **PATH** variable is used to store the location of all the known executables the command line can call
     - Type the following command (a bit different depending on the OS) to add the path of the ARM toolchain
-      >### set PATH for Windows
-      ```
+      ### set PATH for Windows
+      ```shell
       set PATH=installpath/EPuck2Tools/gcc-arm-none-eabi-7-2017-q4-major/bins;%PATH%
       ```
-      >### set PATH for MacOS and Linux
-      ```
+      ### set PATH for MacOS and Linux
+      ```shell
       export PATH=installpath/EPuck2Tools/gcc-arm-none-eabi-7-2017-q4-major/bin:$PATH
       ```
     - ⚠ the exact path to the gcc-arm-none-eabi toolchain might depend on your installation
