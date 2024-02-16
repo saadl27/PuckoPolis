@@ -14,8 +14,15 @@ To achieve the main goal, we will go through the following steps:
 - Making a library out of it.
 
 ## ⚠ TODO before starting the Lab
-- execute the command `git checkout reference/TP2_Exercise`
-  - all the files related to this lab should now be downloaded in your Workplace folder
+- Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Setting-up-git-for-TPs) wiki page.
+- Checkout to the branch of the lab:
+```shell
+git fetch reference # Update your local git index
+git checkout reference/TP2_Exercise
+```
+This should create a local version of the remote TP2_Exercise branch and give you access to all the files related to this lab.
+
+Alternatively, you can use the VSCode git plug-in or git graph extension to fetch the `reference` remote and checkout to the correct branch.
 - Create a symbolic link to the ST library (won't compile otherwise) by running the `Link Library ST to workspace` task
     <p float="left">
         <img src="pictures/linkSTLibrary.png" alt="drawing" width="200"/>
