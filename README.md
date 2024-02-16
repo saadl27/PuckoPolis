@@ -1,4 +1,4 @@
-# Hometask 1: Result of the compilation
+# Task 1: Result of the compilation
 - The meaning of **text**, **data**, **bss**, **dec** are:
     - **text** : Size of the code in the Flash memory in bytes.
     - **data** : Size of the Non-Zero Initialized global and static data in bytes.
