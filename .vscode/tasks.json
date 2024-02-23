@@ -35,7 +35,7 @@
             }
         },
         {
-            "label": "TPIntro: Link Library ST",
+            "label": "TPIntro:Link Library ST",
             "type": "shell",
             "linux": {
                 "command": "LIB=ST; if [ -d $LIB ] ; then echo -n -e '\\033[0;91m'Link $LIB already present ; echo '\\033[0m'>>/dev/null ; else ln -s ${config:workplace}/EPuck2_Workplace/Lib/$LIB . ; echo -n -e '\\033[1;32m'Link $LIB done ! ; echo '\\033[0m'>>/dev/null ; fi ; echo '\n'",
@@ -45,7 +45,7 @@
             },
             "windows": {
                 // DONT FORGET to change the Library name in the Path parameter on the New-Item command, because there is no expansion !!
-                "command": "LIB=ST; if [ -d $LIB ] ; then echo -n -e '\\033[0;91m'Link $LIB already present ; echo '\\033[0m'>>/dev/null ; else powershell -command 'New-Item -ItemType Junction -Path ST -Target ${config:workplace}/EPuck2_Workplace/Lib/.' >>/dev/null; echo -n -e '\\033[1;32m'Link $LIB done ! ; echo '\\033[0m'>>/dev/null ; fi ; echo '\n'",
+                "command": "LIB=ST; if [ -d $LIB ] ; then echo -n -e '\\033[0;91m'Link $LIB already present ; echo '\\033[0m'>>/dev/null ; else powershell -command 'New-Item -ItemType Junction -Path ST -Target ${config:workplace}/EPuck2_Workplace/Lib/ST' >>/dev/null; echo -n -e '\\033[1;32m'Link $LIB done ! ; echo '\\033[0m'>>/dev/null ; fi ; echo '\n'",
             },
             "group": {
                 "kind": "build",
