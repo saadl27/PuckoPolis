@@ -25,8 +25,8 @@ In summary:
         Python 3.9.1
         </pre></div>
 
-    >[!NOTE]
-    >The wikis will be adapted soon with this convention.
+>[!NOTE]
+> The wikis will be adapted soon with this convention.
 
 2. PyEnv:
     - Under Windows the virtual environment can be "simulated" by duplication. It take more disk space but the end user result is the same. Then use the command `pyenv duplicate python_version env_name` for Windows instead `pyenv virtualenv python_version env_name` for MacOS/Linux.
