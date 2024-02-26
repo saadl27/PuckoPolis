@@ -20,6 +20,7 @@ To achieve the main goal, we will go through the following steps:
 ```shell
 git fetch reference # Update your local git index
 git checkout reference/TP1_Exercise
+
 ```
 This should create a local version of the remote TP1_Exercise branch and give you access to all the files related to this lab.
 
@@ -58,8 +59,9 @@ To understand how the code is generated, it is important to understand how the c
   - this task was executing a Makefile itself executing GNU toolchain for ARM processor executables
 - We will now compile the code using only the command line, in order to see the compilation process in detail. This is the standard and basic way to compile a program
 - The command to compile the C code and generate an object files and all the intermediate steps is :
-  ```sh
+  ```shell
   arm-none-eabi-gcc -save-temps=obj -mcpu=cortex-m4 -c test.c -o test.o
+  
   ```
   - **arm-none-eabi-gcc** is the command to launch the compiler
   - **-save-temps=obj** is used to save the intermediate files of the compilation process
@@ -70,23 +72,31 @@ To understand how the code is generated, it is important to understand how the c
   - executing the command in the VSCode EPuck2 internal terminal should not run in errors
     - in fact, this terminal was configured to add the arm-none-eabi toolchain to the **PATH** variables
   - ⚠ however executing this command from any other terminal might lead to errors:
-    ```shell
-    $ arm-none-eabi-gcc -save-temps=obj -mcpu=cortex-m4 -c test.c -o test.o
 
-    'arm-none-eabi-gcc' is not recognized as an internal or external command, an executable program or a batch file.
+    ```shell
+    arm-none-eabi-gcc -save-temps=obj -mcpu=cortex-m4 -c test.c -o test.o
+    
     ```
+
+    <div class="box">output console:<pre>
+    'arm-none-eabi-gcc' is not recognized as an internal or external command, an executable program or a batch file.
+    </pre></div>
+
     - This error occurs because the command line instance doesn't know yet what is this command
     - We have to add the path to the folder containing the executable files in the **PATH** environment variable
     - the **PATH** variable is used to store the location of all the known executables the command line can call
     - Type the following command (a bit different depending on the OS) to add the path of the ARM toolchain
+
       ### set PATH for Windows
-      ```shell
-      set PATH=installpath/EPuck2Tools/gcc-arm-none-eabi-7-2017-q4-major/bins;%PATH%
-      ```
+      <div class="box"><pre>
+      set PATH=C:\Users\username\AppData\Roaming\EPuck2_Utils\arm_gcc_toolchain\bin;%PATH%
+      </pre></div>
+
       ### set PATH for MacOS and Linux
-      ```shell
-      export PATH=installpath/EPuck2Tools/gcc-arm-none-eabi-7-2017-q4-major/bin:$PATH
-      ```
+      <div class="box"><pre>
+      export PATH=/Users/username/Applications/EPuck2_Utils/arm_gcc_toolchain/bin:$PATH
+      </pre></div>
+      
     - ⚠ the exact path to the gcc-arm-none-eabi toolchain might depend on your installation
     - ⚠ This procedure is temporary, it applies only to this current existing command line window
     - You will have to set again the **PATH** variable if you open a new command line window
