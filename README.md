@@ -1,7 +1,7 @@
 # TPIntro_Exercise updated !!
 There have been quite a few errors in the TPIntro_Exercise README.md file and you have certainly noticed some differences from what you had experienced.
 
-Just as you had to experiment the use of Git therefore you can compare the README.md of the Exercise between the `Reference` remote and yours in order to see which changes have been made and try to understand them.
+Just as you had to experiment the use of Git therefore you can compare the README.md of the Exercise between the `reference` remote and yours in order to see which changes have been made and try to understand them.
 
 In summary:
 
@@ -22,11 +22,11 @@ In summary:
 
     - Output's result of commands:
         <div class="box">output console:<pre>
-        `Python 3.9.1`
+        Python 3.9.1
         </pre></div>
 
-    > [!NOTE]
-    > The wikis will be adapted soon with this convention.
+    >[!NOTE]
+    >The wikis will be adapted soon with this convention.
 
 2. PyEnv:
     - Under Windows the virtual environment can be "simulated" by duplication. It take more disk space but the end user result is the same. Then use the command `pyenv duplicate python_version env_name` for Windows instead `pyenv virtualenv python_version env_name` for MacOS/Linux.
@@ -39,7 +39,7 @@ In summary:
 >[!NOTE]
 > ***It would therefore be wise at least to reread these 2 parts!!***
 
-And don't forget to update the TPIntro_Exercise branch locally and on your `Origin` remote group repository.
+And don't forget to update the TPIntro_Exercise branch locally and on your `origin` remote group repository.
 
 # Task 1: Result of the compilation
 - The meaning of **text**, **data**, **bss**, **dec** are:
