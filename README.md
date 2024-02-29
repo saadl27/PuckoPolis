@@ -22,10 +22,9 @@ git fetch reference # Update your local git index
 git checkout reference/TP1_Exercise
 
 ```
-This should create a local version of the remote TP1_Exercise branch and give you access to all the files related to this lab.
+This should create a local version of the remote TP1_Exercise branch and give you access to all the files related to this lab. Alternatively, you can use the VSCode git plug-in or git graph extension to fetch the `reference` remote and checkout to the correct branch.
 
-Alternatively, you can use the VSCode git plug-in or git graph extension to fetch the `reference` remote and checkout to the correct branch.
-- Create a symbolic link to the ST library (won't compile otherwise) by running the `Link Library ST to workspace` task
+Then, create a symbolic link to the ST library (won't compile otherwise) by running the `(Link Library ST)` task
     <p float="left">
         <img src="pictures/linkSTLibrary.png" alt="drawing" width="200"/>
     </p>
@@ -39,8 +38,8 @@ To understand how the code is generated, it is important to understand how the c
 > </p>
 
 ## 1.1 Generated code
-- Create a new folder src under Workplace/TPs and create in it a file named **test.c**
-- copy the [following code](#code-block-1) in it:
+- Create a new folder called `src` under Workplace/TPs/ and create in it a file named **test.c**;
+- Copy the code in [code block 1](#code-block-1) in it;
     >### Code block 1
     >```c
     >int main()
@@ -52,26 +51,25 @@ To understand how the code is generated, it is important to understand how the c
     >    return out;
     >}
     >```
-- Now open a terminal using VSCode EPuck2: `Ctrl` + `Shift` + `P` and then type and execute `View: Toggle Terminal`
-- in the terminal, **cd** in the folder **Workplace/TPs/src**
-  - 💡 executing `ls` or `dir` will display the content of the current folder, verify that **test.c** is there
-- During the first practical, your code was compiled using the GNU toolchain for ARM processor through the VSCode task `Make`
-  - this task was executing a Makefile itself executing GNU toolchain for ARM processor executables
-- We will now compile the code using only the command line, in order to see the compilation process in detail. This is the standard and basic way to compile a program
-- The command to compile the C code and generate an object files and all the intermediate steps is :
+- Now open a terminal using VSCode EPuck2: `Ctrl` + `Shift` + `P` and then type and execute `Terminal: Create New Terminal`;
+- In the terminal, **cd** in the folder **Workplace/TPs/src**
+  - 💡 executing `ls` or `dir` will display the content of the current folder, verify that the file `test.c` is indeed in there;
+- During the first practical, your code was compiled using the GNU toolchain for ARM processor through the VSCode task `Make`;
+  - this task was executing a Makefile, itself executing GNU toolchain for ARM processor executables;
+- Now, we will compile the code using only the command line in order to see the compilation process in detail. This is the standard and basic way to compile a program;
+- The command to compile the C code and generate an object files and all the intermediate steps is as follows:
   ```shell
   arm-none-eabi-gcc -save-temps=obj -mcpu=cortex-m4 -c test.c -o test.o
   
   ```
   - **arm-none-eabi-gcc** is the command to launch the compiler
-  - **-save-temps=obj** is used to save the intermediate files of the compilation process
-  - **-mcpu=cortex-m4** is called to specify the processor that will execute the code
+  - **-save-temps=obj** is an option used to save the intermediate files of the compilation process
+  - **-mcpu=cortex-m4** is an option called to specify the processor that will execute the code
   - **-c** specifies to not do the linking step
-- Compile the test.c file using the explained command in the terminal
-- When executing the command, the shell searchs for an executable named arm-none-eabi-gcc in the folder specified in the **PATH** variables
-  - executing the command in the VSCode EPuck2 internal terminal should not run in errors
-    - in fact, this terminal was configured to add the arm-none-eabi toolchain to the **PATH** variables
-  - ⚠ however executing this command from any other terminal might lead to errors:
+- Compile the test.c file using the latter command in the terminal;
+- When executing the command, the shell searches for an executable named arm-none-eabi-gcc in the folder specified in the **PATH** variables;
+  - executing the command in the VSCode EPuck2 internal terminal should not run in errors as this terminal was configured to add the arm-none-eabi toolchain to the **PATH** variable;
+  - ⚠ However executing this command from any other terminal might lead to errors:
 
     ```shell
     arm-none-eabi-gcc -save-temps=obj -mcpu=cortex-m4 -c test.c -o test.o
@@ -82,10 +80,10 @@ To understand how the code is generated, it is important to understand how the c
     'arm-none-eabi-gcc' is not recognized as an internal or external command, an executable program or a batch file.
     </pre></div>
 
-    - This error occurs because the command line instance doesn't know yet what is this command
-    - We have to add the path to the folder containing the executable files in the **PATH** environment variable
-    - the **PATH** variable is used to store the location of all the known executables the command line can call
-    - Type the following command (a bit different depending on the OS) to add the path of the ARM toolchain
+    - This error occurs because the command line instance doesn't know yet what is this command;
+    - We have to add the path to the folder containing the executable files in the **PATH** environment variable;
+    - 💡 The **PATH** variable is used to store the location of all the known executables the command line can call;
+    - Type the following command (a bit different depending on the OS) to add the ARM toolchain command to the path:
 
       ### set PATH for Windows
       <div class="box"><pre>
@@ -97,10 +95,10 @@ To understand how the code is generated, it is important to understand how the c
       export PATH=/Users/username/Applications/EPuck2_Utils/arm_gcc_toolchain/bin:$PATH
       </pre></div>
       
-    - ⚠ the exact path to the gcc-arm-none-eabi toolchain might depend on your installation
-    - ⚠ This procedure is temporary, it applies only to this current existing command line window
-    - You will have to set again the **PATH** variable if you open a new command line window
-    - 🚀 Now the compilation command should execute correctly
+    - ⚠ The exact path to the gcc-arm-none-eabi toolchain might depend on your installation;
+    - ⚠ This procedure is temporary, it applies only to this current existing terminal, meaning you will have to repeat this command if you open a new command line window;
+    
+  🚀 Now the compilation command should execute correctly !
 
 
 > `Task 1`
