@@ -5,7 +5,7 @@
 ## Goals
 - The rest of this exercise shows all necessary steps to generate a low-level library for the e-puck2 miniature mobile robot written in C
 - The library targeted in this exercise is a motor control library allowing to set speed and position targets.
-- 💡 All the documentation concerning the GNU embedded toolchain for ARM processors **arm-none-eabi** and the compiler GCC can be found in the subfolder **installpath/EPuck2Tools/gcc-arm-none-eabi-7-2017-q4-major/share/doc/gcc-arm-none-eabi/pdf**
+- 💡 All the documentation concerning the GNU embedded toolchain for ARM processors **arm-none-eabi** and the compiler GCC can be found in the subfolder **installpath/EPuck2_Utils/arm_gcc_toolchain/share/doc/gcc-arm-none-eabi/pdf**
 
 ## Methodology
 To achieve the main goal, we will go through the following steps:
@@ -19,11 +19,13 @@ To achieve the main goal, we will go through the following steps:
 ```shell
 git fetch reference # Update your local git index
 git checkout reference/TP2_Exercise
+
 ```
 This should create a local version of the remote TP2_Exercise branch and give you access to all the files related to this lab.
 
 Alternatively, you can use the VSCode git plug-in or git graph extension to fetch the `reference` remote and checkout to the correct branch.
-- Create a symbolic link to the ST library (won't compile otherwise) by running the `Link Library ST to workspace` task
+
+Then, create a symbolic link to the ST library (won't compile otherwise) by running the `(Link Library ST)` task
     <p float="left">
         <img src="pictures/linkSTLibrary.png" alt="drawing" width="200"/>
     </p>
@@ -129,8 +131,9 @@ Alternatively, you can use the VSCode git plug-in or git graph extension to fetc
 - Now let's create a library archive which will contain **motor.o**, **gpio.o**, **timer.o** and **selector.o**:
   - Reopen the VSCode terminal (or open an external one and reconfigure the **PATH**)
   - Go to the directory containing the files of the projects (command **cd**) and type the following command:
-  ```
+  ```shell
   arm-none-eabi-ar -q libtp2.a gpio.o motor.o timer.o selector.o
+  
   ```
 
 - Now in the file explorer window, a **libtp2.a** file should have appeared
