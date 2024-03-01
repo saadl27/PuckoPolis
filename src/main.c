@@ -15,7 +15,7 @@ int main(void)
 
     // LED used init
     gpio_config_output_opendrain(LED_USED);
-    gpio_clear(LED_USED);
+    gpio_set(LED_USED);
 
     while (1) {
         ;
