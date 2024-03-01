@@ -13,7 +13,13 @@
             },
             "problemMatcher": "$gcc",
             "options": {
-                "cwd": "${workspaceFolder}/src/"
+                "cwd": "${workspaceFolder}/src/",
+                "windows": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": ["/d", "/C"]
+                    }
+                }
             },
             "presentation": {
                 "echo": false,
@@ -28,7 +34,13 @@
                 "isDefault": true
             },
             "options": {
-                "cwd": "${workspaceFolder}/src/"
+                "cwd": "${workspaceFolder}/src/",
+                "windows": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": ["/d", "/C"]
+                    }
+                }
             },
             "presentation": {
                 "echo": false,
