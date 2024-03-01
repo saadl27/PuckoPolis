@@ -49,12 +49,7 @@
         {
             "label": "TPIntro:(Link Library ST)",
             "type": "shell",
-            "linux": {
-                "command": "LIB=ST; if [ -d $LIB ] ; then echo -n -e '\\033[0;91m'Link $LIB already present ; echo '\\033[0m'>>/dev/null ; else ln -s ${config:workplace}/EPuck2_Workplace/Lib/$LIB . ; echo -n -e '\\033[1;32m'Link $LIB done ! ; echo '\\033[0m'>>/dev/null ; fi ; echo '\n'",
-            },
-            "osx": {
-                "command": "LIB=ST; if [ -d $LIB ] ; then echo -n -e '\\033[0;91m'Link $LIB already present ; echo '\\033[0m'>>/dev/null ; else ln -s ${config:workplace}/EPuck2_Workplace/Lib/$LIB . ; echo -n -e '\\033[1;32m'Link $LIB done ! ; echo '\\033[0m'>>/dev/null ; fi ; echo '\n'",
-            },
+            "command": "LIB=ST; if [ -d $LIB ] ; then echo -n -e '\\033[0;91m'Link $LIB already present ; echo '\\033[0m'>>/dev/null ; else ln -s ${config:workplace}/EPuck2_Workplace/Lib/$LIB . ; echo -n -e '\\033[1;32m'Link $LIB done ! ; echo '\\033[0m'>>/dev/null ; fi ; echo '\n'",
             "windows": {
                 // DON'T FORGET to change the name of the library (LibName) in 3 places:
                 // 1. LIB=LibName
