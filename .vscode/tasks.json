@@ -47,7 +47,7 @@
             }
         },
         {
-            "label": "TP2 Exercise: (Link Library ST)",
+            "label": "TP2 Exercise:(Link Library ST)",
             "type": "shell",
             "command": "LIB=ST; if [ -d $LIB ] ; then echo -n -e '\\033[0;91m'Link $LIB already present ; echo '\\033[0m'>>/dev/null ; else ln -s ${config:workplace}/EPuck2_Workplace/Lib/$LIB . ; echo -n -e '\\033[1;32m'Link $LIB done ! ; echo '\\033[0m'>>/dev/null ; fi ; echo '\n'",
             "windows": {
