@@ -1,29 +1,27 @@
 # Introduction
-- Welcome in lab 2 of MICRO-315
-- `⏱ Duration`: 3 hours
+- Welcome to the second lab of MICRO-315;
+- `⏱ Duration`: 3 hours.
 
 ## Goals
-- The rest of this exercise shows all necessary steps to generate a low-level library for the e-puck2 miniature mobile robot written in C
-- The library targeted in this exercise is a motor control library allowing to set speed and position targets.
-- 💡 All the documentation concerning the GNU embedded toolchain for ARM processors **arm-none-eabi** and the compiler GCC can be found in the subfolder **installpath/EPuck2_Utils/arm_gcc_toolchain/share/doc/gcc-arm-none-eabi/pdf**
+- Generate a low-level library for the e-puck2 miniature mobile robot written in C;
+- The library targeted in this exercise is a motor control library allowing to set speed and position targets;
+- 💡 All the documentation concerning the GNU embedded toolchain for ARM processors **arm-none-eabi** and the compiler GCC can be found in the subfolder `installpath/EPuck2_Utils/arm_gcc_toolchain/share/doc/gcc-arm-none-eabi/pdf`.
 
 ## Methodology
 To achieve the main goal, we will go through the following steps:
-- Understanding how a PWM works.
-- Understanding how a stepper motor works and programming a stepper motor controller in C.
+- Master PWM signals in the context of the EPuck-2 LEDs;
+- Understand how a stepper motor works and programming a stepper motor controller in C;
 - Making a library out of it.
 
 ## ⚠ TODO before starting the Lab
-- Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Setting-up-git-for-TPs) wiki page.
+- Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Setting-up-git-for-TPs) wiki page;
 - Checkout to the branch of the lab:
 ```shell
 git fetch reference # Update your local git index
 git checkout reference/TP2_Exercise
 
 ```
-This should create a local version of the remote TP2_Exercise branch and give you access to all the files related to this lab.
-
-Alternatively, you can use the VSCode git plug-in or git graph extension to fetch the `reference` remote and checkout to the correct branch.
+This should create a local version of the remote TP2_Exercise branch and give you access to all the files of this lab. Alternatively, you can use the VSCode git plug-in or git graph extension to fetch the `reference` remote and checkout to the correct branch.
 
 Then, create a symbolic link to the ST library (won't compile otherwise) by running the `(Link Library ST)` task
     <p float="left">
@@ -32,10 +30,8 @@ Then, create a symbolic link to the ST library (won't compile otherwise) by runn
 
 # Part 1 - Programming a PWM signal to drive a LED
 ## 1.1 Introduction
-- During TP1, you used a timer and an interrupt routine to toggle a LED with a given frequency
-- Here, we are going to drive a LED using a PWM (Pulse Width Modulation) signal, which will allow us to change the visible intensity of the LED
-- First read the wiki to learn more about the PWM configuration on STM32
-  - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-PWM)
+During TP1, you used a timer and an interrupt routine to toggle a LED with a given frequency. Here, we are going to drive a LED using a PWM (Pulse Width Modulation) signal, which will allow us to change the visible intensity of the LED. To start, read through the wiki to learn more about the PWM configuration on STM32:
+- 👉 [STM32-PWM](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-PWM)
 
 ## 1.2 Configuration of the GPIO
 - In this exercise, we will select the Pin 14 of the Port D: **PD14** that is connected to the channel 3 of the timer 4: **TIM4_CH3** as shown in the [**table 7 STM32F40xxx pin and ball definitions**](#figure-3)
@@ -52,11 +48,11 @@ Then, create a symbolic link to the ST library (won't compile otherwise) by runn
       <img src="pictures/GPIOAF.png" alt="drawing" width="700"/>
     </p>
 
-> `Task 7`
+> `Task 1`
 >- Create a function in **gpio.c** and **gpio.h** called **gpio_config_output_af_pushpull**
 >- Use the Reference Manual to configure the pin in **Alternate Function (AF)** mode by changing bits in the **MODER** register
 
-> `Task 8`
+> `Task 2`
 >- Use the Reference Manual to configure the register **AFR** to select the right alternate function for the pin 14 so that it is driven by the **Channel 3** of the **Timer 4**
 >
 >💡 Hints:
@@ -66,9 +62,9 @@ Then, create a symbolic link to the ST library (won't compile otherwise) by runn
 
 
 - The GPIO is now configured 🥇
-- Now let's configure the **Timer4** and **Channel 3** to obtain the desired PWM on the pin 14
+- Now let's configure the **Timer4** and **Channel 3** to obtain the desired PWM on the pin 14 of port D
 - The **Timer 4** should be configured similarly to what was done in Lab 1 with **Timer 6**
--💡 Look at the wiki on PWM to configure the timer
+-💡 Look at the [wiki on PWM](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-PWM) to configure the timer
 
 > `Task 9`
 >- Determine the **Prescaler** and **Counter maximum** value for **Timer 4**
