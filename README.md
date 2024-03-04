@@ -68,9 +68,7 @@ During TP1, you used a timer and an interrupt routine to toggle a LED with a giv
 
 > `Task 9`
 >- Determine the **Prescaler** and **Counter maximum** value for **Timer 4**
->- Hint:
->   - The blinking of the LED should be fast in order to not being seen
->   - Something around **80-100Hz**
+>- The blinking of the LED should be fast (something around **80 - 100Hz**) in order to not be visible to the human eye
 
 - The final step: configure the **Channel 3** of **Timer4** for **Output Compare**
 
@@ -80,17 +78,17 @@ During TP1, you used a timer and an interrupt routine to toggle a LED with a giv
 >- Build and run your code
 >   - 💡 Remember there is debugger with register visualization to check register bits
 >- You can use the selector to change the value of **CCR3** → change the apparent intensity of the Front LED
->- Use the oscilloscope to visualize the PWM signal with different duty cycle
+>- Use the oscilloscope to visualize the PWM signal for different duty cycles
 >
 >💡 Hint:
 >- Take a look at the reference manual to learn how to configure the timer to use the PWM
 
 # Part 2 - Programming a library to drive the stepper motor of the e-puck2
-- First read the wiki to learn more about the EPuck2 Motors
-  - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Motor)
+First read through the wiki to learn more about the EPuck2 Motors.
+  - 👉 [EPuck2-Motor](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Motor)
 
 ## 2.1 Functions implementation
-- All the functions are already declared in **motor.c** and **motor.h**. What is asked is to complete them.
+All the functions are already declared in **motor.c** and **motor.h**, but it is up to you to complete them.
 > `Task 11`
 >- Make sure to be in the branch **TP2_Exercise**
 >- Complete the necessary functions to control the two stepper motors in speed, direction or target position
@@ -105,7 +103,7 @@ During TP1, you used a timer and an interrupt routine to toggle a LED with a giv
 >   - add motor.c in the **makefile** on the line listing the .c files to be compiled
 >- Hint: Test these functions with a simple demo that moves forward for 10 cm, turns 180 degrees, and comes back to the starting point
 
->⚠⚠ **It is important to set each phase of the motor to 0 when the robot does not have to move, or if the program is stopped, thus ensure that no phase is active continuously, otherwise you risk damaging the motors!** ⚠⚠
+>⚠⚠ **It is important to set each phase of the motor to 0 when the robot does not have to move, or if the program is stopped, to ensure that no phase is active continuously which might damage the motors!** ⚠⚠
 
 ## 2.2 Library
 - Compile your project again to be sure to have the **.o** files
@@ -135,7 +133,7 @@ During TP1, you used a timer and an interrupt routine to toggle a LED with a giv
 - Now in the file explorer window, a **libtp2.a** file should have appeared
 - Move out of the project's folder **motor.o**, **motor.c**, **gpio.o**, **gpio.c**, **timer.o**, **timer.c**, **selector.o** and **selector.h**
 - Edit the **Makefile** and delete all the mention to these files (.c and .o) and add **libtp2.a** to the variable **LIBS**
-- You should now be able to compile the project.
+- You should now be able to compile the project with a library rather than source code.
 
 > `Task 13`
 >- Do you see a difference?
