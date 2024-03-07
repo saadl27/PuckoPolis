@@ -42,6 +42,7 @@ NM   = $(TRGT)nm
 
 # Compiler options
 OPT = -O0 -ggdb -fomit-frame-pointer -falign-functions=16
+
 OPT += -ffunction-sections -fdata-sections -fno-common
 
 # THUMB-specific options
