@@ -2,7 +2,7 @@
     "configurations": [
         {
             "name": "EPUCK2 ARM C",
-            "forcedInclude": ["${config:workplace}//Lib//e-puck2_main-processor//ChibiOS//os//ext//CMSIS//ST//stm32f407xx.h"],
+            "forcedInclude": ["${config:workplace}//EPuck2_Workplace//Lib//e-puck2_main-processor//ChibiOS//os//ext//CMSIS//ST//stm32f407xx.h"],
             "includePath": [
                 "${config:gcc_arm_path}//arm-none-eabi//7.2.1//include//",
                 // I don't have this version under any OS
