@@ -9,10 +9,23 @@
 ## Methodology
 - Understand the RTOS main mechanisms and complete some functions to correct the offset of the IMU, convert the raw measurements into known units and turn on the leds depending on the orientation of the robot
 
-## ⚠ ToDo before starting the Lab
+## ⚠ ToDo before starting this Lab
 
 >[!IMPORTANT]
+>### Update `Lib`
 >As we have just made an important correction to the `e-puck2_main-processor` sub-library then you need to update it by running the `Clone Lib` user task.
+
+## ⚠ ToDo before changing branch
+
+>[!IMPORTANT]
+>### Clean the TPs folder
+>**Before to pass** on the new TP (or another branch) it is important to clean the actual branch in order to erase all compilation results. Then you must run the `Clean` task of the current branch **before** to change the branch.
+>
+>If you forget to do it, you can checkout the previous branch, run the `Clean` task then checkout the new branch. Or you can delete all untracked files manually.
+>
+> The goal is to avoid to have files not linked with the new branch and to make you confused.
+
+## Take TP3_Exercise branch
 
 - Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Setting-up-git-for-TPs) wiki page.
 
@@ -20,7 +33,7 @@
 
 - Don't forget to push this branch with the upstream enabled to your origin remote
 
-- Once on this branch `TP3_Exercise`, normaly the `e-puck2_main-processor` library has certainly not yet been installed and `ST` library from previous TP is still present. Then you can:
+- Once on this branch `TP3_Exercise`, normaly the `e-puck2_main-processor` library has certainly not yet been linked and `ST` library from previous TP is still linked. Then you must:
 
     - delete the old library but only the `ST` link in the File explorer tab **and not the content**
 
@@ -28,7 +41,7 @@
             <img src="pictures/DeleteSTLibraryLink.png" alt="drawing" width="200"/>
         </p>
 
-    - install the new library by running the `Link Library e-puck2_main-processor` task otherwise the code won't compile.
+    - link the new library by running the `Link Library e-puck2_main-processor` task otherwise the code won't compile.
 
         <p float="left">
             <img src="pictures/linkLib.png" alt="drawing" width="200"/>
@@ -47,7 +60,7 @@
 >***
 
 >[!WARNING]
->From now on, you should **ALWAYS create a .gitignore and properly configure it**
+>From now on, you should **ALWAYS check to have a .gitignore and properly configure it**
 
 >***
 
@@ -57,25 +70,25 @@
 
     - to ignore a precise folder named `src/func/test/`, simply add the folder path on a newline (simply `src/func/test/`)
 
-    - to ignore a precise file named `src/func/main.o`, simply add the folder path on a newline (simply `src/func/main.o`)
+    - to ignore a precise file named `src/func/main.o`, simply add the file path on a newline (simply `src/func/main.o`)
 
     - to ignore any file ending with .elf (like `main.elf`), simply add `*.elf`
 
 - To ignore the ST and the e-puck2_main-processor librairies, and all the build files, one's .gitignore should look like:
 
-    - either to [gitignore's content for TP1 or TP2]
-    (#gitignores-content-for-tps-using-st-library) if your code is using `ST library`
+    - either to [gitignore's content for TP1 or TP2](#gitignores-content-for-tps-using-st-library) if your code is using `ST library`
 
     - or to [gitignore's content for TP3 and following](#gitignores-content-for-tps-using-e-puck2_main-processor-library) if your code is using `e-puck2_main-processor` library
 
 >***
 
 >[!WARNING]
->Your code should **NEVER use these 2 libraries (`ST` and `e-puck2_main-processor` simultaneously**. It’s really two different ways to use the low level of the STM32F4 microcontroller
+>Your code should **NEVER use these 2 libraries (`ST` and `e-puck2_main-processor`) simultaneously**. It’s really two different ways to use the low level of the STM32F4 microcontroller
 
 >***
 
 - >#### .gitignore's content for TPs using ST library
+    >
     >```bash
     ># Normally required only for TP1 and TP2
     >ST/
@@ -108,6 +121,7 @@
     >```
 
 - >#### .gitignore's content for TPs using e-puck2_main-processor library
+    >
     >```bash
     ># Normally required only for TPs preceding TP3
     ># But keep them if bad use of "Link Library ST"
@@ -138,6 +152,7 @@
     ># Windows specific files but always use if another user can work under Windows
     >Thumbs.db
     >```
+
 - for further details on .gitignore, have a look at [this page](https://git-scm.com/docs/gitignore)
 
 # Part 1 - Read about RTOS and ChibiOS
@@ -210,7 +225,7 @@ Read through ALL those 2 wiki pages:
 >- Take a look at the files and try to understand how the code configures and reads the IMU
 >- For this you have really to explore all the libraries linked with the IMU (right click on the function call, then go to declaration, for instance)
 
-- futher reading on messagebus at [https://github.com/cvra/msgbus](https://github.com/cvra/msgbus) 
+- futher reading on messagebus at https://github.com/e-puck2/msgbus
 ## Processing the IMU's data
 - If you looked carefully at the **imu.c** file, you should have seen two empty functions which are **imu\_compute\_offset()** and **imu\_compute\_units()**
 - The first one is used to get a given amount of measurements from the IMU and to compute an averaged offset value for all the axis of the accelerometer and of the gyroscope in order to use them later to have measurements without offsets (the IMU is not perfectly calibrated)
