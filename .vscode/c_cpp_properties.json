@@ -9,9 +9,9 @@
         {
             "name": "EPUCK2 ARM C",
             "includePath": [
-                "${config:workplace}//Lib//ST",
+                "${config:workplace}//EPuck2_Workplace//Lib//ST",
                 "${config:gcc_arm_path}//arm-none-eabi//include",
-                "${config:gcc_arm_path}//lib//gcc//arm-none-eabi//10.3.1//include"
+                "${config:gcc_arm_path}//lib//gcc//arm-none-eabi//7.2.1//include"
             ],
             "defines": [
                 "HAL_USE_PAL",
