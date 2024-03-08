@@ -1,44 +1,87 @@
 # Introduction
-- Introduces the concept of a RTOS using ChibiOS as an example, utilization of the IMU
-- ChibiOS: a RTOS optimized for the execution speed and the size of the code, it contains a lot of drivers to use the peripherals of the STM32 families
-- `Goal`: Understand the RTOS main mechanisms and complete some functions to correct the offset of the IMU, convert the raw measurements into known units and turn on the leds depending on the orientation of the robot
+- Welcome in lab 3 of MICRO-315
 - `⏱ Duration`: 4 hours
 
+## Goals
+- Introduces the concept of a RTOS using ChibiOS as an example, utilization of the IMU
+- ChibiOS: a RTOS optimized for the execution speed and the size of the code, it contains a lot of drivers to use the peripherals of the STM32 families
+
+## Methodology
+- Understand the RTOS main mechanisms and complete some functions to correct the offset of the IMU, convert the raw measurements into known units and turn on the leds depending on the orientation of the robot
+
 ## ⚠ ToDo before starting the Lab
-- to pull the TP3_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Fetching-Exercises-Solutions)
+
+>[!IMPORTANT]
+>As we have to do an important correction to the `e-puck2_main-processor` sub-library then you will need to update it **as soon as it will be ready**.
+>
+>Thank you to check this remark and wait this update !!
+
+- Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Setting-up-git-for-TPs) wiki page.
+
+- To pull the TP3_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Fetching-Exercises-Solutions)
+
 - Don't forget to push this branch with the upstream enabled to your origin remote
-- Once on this branch `TP3_Exercise`, normaly the `e-puck2_main-processor` library has certainly not yet been installed. Then do it by running the `Link Library e-puck2_main-processor` task otherwise the code won't compile.
-    <p float="left">
-        <img src="pictures/linkLib.png" alt="drawing" width="200"/>
-    </p>
+
+- Once on this branch `TP3_Exercise`, normaly the `e-puck2_main-processor` library has certainly not yet been installed and `ST` library from previous TP is still present. Then you can:
+
+    - delete the old library but only the `ST` link in the File explorer tab **and not the content**
+
+        <p float="left">
+            <img src="pictures/DeleteSTLibraryLink.png" alt="drawing" width="200"/>
+        </p>
+
+    - install the new library by running the `Link Library e-puck2_main-processor` task otherwise the code won't compile.
+
+        <p float="left">
+            <img src="pictures/linkLib.png" alt="drawing" width="200"/>
+        </p>
 
 ## Small tutorial on .gitignore use
+
 - The purpose of the .gitignore file is simply to tell to `ignore` (`untrack`) specific files or folders
+
 - In fact, you may have at some point committed "useless" files to your repository
+
 - Such files could be build generated, libraries or anything not relevant to be pushed on the remote
+
 - First of all those files takes place on the Github repository, which can greatly increase the downloading and uploading size per commit and unnecessarily polue everywhere (github.com and each local repositories)
 
 >***
->⚠ From now on, you should `ALWAYS create a .gitignore and properly configure it`
+
+>[!WARNING]
+>From now on, you should **ALWAYS create a .gitignore and properly configure it**
+
 >***
 
 - Fortunately this process is dead simple:
+
     - the file `.gitignore` should be located directly in the root folder of your repository
+
     - to ignore a precise folder named `src/func/test/`, simply add the folder path on a newline (simply `src/func/test/`)
+
     - to ignore a precise file named `src/func/main.o`, simply add the folder path on a newline (simply `src/func/main.o`)
+
     - to ignore any file ending with .elf (like `main.elf`), simply add `*.elf`
+
 - To ignore the ST and the e-puck2_main-processor librairies, and all the build files, one's .gitignore should look like:
-    - either to [gitignore's content for TP1 or TP2](#gitignores-content-for-tps-using-st-library) if your code is using `ST library`
+
+    - either to [gitignore's content for TP1 or TP2]
+    (#gitignores-content-for-tps-using-st-library) if your code is using `ST library`
+
     - or to [gitignore's content for TP3 and following](#gitignores-content-for-tps-using-e-puck2_main-processor-library) if your code is using `e-puck2_main-processor` library
 
 >***
->⚠ Your code should `NEVER use these 2 libraries simultaneously`. It is really 2 different worlds to use the low level of the STM32F4 microcontroller
+
+>[!WARNING]
+>Your code should **NEVER use these 2 libraries (`ST` and `e-puck2_main-processor` simultaneously**. It’s really two different ways to use the low level of the STM32F4 microcontroller
+
 >***
 
 - >#### .gitignore's content for TPs using ST library
     >```bash
     ># Normally required only for TP1 and TP2
     >ST/
+    >ST
     >*.o
     >*.d
     >*.elf
@@ -48,9 +91,16 @@
     >*.sizelib
     >
     ># Normally required only for TP3 and following
-    ># But keep at less always e-puck2_main-processor if bad use of
-    ># Link Library e-puck2_main-processor task in TPs preceding TP3
+    ># But keep them if bad use of "Link Library
+    ># e-puck2_main-processor" task in TPs preceding TP3
     >e-puck2_main-processor/
+    >e-puck2_main-processor
+    >build/
+    >.dep/
+    >*.a
+    >
+    ># Files generated by the debugger
+    >.vscode/.cortex-debug.*
     >
     ># MacOS specific files but always use if another user can work under MacOS
     >.DS_Store
@@ -62,14 +112,27 @@
 - >#### .gitignore's content for TPs using e-puck2_main-processor library
     >```bash
     ># Normally required only for TPs preceding TP3
-    ># But keep at less always ST if bad use of
-    ># "Link Library ST" task in TP3 or following
+    ># But keep them if bad use of "Link Library ST"
+    ># task in TP3 or following
     >ST/
+    >ST
+    >*.o
+    >*.d
+    >*.elf
+    >*.list
+    >*.mem
+    >*.size
+    >*.sizelib
     >
     ># Normally required only for TP3 and following
     >e-puck2_main-processor/
+    >e-puck2_main-processor
     >build/
     >.dep/
+    >*.a
+    >
+    ># Files generated by the debugger
+    >.vscode/.cortex-debug.*
     >
     ># MacOS specific files but always use if another user can work under MacOS
     >.DS_Store
