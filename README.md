@@ -12,9 +12,7 @@
 ## ⚠ ToDo before starting the Lab
 
 >[!IMPORTANT]
->As we have to do an important correction to the `e-puck2_main-processor` sub-library then you will need to update it **as soon as it will be ready**.
->
->Thank you to check this remark and wait this update !!
+>As we have just made an important correction to the `e-puck2_main-processor` sub-library then you need to update it by running the `Clone Lib` user task.
 
 - Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Setting-up-git-for-TPs) wiki page.
 
