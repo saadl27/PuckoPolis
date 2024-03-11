@@ -3,8 +3,9 @@
 - `⏱ Duration`: 4 hours
 
 ## Goals
-- Introduces the concept of a RTOS using ChibiOS as an example, utilization of the IMU
-- ChibiOS: a RTOS optimized for the execution speed and the size of the code, it contains a lot of drivers to use the peripherals of the STM32 families
+- Introduce the concept of an RTOS by using ChibiOS as an example
+    - ChibiOS: an RTOS optimized for the execution speed and the size of the code, it contains a lot of drivers to use the peripherals of the STM32 families 
+- Introduce the use of the IMU
 
 ## Methodology
 - Understand the RTOS main mechanisms and complete some functions to correct the offset of the IMU, convert the raw measurements into known units and turn on the leds depending on the orientation of the robot
@@ -15,15 +16,19 @@
 >### Update `Lib`
 >As we have just made an important correction to the `e-puck2_main-processor` sub-library then you need to update it by running the `Clone Lib` user task.
 
+<p float="left">
+            <img src="pictures/cloneLib.png" alt="drawing" width="200"/>
+</p>
+
 ## ⚠ ToDo before changing branch
 
 >[!IMPORTANT]
 >### Clean the TPs folder
->**Before to pass** on the new TP (or another branch) it is important to clean the actual branch in order to erase all compilation results. Then you must run the `Clean` task of the current branch **before** to change the branch.
+>**Before to pass** on the new TP (or another branch) it is important to clean the actual branch in order to erase all compilation results. Therefore, you must run the `Clean` task of the current branch **before** switching branch.
 >
->If you forget to do it, you can checkout the previous branch, run the `Clean` task then checkout the new branch. Or you can delete all untracked files manually.
+>If you forget to do it, you can checkout the previous branch, run the `Clean` task then checkout the new branch. Alternatively, you can delete all untracked files manually.
 >
-> The goal is to avoid to have files not linked with the new branch and to make you confused.
+> The goal is to avoid to have files not linked with the new branch that could confuse you.
 
 ## Take TP3_Exercise branch
 
@@ -41,7 +46,7 @@
             <img src="pictures/DeleteSTLibraryLink.png" alt="drawing" width="200"/>
         </p>
 
-    - link the new library by running the `Link Library e-puck2_main-processor` task otherwise the code won't compile.
+    - link the new library by running the `Link Library e-puck2_main-processor` task, otherwise the code will not compile.
 
         <p float="left">
             <img src="pictures/linkLib.png" alt="drawing" width="200"/>
@@ -49,18 +54,12 @@
 
 ## Small tutorial on .gitignore use
 
-- The purpose of the .gitignore file is simply to tell to `ignore` (`untrack`) specific files or folders
-
-- In fact, you may have at some point committed "useless" files to your repository
-
-- Such files could be build generated, libraries or anything not relevant to be pushed on the remote
-
-- First of all those files takes place on the Github repository, which can greatly increase the downloading and uploading size per commit and unnecessarily polue everywhere (github.com and each local repositories)
+The purpose of the .gitignore file is simply to tell to `ignore` (`not track`) specific files or folders. In fact, you may have at some point committed "useless" files to your repository. Such files could be build generated, libraries or anything not relevant to be pushed on the remote. Those files are then pushed on the Github repository, which can greatly increase the downloading and uploading size per commit and unnecessarily polute the repository on both github.com and on every local repository.
 
 >***
 
 >[!WARNING]
->From now on, you should **ALWAYS check to have a .gitignore and properly configure it**
+>From now on, you should **ALWAYS ensure you have a .gitignore and properly configure it**
 
 >***
 
@@ -83,7 +82,7 @@
 >***
 
 >[!WARNING]
->Your code should **NEVER use these 2 libraries (`ST` and `e-puck2_main-processor`) simultaneously**. It’s really two different ways to use the low level of the STM32F4 microcontroller
+>Your code should **NEVER use these 2 libraries (`ST` and `e-puck2_main-processor`) simultaneously**. It’s really two separate ways of managing the low level of the STM32F4 microcontroller
 
 >***
 
@@ -153,25 +152,26 @@
     >Thumbs.db
     >```
 
-- for further details on .gitignore, have a look at [this page](https://git-scm.com/docs/gitignore)
+For further details on .gitignore, feel free to have a look at [this webpage](https://git-scm.com/docs/gitignore).
 
 # Part 1 - Read about RTOS and ChibiOS
-Read through ALL those 2 wiki pages:
+Read through the 2 following wiki pages:
 
 - [Generalities about RTOS](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/ChibiOS-Generalities-about-RTOS)
 - [Presenting ChibiOS](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/ChibiOS-Presenting-ChibiOS)
+
 # Part 2 - Multi-threaded blinky demo
 - The code provided to you does several things:
     - initializes the system
     - configures a serial port to send data to computer
     - configures the I2C (used by the IMU)
     - configures the IMU
-    - writes continuously at a given frequency to the serial port the measurements from the IMU
+    - writes the measurements from the IMU continuously at a given frequency to the serial port
 - 💡 To monitor what the EPuck2 sends via UART to computer, you must use a serial terminal. Consult [STM32F407 UART communication - Serial Monitor](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Communicating-with-the-EPuck2#stm32f407-uart-communication---serial-monitor) for more details
 - 💡 You will find in the **main.c** file two threads:
     - **ThdFrontLed**
     - **ThdBodyLed**
-- The goal here is to see how to achieve the same result as in the TP1 (blink a led) but using threads
+- The goal here is to see how to achieve the same result as in the TP1 (blink a led) but using threads rather than timers directly
 - It is much simpler because no timer has to be configured and the choice of frequency is very easy
 - You will also visualize on the oscilloscope the mechanisms used by ChibiOS to switch between the threads
 
