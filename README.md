@@ -186,10 +186,10 @@ Read through the 2 following wiki pages:
 
 > `Task 3`
 >- Use the oscilloscope with the two test points of the e-puck2 to visualize the signals sent to the leds;
->- The two test points are located under the left side of the EPuck;
->- Only trust the writings under the EPuck PCB (B.L. and F.L for Bottom Led and Front Led respectively) and not BL and FL on top of the EPuck2 to find the correspondence with bottom and front LEDs, as some of the engravings on the top-side are wrong;
->- You can use the screw on top of your EPuck as ground;
->- Is the frequency/period of the commutations correct ?
+>- The two test points are located under the right side of the e-puck2;
+>- Only trust the writings under the PCB (B.L. and F.L for Bottom Led and Front Led respectively) and not BL and FL markings on the plastic lid of the e-puck2 to find the correspondence with bottom and front LEDs, as some of the engravings on the top-side are wrong; or simply F.L test point is ahead B.L one!
+>- You must use the screw on top of your EPuck to connect at least one ground of the two probes.
+>- Is the frequency/period of the commutations correct?
 
 > `Task 4`
 >- Comment in the thread **ThdBodyLed** the first case (line 86) and uncomment the second case (lines 92-95)
