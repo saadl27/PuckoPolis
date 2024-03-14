@@ -185,7 +185,10 @@ Read through the 2 following wiki pages:
 >- Resolve the problem and verify that **BODY_LED** and **FRONT_LED** are blinking (**FRONT_LED** will blink too fast and will simply seem to be turned on)
 
 > `Task 3`
->- Use the oscilloscope with the two test points of the e-puck2 to visualize the signals sent to the leds
+>- Use the oscilloscope with the two test points of the e-puck2 to visualize the signals sent to the leds;
+>- The two test points are located under the left side of the EPuck;
+>- Only trust the writings under the EPuck PCB (B.L. and F.L for Bottom Led and Front Led respectively) and not BL and FL on top of the EPuck2 to find the correspondence with bottom and front LEDs, as some of the engravings on the top-side are wrong;
+>- You can use the screw on top of your EPuck as ground;
 >- Is the frequency/period of the commutations correct ?
 
 > `Task 4`
