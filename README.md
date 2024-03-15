@@ -1,11 +1,8 @@
 # Introduction
-- Setting of a distance between the robot and a visual object with an optical tracking and a PI regulator
-- ChibiOS: a RTOS optimized for the execution speed and the size of the code, it contains a lot of drivers to use the peripherals of the STM32 families
-- `Goal`: To program in a real case a PI regulator and a simple, but real time, image processing in order to keep a given distance between a printed sheet and the robot
+- Welcome in lab 4 of MICRO-315
 - `⏱ Duration`: 4 hours
-- `Equipment`: EPuck2 robot, ChibiOS library, Python
 
-# Main goal
+## Goals
 - The goal of this practical session is to implement a PI regulator in order to keep a given distance between the robot and a vertical black line printed on a white sheet by using the camera to detect it and measure the distance
 - This will be achieved by reading one line of pixels of the camera, processing it to find the black line and compute the distance and writing and setting a simple PI regulator to control the motors
 
@@ -17,10 +14,21 @@
     - Using the distance measurement to write a PI regulator used to keep the robot at a certain distance
     - Verifying the characteristics of the regulator and correcting some implementation's problems with an ARW (Anti Reset Windup) and/or other mechanisms
 
+## ⚠ ToDo before changing branch
 
-## ⚠ Setup of the project
-- execute the command `git checkout reference/TP4_Exercise`
-    - all the files related to this lab should now be downloaded in your Workplace folder
+>[!IMPORTANT]
+>### Clean the TPs folder
+>**Before to pass** on the new TP (or another branch) it is important to clean the actual branch in order to erase all compilation results. Therefore, you must run the `Clean` task of the current branch **before** switching branch.
+>
+>If you forget to do it, you can checkout the previous branch, run the `Clean` task then checkout the new branch. Alternatively, you can delete all untracked files manually.
+>
+> The goal is to avoid to have files not linked with the new branch that could confuse you.
+
+## Take TP4_Exercise branch
+
+- To pull the TP4_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Fetching-Exercises-Solutions)
+
+- Don't forget to push this branch with the upstream enabled to your origin remote
 
 # e-puck2_main-processor library
 For TP1 and TP2 you have used `ST` library in order to see how to code at low level:
@@ -36,33 +44,38 @@ For TP3 you have used `e-puck2_main-processor` as library but everything about I
 - All the functionalities you will use in this TP come from e-puck2_main-processor
 - This is the library you will use for the mini-projects too
 - The project you have for this practical session uses a simple makefile which sets some parameters, and then calls the bigger makefile of the e-puck2_main-processor library
+
 ***
+
 > In fact e-puck2_main-processor is a demo program written for the e-puck2 but it is configured as a "library" for your TPs and mini-project
+
 ***
+
 # Using the Bluetooth of the EPuck2
+
 1) read [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Presenting-the-EPuck2)
 2) read [EPuck2 - Bluetooth](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Bluetooth)
 
-## Functions to communicate with ChibiOS
+### Functions to communicate with ChibiOS
 - ChibiOS offers several functions to send or receive data
 - Thanks to the HAL (Hardware Abstraction Layer) implementation in ChibiOS, you can use the same functions with the UART3 or the USB
 - The difference is which pointer you will use as argument in the functions.
 Below are some examples of communication functions :
 
->### Code block 1
-> ```c
-> //formatted print of the variable "time" to SD3 (UART3)
-> chprintf((BaseSequentialStream *)&SD3, "time = %d \n", time);
-> 
-> //formatted print of the variable "time" to SDU1 (USB)
-> chprintf((BaseSequentialStream *)&SDU1, "time = %d \n", time);
-> 
-> //sends the buffer "data" of size "size" to SD3 (UART3)
-> chSequentialStreamWrite((BaseSequentialStream *)&SD3, data, size);
-> 
-> //reads from SDU1 (USB) "nb_values" values and stores them to the buffer "data"
-> chSequentialStreamRead((BaseSequentialStream *)&SDU1, data, nb_values);
-> ```
+    >Communication function's examples
+    > ```c
+    > //formatted print of the variable "time" to SD3 (UART3)
+    > chprintf((BaseSequentialStream *)&SD3, "time = %d \n", time);
+    > 
+    > //formatted print of the variable "time" to SDU1 (USB)
+    > chprintf((BaseSequentialStream *)&SDU1, "time = %d \n", time);
+    > 
+    > //sends the buffer "data" of size "size" to SD3 (UART3)
+    > chSequentialStreamWrite((BaseSequentialStream *)&SD3, data, size);
+    > 
+    > //reads from SDU1 (USB) "nb_values" values and stores them to the buffer "data"
+    > chSequentialStreamRead((BaseSequentialStream *)&SDU1, data, nb_values);
+    > ```
 
 - What you need to remember are the pointers **SDU1** (USB) and **SD3** (UART3) which indicate which interface you will use to communicate
 - The cast **(BaseSequentialStream *)** is here to convert the type of the pointer into the good one
@@ -92,23 +105,25 @@ The synchronization between `CaptureImage` and `ProcessImage` works like as foll
 - For the practical session, you will need to extract the color of your choice to only use one color information for the line detection
 - As the line is black and the sheet is white, the choice of color should not change the result a lot
 - But it is sure you will have more information if you use the green for example, as it is coded with 6 bits instead of 5 for the others
-- ⚠ Careful, **img_buff_ptr** is an **uint8_t** buffer, this means you will read your 16 bits pixel through two **uint8_t** values in **big-endian** format
+- ⚠ Careful, **img_buff_ptr** is an **uint8_t** buffer, this means you will read your 16 bits pixel through two **uint8_t** values in **big-endian** format (consult https://en.wikipedia.org/wiki/Endianness)
 - In the loop you will write code to extract one color information, **img_buff_ptr** will have a size two times bigger than the size of the buffer you will use to store one color value
 
 # Sending the data to the computer
 - In this Lab, you will use a Python script to plot the lines of pixels taken with the e-puck2
 - You can use the following function on the e-puck2 side to send the one-line images to the computer:
 
->### Code block 5
->```c
->//sends the data buffer of the given size to the computer
->SendUint8ToComputer(uint8_t* data, uint16_t size);
->```
+    >```c
+    >//sends the data buffer of the given size to the computer
+    >SendUint8ToComputer(uint8_t* data, uint16_t size);
+    >```
 
-- Then on the computer side you need to run the python script **plotImage.py**
-- You have at this time only 1 possibility to run this script: You must directly launch the python script but you must to have python3 installed on your computer.
+- Then on the computer side you need to run the python script **plotImage.py**. You can open a terminal from VSCode, by right-clicking on the script and selecting `Open in Integrated Terminal` then in this terminal run this command:
+    ><div class="box"><pre>
+    ># Replace "SerialMonitorDevice" by your e-puck2 SerialMonitor device name
+    >python plotimage.py SerialMonitorDevice
+    ></pre></div>
 
-- You can refer to the **readme.txt** located into the **Scripts\_python** folder provided for more informations about how to install python and the needed libraries
+- You can refer to the **Readme.txt** located into the **Scripts\_python** folder provided for more informations about how to use these scripts and what about python dependences.
 
 > `Task 1`
 >- In the thread `ProcessImage`, use the code provided to read images from the camera and write a simple loop to extract one color of your choice from the images (you need to do bits manipulations)
@@ -214,12 +229,12 @@ This solution is interesting because it only requires the use of a Python script
 
 > `Task 12`
 >- If you want, you can experiment with the value used at line 7 of process_image.h
->>### Code block 1
+>>Part of process_image.h
 >> ```c
 >> ...
 >> #define USED_LINE 200   // Must be inside [0..478], according to the above explanations 
 >> ...
->>````
+>>```
 >- What do you obtain with a value of 450 between 3 to 20 cm? Can you explain?
 >- What do you obtain with a value of 0 between 3 to 20 cm? Can you explain?
 >- You can play with another color detection to compare and/or with the multi-lines by rotating the sheet of 180 degres
