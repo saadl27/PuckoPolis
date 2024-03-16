@@ -63,13 +63,16 @@ Below are some examples of communication functions :
     > ```c
     > //formatted print of the variable "time" to SD3 (UART3)
     > chprintf((BaseSequentialStream *)&SD3, "time = %d \n", time);
-    > 
+    > ```
+    > ```c
     > //formatted print of the variable "time" to SDU1 (USB)
     > chprintf((BaseSequentialStream *)&SDU1, "time = %d \n", time);
-    > 
+    > ```
+    > ```c
     > //sends the buffer "data" of size "size" to SD3 (UART3)
     > chSequentialStreamWrite((BaseSequentialStream *)&SD3, data, size);
-    > 
+    > ```
+    > ```c
     > //reads from SDU1 (USB) "nb_values" values and stores them to the buffer "data"
     > chSequentialStreamRead((BaseSequentialStream *)&SDU1, data, nb_values);
     > ```
