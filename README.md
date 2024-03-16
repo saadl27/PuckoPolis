@@ -36,20 +36,17 @@ For TP1 and TP2 you have used `ST` library in order to see how to code at low le
 
 For TP3 you have used `e-puck2_main-processor` as library but everything about I2C and IMU was duplicated in the src folder of TP3 in order to "hide" the original IMU driver and ask you to complete it:
 - This allowed you to see how to code an IMU driver and start to work with ChibiOS.
-***
-> From TP4 and including for your mini-projects, you will use `ONLY and COMPLETELY` **e-puck2_main-processor** as library. It contains nearly all the drivers needed to use the functionalities of the robot and it uses ChibiOS to run. 
-***
+
+>[!IMPORTANT]
+> From TP4 and including for your mini-projects, you will use `ONLY and COMPLETELY` **e-puck2_main-processor** as library. It contains nearly all the drivers needed to use the functionalities of the robot and it uses ChibiOS to run.
 - For example the files to use the I2C and the IMU in TP3 were taken from this library
 - You are free to look at it to see how things are done if you want, or simply to see what is possible to do with it
 - All the functionalities you will use in this TP come from e-puck2_main-processor
 - This is the library you will use for the mini-projects too
 - The project you have for this practical session uses a simple makefile which sets some parameters, and then calls the bigger makefile of the e-puck2_main-processor library
 
-***
-
+>[!NOTE]
 > In fact e-puck2_main-processor is a demo program written for the e-puck2 but it is configured as a "library" for your TPs and mini-project
-
-***
 
 # Using the Bluetooth of the EPuck2
 
@@ -123,7 +120,12 @@ The synchronization between `CaptureImage` and `ProcessImage` works like as foll
     >python plotimage.py SerialMonitorDevice
     ></pre></div>
 
-- You can refer to the **Readme.txt** located into the **Scripts\_python** folder provided for more informations about how to use these scripts and what about python dependences.
+>[!WARNING]
+>You will most certainly have errors because it lacks python packages necessary for the use of this script. See the README.md file that accompanies python scripts
+>
+>You can refer to the **README.md** located into the **Scripts\_python** folder provided for more informations about how to use these scripts and what about python dependences.
+>
+>It is also an opportunity to benefit from the e-puck2 environment set up with pyenv during the installation of VSCode for e-puck2
 
 > `Task 1`
 >- In the thread `ProcessImage`, use the code provided to read images from the camera and write a simple loop to extract one color of your choice from the images (you need to do bits manipulations)
