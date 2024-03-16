@@ -124,11 +124,11 @@ The synchronization between `CaptureImage` and `ProcessImage` works like as foll
     ></pre></div>
 
 >[!WARNING]
->You will most certainly have errors because it lacks python packages necessary for the use of this script. See the README.md file that accompanies python scripts
+>You will most certainly have errors because it lacks python packages necessary for the use of this script.
 >
 >You can refer to the **README.md** located into the **Scripts\_python** folder provided for more informations about how to use these scripts and what about python dependences.
 >
->It is also an opportunity to benefit from the e-puck2 environment set up with pyenv during the installation of VSCode for e-puck2
+>It is also an opportunity to benefit from the `e-puck2` environment set up with pyenv during the installation of VSCode for e-puck2. These package will be installed **ONLY** in this environment.
 
 > `Task 1`
 >- In the thread `ProcessImage`, use the code provided to read images from the camera and write a simple loop to extract one color of your choice from the images (you need to do bits manipulations)
