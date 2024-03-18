@@ -7,55 +7,50 @@
 - This will be achieved by reading one line of pixels of the camera, processing it to find the black line and compute the distance and writing and setting a simple PI regulator to control the motors
 
 # Methodology
-- To achieve the main goal, you will go through the following steps:
-    - Understanding how to communicate with the e-puck2 throught USB or Bluetooth
-    - Understanding how the camera works, what are the values returned and what the operating conditions are
-    - Implementing and verifying an algorithm to find the line and compute the distance
-    - Using the distance measurement to write a PI regulator used to keep the robot at a certain distance
-    - Verifying the characteristics of the regulator and correcting some implementation's problems with an ARW (Anti Reset Windup) and/or other mechanisms
+To achieve the main goal, you will go through the following steps:
+- Understanding how to communicate with the e-puck2 throught USB or Bluetooth;
+- Understanding how the camera works, what are the values returned and what the operating conditions are;
+- Implementing and verifying an algorithm to find the line and compute the distance;
+- Using the distance measurement to write a PI regulator used to keep the robot at a certain distance;
+- Verifying the characteristics of the regulator and correcting some implementation issues with the ARW (Anti-Reset Windup) and/or other mechanisms.
 
 ## ⚠ ToDo before changing branch
 
 >[!IMPORTANT]
 >### Clean the TPs folder
->**Before to pass** on the new TP (or another branch) it is important to clean the actual branch in order to erase all compilation results. Therefore, you must run the `Clean` task of the current branch **before** switching branch.
+>**Before checking out** on the new TP branch (or any another branch), it is important to clean the current branch in order to erase all compilation results. To do this, you must run the `Clean` task of the current branch **before** switching branch.
 >
->If you forget to do it, you can checkout the previous branch, run the `Clean` task then checkout the new branch. Alternatively, you can delete all untracked files manually.
+>If you forgot to do it, you can checkout back to the previous branch, run the `Clean` task then checkout to the new branch. Alternatively, you can delete all untracked files manually.
 >
-> The goal is to avoid to have files not linked with the new branch that could confuse you.
+> The goal is to avoid having files that are not linked with the new branch and that could be confusing.
 
 ## Take TP4_Exercise branch
 
 - To pull the TP4_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Fetching-Exercises-Solutions)
 
-- Don't forget to push this branch with the upstream enabled to your origin remote
+- Don't forget to push/publish this branch with the set-upstream enabled to your origin remote
 
 # e-puck2_main-processor library
-For TP1 and TP2 you have used `ST` library in order to see how to code at low level:
-- This allowed you to see how to access and manage the STM32F407 peripheral registers (Clock's module, GPIOs and Timers) in order to communicate properly with the e-puck2 components (LEDs, motors).   
+For TP1 and TP2 you used the `ST` library in order to see how to code works at low level. This allowed you to see how to access and manage the STM32F407 peripheral registers (Clock's module, GPIOs and Timers) in order to communicate properly with the e-puck2 components (LEDs, motors).   
 
-For TP3 you have used `e-puck2_main-processor` as library but everything about I2C and IMU was duplicated in the src folder of TP3 in order to "hide" the original IMU driver and ask you to complete it:
-- This allowed you to see how to code an IMU driver and start to work with ChibiOS.
-
+For TP3 you have used `e-puck2_main-processor` as library but everything about I2C and IMU was **duplicated** in the src folder of TP3 in order to "hide" the original IMU driver and ask you to complete it. This allowed you to see how to code an IMU driver and start to work with ChibiOS.
 >[!IMPORTANT]
-> From TP4 and including for your mini-projects, you will use `ONLY and COMPLETELY` **e-puck2_main-processor** as library. It contains nearly all the drivers needed to use the functionalities of the robot and it uses ChibiOS to run.
-- For example the files to use the I2C and the IMU in TP3 were taken from this library
-- You are free to look at it to see how things are done if you want, or simply to see what is possible to do with it
-- All the functionalities you will use in this TP come from e-puck2_main-processor
-- This is the library you will use for the mini-projects too
-- The project you have for this practical session uses a simple makefile which sets some parameters, and then calls the bigger makefile of the e-puck2_main-processor library
+> From TP4 onwards, and including for your mini-projects, you will use `ONLY` **e-puck2_main-processor** library. It contains nearly all the drivers needed to use the functionalities of the robot and it uses ChibiOS to run.
+- For example the files to use the IMU and the I2C bus in TP3 were taken from this library: e-puck2_main-processor/src/sensors/imu.* and e-puck2_main-processor/src/i2c_bus.* respectively. Feel free to browse through those to see how things are done if you want, or simply to see what is possible to do with it;
+- All the functionalities you will use in this TP come from e-puck2_main-processor;
+- The project you have for this practical session uses a simple makefile which sets some parameters, and then calls the bigger makefile of the e-puck2_main-processor library.
 
 >[!NOTE]
 > In fact e-puck2_main-processor is a demo program written for the e-puck2 but it is configured as a "library" for your TPs and mini-project
 
 # Using the Bluetooth of the EPuck2
 
-1) read [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Presenting-the-EPuck2)
-2) read [EPuck2 - Bluetooth](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Bluetooth)
+1) Read through [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Presenting-the-EPuck2)
+2) Read through [EPuck2 - Bluetooth](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Bluetooth)
 
 ### Functions to communicate with ChibiOS
-- ChibiOS offers several functions to send or receive data
-- Thanks to the HAL (Hardware Abstraction Layer) implementation in ChibiOS, you can use the same functions with the UART3 or the USB
+- ChibiOS offers several functions to send or receive data;
+- Thanks to the HAL (Hardware Abstraction Layer) implementation in ChibiOS, you can use the same functions with the UART3 or the USB, despite those two protocols being radically different;
 - The difference is which pointer you will use as argument in the functions.
 Below are some examples of communication functions :
 
@@ -117,18 +112,18 @@ The synchronization between `CaptureImage` and `ProcessImage` works like as foll
     >SendUint8ToComputer(uint8_t* data, uint16_t size);
     >```
 
-- Then on the computer side you need to run the python script **plotImage.py**. You can open a terminal from VSCode, by right-clicking on the script and selecting `Open in Integrated Terminal` then in this terminal run this command:
+- Then, on the computer side you need to run the python script **plotImage.py**. You can open a terminal from VSCode, by right-clicking on the script and selecting `Open in Integrated Terminal` then in this terminal run this command:
     ><div class="box"><pre>
     ># Replace "SerialMonitorDevice" by your e-puck2 SerialMonitor device name
     >python plotimage.py SerialMonitorDevice
     ></pre></div>
 
 >[!WARNING]
->You will most certainly have errors because it lacks python packages necessary for the use of this script.
+>You will most certainly have errors because it lacks python packages necessary for the usage of this script.
 >
->You can refer to the **README.md** located into the **Scripts\_python** folder provided for more informations about how to use these scripts and what about python dependences.
+>Refer to the **README.md** located in the **Scripts\_python** folder provided for more informations about how to use these scripts and python dependencies.
 >
->It is also an opportunity to benefit from the `e-puck2` environment set up with pyenv during the installation of VSCode for e-puck2. These package will be installed **ONLY** in this environment.
+>It is also an opportunity to benefit from the `e-puck2` environment set up with pyenv during the installation of VSCode for e-puck2. These package will be installed **ONLY** in this environment, and not on your whole system.
 
 > `Task 1`
 >- In the thread `ProcessImage`, use the code provided to read images from the camera and write a simple loop to extract one color of your choice from the images (you need to do bits manipulations)
@@ -227,7 +222,7 @@ This solution is interesting because it only requires the use of a Python script
 >- Is it better or worse ?
 >- Why ?
 
-#  **BONUS**
+#  **BONUS tasks**
 > `Task 11`
 >- If you want, you can also add a simple control of the rotation of the robot in order to try to follow the black line
 >- This way the robot will keep the goal distance with the paper and will try to be in front of the black line, even if you move the paper to the left of to the right
