@@ -112,7 +112,14 @@ The synchronization between `CaptureImage` and `ProcessImage` works like as foll
     >SendUint8ToComputer(uint8_t* data, uint16_t size);
     >```
 
-- Then, on the computer side you need to run the python script **plotImage.py**. You can open a terminal from VSCode, by right-clicking on the script and selecting `Open in Integrated Terminal` then in this terminal run this command:
+- Then, on the computer side you need to run the python script **plotImage.py**. You can open a terminal from VSCode, by right-clicking on the script and selecting `Open in Integrated Terminal`:
+
+    <p float="left">
+    <img src="pictures/OpenInIntegratedTerminal.png" alt="drawing" width="400"/>
+    </p>
+
+- Then in this terminal run this command:
+
     ><div class="box"><pre>
     ># Replace "SerialMonitorDevice" by your e-puck2 SerialMonitor device name
     >python plotimage.py SerialMonitorDevice

@@ -11,7 +11,7 @@ Normally, if "VSCode for e-puck2 installer" has been used, python 3.11.2 and som
 	```shell
 	python -m pip install matplotlib pyserial
 	```
-- Linux: Must be checked but for sure at minima: 
+- Linux: 
 	```shell
 	python -m pip install matplotlib pyserial
 	```
