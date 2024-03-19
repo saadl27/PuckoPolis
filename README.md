@@ -141,6 +141,12 @@ The synchronization between `CaptureImage` and `ProcessImage` works like as foll
 ><p float="center">
 >   <img src="pictures/AvoidPythonExtensions.png" alt="drawing" width="200"/>
 ></p>
+>
+>In this sense it would be nice to add this line in your user settings in order to stop to have recommendation's notifications:
+> ```"extensions.ignoreRecommendations": true,```
+><p float="center">
+>   <img src="pictures/IgnoreExtensionsRecommendations.png" alt="drawing" width="500"/>
+></p>
 
 # Tasks
 > `Task 1`
