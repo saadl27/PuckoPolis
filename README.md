@@ -132,6 +132,17 @@ The synchronization between `CaptureImage` and `ProcessImage` works like as foll
 >
 >It is also an opportunity to benefit from the `e-puck2` environment set up with pyenv during the installation of VSCode for e-puck2. These package will be installed **ONLY** in this environment, and not on your whole system.
 
+>[!CAUTION]
+>You are not supposed to use additional extensions in VSCode, but the Python extensions should be avoided because it disrupts the management of PyEnv environments and can cause undesirable effects such as:
+>- installing python packages in the wrong places >
+>- not using the right version of python.
+>
+>You will have been notified and take full responsibility then
+><p float="center">
+>   <img src="pictures/AvoidPythonExtensions.png" alt="drawing" width="200"/>
+></p>
+
+# Tasks
 > `Task 1`
 >- In the thread `ProcessImage`, use the code provided to read images from the camera and write a simple loop to extract one color of your choice from the images (you need to do bits manipulations)
 >- Then send them to the computer to visualize them. You need to send them relatively slowly if you don't want to loose bytes
