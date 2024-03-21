@@ -122,7 +122,7 @@ The synchronization between `CaptureImage` and `ProcessImage` works like as foll
 
     ><div class="box"><pre>
     ># Replace "SerialMonitorDevice" by your e-puck2 SerialMonitor device name
-    >python plotimage.py SerialMonitorDevice
+    >python plotImage.py SerialMonitorDevice
     ></pre></div>
 
 >[!WARNING]
