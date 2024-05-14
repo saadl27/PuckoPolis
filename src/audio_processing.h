@@ -1,9 +1,6 @@
 #ifndef AUDIO_PROCESSING_H
 #define AUDIO_PROCESSING_H
 
-
-#define FFT_SIZE 	1024
-
 typedef enum {
 	//2 times FFT_SIZE because these arrays contain complex numbers (real + imaginary)
 	LEFT_CMPLX_INPUT = 0,

@@ -1,6 +1,7 @@
 #ifndef FFT_H
 #define FFT_H
 
+#define FFT_SIZE 	1024
 
 typedef struct complex_float{
 	float real;

@@ -83,15 +83,13 @@ int fft_c(int lx, complex_float* cx, float signi)
 *	which uses a lot of tricks to optimize the computations
 */
 void doFFT_optimized(uint16_t size, float* complex_buffer){
-	if(size == 1024)
+	if(size == FFT_SIZE) 
 		arm_cfft_f32(&arm_cfft_sR_f32_len1024, complex_buffer, 0, 1);
-	
 }
 
 /*
 *	Wrapper to call the non optimized FFT function
 */
 void doFFT_c(uint16_t size, complex_float* complex_buffer){
-
 	fft_c(size, complex_buffer, +1.);
 }
