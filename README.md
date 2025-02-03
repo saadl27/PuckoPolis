@@ -1,10 +1,10 @@
 # Introduction
-Welcome to the very first lab of MICRO-315. As explained in class, labs take place every Thursday from 8.15am to 1pm, and we strongly advice you to make the best use of those hours are those are the only ones where you can get help from assistants ! Feel free to do labs with your project teammate or on your own, as preferred. To ask questions to or get help from teaching assistants, fill in the [request form](https://docs.google.com/forms/d/e/1FAIpQLSfe6vB1Q9J9KeZzb76N6CFCBLsSWiTrT8yI7M5slsgOXOBlog/closedform) (*This form accepts submissions only during lab hours and and you must log in beforehand on https://www.google.com/ with your EPFL email address*)
+Welcome to the very first lab of MICRO-315. As explained in class, labs take place every Thursday from 10.15am to 3pm, and we strongly recommend you to make the best use of those hours as those are the only ones where you can get help from assistants! Feel free to do labs with your project teammate or on your own, as preferred. To ask questions to or get help from teaching assistants, fill in the [request form](https://docs.google.com/forms/d/e/1FAIpQLSfe6vB1Q9J9KeZzb76N6CFCBLsSWiTrT8yI7M5slsgOXOBlog/closedform) (*This form accepts submissions only during lab hours and and you must log in beforehand on https://www.google.com/ with your EPFL email address*)
 
 - `⏱ Duration`: 3 hours
 ## Goals
-- The main goal is to present the tools that will be used throughought every labs of this semester to program and debug the e-puck2 robot.
-- The second goal is to gain knowledge of the STM32F4 microcontroller and refresh some concepts about peripherals such as GPIOs and TIMERs.
+- The main goal of this lab is to present the tools that will be used throughought all other labs of this semester regarding e-puck2 programming and debugging.
+- The second goal is to gain knowledge around the STM32F4 microcontroller and refresh some concepts about peripherals such as GPIOs and TIMERs.
 - All in all, this practical work shows all the necessary steps to program the e-puck2 miniature mobile robot in C, using the standard library provided by ST.
 
 ## Methodology
