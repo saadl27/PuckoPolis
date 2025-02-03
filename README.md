@@ -209,9 +209,9 @@ nothing added to commit but untracked files present (use "git add" to track)
 </pre></div>
 
 1. The `src` folder and his content are not tracked.
-2. The file of pyenv configration `.python-version` is too untracked but it could be ignored if this pyenv configuration take not part of the project.
+2. The file of pyenv configuration `.python-version` is also untracked, but it could be ignored if this pyenv configuration is not part of the project in itself.
 
-The code being part of the project must be added then commited:
+The code that we consider as part of the project must be added then commited:
 
 ```shell
 git add src/ # add all files in src directory to the next commit
@@ -233,11 +233,11 @@ On branch main
 nothing to commit, working tree clean
 </pre></div>
 
-It remains the local configuration of pyenv which might not be part of the project and could therefore be ignored from version management
+The local configuration of pyenv remains, and as it is not part of the project we will exclude it from version management as follows.
 
 ```shell
-echo .python_version >> .gitignore
-git add .gitignore # add all files in src directory to the next commit
+echo .python_version >> .gitignore # tells git to not start tracking files called .python_version
+git add .gitignore # add the .gitignore file to the next commit
 git commit -m "Git ignore of .python_version" # commit
 git status
 
@@ -248,7 +248,7 @@ On branch main
 nothing to commit, working tree clean
 </pre></div>
 
-Making a local git versioning of a piece of code can be done either through command line, as you've just done, or through the VSCode git plugin. To try out the latter approach, press `Shift + Ctrl + p` (`Shift + Cmd + p` on MacOS) to open the command palette tool, then execute the `Git: Initialize repository` command by selecting `TPIntro2` when prompted. You may notice that the src/ repository of `TPIntro2` turned green, and if you open the git tab of VSCode, you'll also notice that the green letter `U` appears next to `main.c`. This stands for `Untracked`, and embodies the fact that this file is not yet being tracked for by git: it is new and was never seen before by git (as indeed we just started git). Similarly to command line, press the `+` sign next to the file to add it to the next commit, enter a commit message then press `Commit`. Ensure that the commit is well visible in the git graph extension of VSCode (`4` in the picture below).
+Making a local git versioning of a piece of code can be done either through command line, as you've just done, or through the VSCode git plugin. To try out the latter approach, press `Shift + Ctrl + p` (`Shift + Cmd + p` on MacOS) to open the command palette tool, then execute the `Git: Initialize repository` command by selecting `TPIntro2` when prompted. You may notice that the src/ repository of `TPIntro2` turned green, and if you open the git tab of VSCode, you'll also notice that the green letter `U` appears next to `main.c`. This stands for `Untracked`, and embodies the fact that this file is not yet being tracked by git: it is new and was never seen before by git (as indeed we just started git). Similarly to command line, press the `+` sign next to the file to add it to the next commit, enter a commit message then press `Commit`. Ensure that the commit is well visible in the git graph extension of VSCode (`4` in the picture below).
 
 <p float="left">
     <img src="pictures/git_vscode.png" alt="drawing" width="600"/>
@@ -272,7 +272,7 @@ git remote -v
 This command should show nothing as no link with any remote has yet been established.
 
 > [!WARNING]
-> DON'T FORGET to replace `username` with your github username in this following command!!
+> DON'T FORGET to replace `username` with your github username in the following commands
 
 <div class="box"><pre>
 git remote add origin https://github.com/username/TPIntro1.git
@@ -305,9 +305,6 @@ Publishing local branches is typically easier to do with VSCode. In the git tab 
 </p>
 
 Now we'll add the newly created remote repository for `TPIntro2` as second remote to our `TPIntro1` local repository. In the `TPIntro1` terminal session, execute the following:
-
-> [!WARNING]
-> DON'T FORGET to replace `username` with your github username in this following command!!
 
 <div class="box"><pre>
 git remote add another_remote https://github.com/username/TPIntro2.git
@@ -347,7 +344,7 @@ which will ask us to resolve merge conficts, as indeed the same variables are be
     <img src="pictures/merge.png" alt="drawing" width="800"/>
 </p>
 
-You should end up with the same content in `TPIntro1` and `TPIntro2`, without having done any manual code edits. Confirm this by doing a VSCode comparisong between both files as seen in [part 1.1](#11-base-vscode).
+You should end up with the same content in `TPIntro1` and `TPIntro2`, without having done any manual code edits. Confirm this by doing a VSCode comparison between both files as seen in [part 1.1](#11-base-vscode).
 
 Now we'll do the same for `TPIntro2` except through VSCode to test the differences. For this, select `add remote` from the three dots next to the `TPIntro2` source control (`1` in image below). Copy the url of your first remote (https://github.com/username/TPIntro1.git) then name it `another_remote`.
 
@@ -364,7 +361,7 @@ Now that we've experienced git on our own, it's time to use it on a real example
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Working-in-groups) to learn how to work in group using Git
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Asking-for-support) to check how to ask for support
 
-You should now continue the lab by reading through this README.md, but opened on VSCode locally rather than on Github.com. To do this, open the `TPs` folder on VSCode and run the following command on the VSCode terminal:
+You should now continue the lab by reading through this README.md on VSCode locally, rather than on GitHub.com. To do this, open the `TPs` folder on VSCode and run the following command on the VSCode terminal:
 
 ```shell
 git checkout TPIntro_Exercise # This will create a local version of the TPIntro branch on the reference remote
