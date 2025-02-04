@@ -1,21 +1,23 @@
 # Introduction
-Welcome to the very first lab of MICRO-315. As explained in class, labs take place every Thursday from 10.15am to 3pm, and we strongly recommend you to make the best use of those hours as those are the only ones where you can get help from assistants! Feel free to do labs with your project teammate or on your own, as preferred. To ask questions to or get help from teaching assistants, fill in the [request form](https://forms.gle/jFwRktK8T3m1PhtJ9) (*This form accepts submissions only during lab hours and and you must log in beforehand on https://www.google.com/ with your EPFL email address*), also available on [Moodle](https://moodle.epfl.ch/course/view.php?id=467).
+Welcome to the very first lab of MICRO-315. As explained in class, labs take place every Thursday from 10.15am to 3pm, and we strongly recommend you to make the best use of those hours as those are the only ones where you can get help from assistants! Feel free to do labs with your project teammate or on your own, as preferred. To ask questions to or get help from teaching assistants, fill in the [request form](https://forms.gle/jFwRktK8T3m1PhtJ9) (*This form accepts submissions only during lab hours and you must log in beforehand on https://www.google.com/ with your EPFL email address*), also available on [Moodle](https://moodle.epfl.ch/course/view.php?id=467).
 
 - `⏱ Duration`: 3 hours
 ## Goals
-- The main goal of this lab is to present the tools that will be used throughought all other labs of this semester regarding e-puck2 programming and debugging.
+- The main goal of this lab is to install and present the tools that will be used throughought all other labs of this semester regarding e-puck2 programming and debugging.
 - The second goal is to gain knowledge around the STM32F4 microcontroller and refresh some concepts about peripherals such as GPIOs and TIMERs.
 - All in all, this practical work shows all the necessary steps to program the e-puck2 miniature mobile robot in C, using the standard library provided by ST.
 
 ## Methodology
 To achieve the main goal, we will go through the following steps:
-  - Getting familiar with the IDE (Integrated Development Environment): [Part 1](#part-1---integrated-development-environment-ide)
-  - Getting familiar with python environments and pyenv specifically [Part 2](#part-2---pyenv)
-  - Getting familiar with e-puck2 robot: [Part 3](#part-3---presenting-the-epuck2-robot)
-  - Understand the basic of the version control tool *Git*, **MANDATORY** for this course: [Part 4](#part-4---git-introduction)
-  - Setup the git repository for your group: [Part 5](#part-5---setting-up-your-group-tps-repository)
-  - Getting used to program an e-puck2: use the on board debugger interface for programming and debugging [Part 6](#part-6---tutorial-for-programming-the-epuck2-robot)
+  - Install the tools used throughought all other labs of this semester: [Part 1](#part-1---installation-of-tools-required-for-the-labs-and-mini-project)
+  - Getting familiar with the IDE (Integrated Development Environment): [Part 2](#part-2---integrated-development-environment-ide)
+  - Getting familiar with python environments and pyenv specifically [Part 3](#part-3---pyenv)
+  - Getting familiar with e-puck2 robot: [Part 4](#part-4---presenting-the-epuck2-robot)
+  - Understand the basic of the version control tool *Git*, **MANDATORY** for this course: [Part 5](#part-5---git-introduction)
+  - Setup the git repository for your group: [Part 6](#part-6---setting-up-your-group-tps-repository)
+  - Getting used to program an e-puck2: use the on board debugger interface for programming and debugging [Part 7](#part-7---tutorial-for-programming-the-epuck2-robot)
   
+# Part 1 - Installation of tools required for the labs and mini-project
 To install the IDE and tools used in the labs, click on one the links accordingly to your computer's configuration here below and follow the instructions. If you encounter issues with the installation, please request an assistant to help out using this [link](https://forms.gle/jFwRktK8T3m1PhtJ9).
 
 - 👉 [🍎 MacOS](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Installing-the-IDE-%F0%9F%8D%8E-MacOS)
@@ -23,11 +25,11 @@ To install the IDE and tools used in the labs, click on one the links accordingl
 - 👉 [🐧 Linux](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Installing-the-IDE-%F0%9F%90%A7-Linux)
 
 
-# Part 1 - Integrated Development Environment (IDE)
+# Part 2 - Integrated Development Environment (IDE)
 The IDE now freshly installed, let's start by learning how to navigate the IDE and how to make use of it for coding.
 
-## 1.1 Base VSCode
-If you are already experienced with VSCode as an IDE, feel free to skip this section and continue towards [Part 1.2](#12-tools-used-throughout-the-labs).
+## 2.1 Base VSCode
+If you are already experienced with VSCode as an IDE, feel free to skip this section and continue towards [Part 2.2](#22-tools-used-throughout-the-labs).
 
 Before diving into practical excercises, please give a thorough read to the wiki page of the IDE that contains most of what you need to know to complete the following exercises: 
 - 👉 [🗔 User Interface](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/IDE-%F0%9F%97%94-User-Interface)
@@ -62,11 +64,11 @@ Another advantage of VSCode workplaces is the easy and fast comparison it enable
     <img src="pictures/compare.png" alt="drawing" width="800"/>
 </p>
 
-## 1.2 Tools used throughout the labs
+## 2.2 Tools used throughout the labs
 For the purpose of this lab, and to facilitate the programming of the e-puck2 robot, additionnal tools have been set up during the installation. Please get familiar with those tools, including VSCode extensions by reading through the wiki:
 - 👉 [🛠 Tools](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/IDE-%F0%9F%9B%A0-Tools)
 
-# Part 2 - Pyenv
+# Part 3 - Pyenv
 Some labs will require the execution of python scripts, which you may in fact also be interested to develop for your own miniproject. For this purpose, the labs make use of Pyenv (MacOS and Linux) or Pyenv-win (Windows) to facilitate python executions use without disturbing other python projects you may have on your computer. Please read through the [wiki of Pyenv](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/pyenv-basic) before going on to ensure you understand the basics of this tool.
 
 As explained in the wiki, pyenv not only enables us to switch python versions but also keep python modules specific to one project, rather than system-wide. To test this, open a terminal on VSCode Epuck2 by pressing `Shift + Ctrl + p` (`Shift + Cmd + p` on MacOS) and execute the `Terminal: Create New Terminal` command. Select `TPIntro1` as root for the terminal, and do it all again for `TPIntro2` to end up with two terminal windows.
@@ -178,12 +180,12 @@ Python 3.9.1
 
 This shows that while travelling between different folders, pyenv in fact dynamically changes the environment (and thus python version) ! All the packages that you install with `pip` (`numpy`, `pandas`, etc.) will be stored independently for all these folders, thus not interferring with other projects you may have.
 
-# Part 3 - Presenting the EPuck2 robot
+# Part 4 - Presenting the EPuck2 robot
 Read through the following documentation to get acquainted with the e-puck2.
 
 - 👉 [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Presenting-the-EPuck2)
 
-# Part 4 - Git introduction
+# Part 5 - Git introduction
 Now that we're familiar with the IDE and the robot, there's a final step before we can start coding. As a mean to facilitate the reviewing, testing, sharing and saving of code, many developers use a code versioning tool. For this course (i.e labs **and miniproject**), we've decided to make use of `git`, which is the most widely used versioning tool. Please read through the following wiki page to get familiar with the basic concepts behind `git`.
 - 👉 [Introduction to Git](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Introduction-to-Git)
 
@@ -344,7 +346,7 @@ which will ask us to resolve merge conficts, as indeed the same variables are be
     <img src="pictures/merge.png" alt="drawing" width="800"/>
 </p>
 
-You should end up with the same content in `TPIntro1` and `TPIntro2`, without having done any manual code edits. Confirm this by doing a VSCode comparison between both files as seen in [part 1.1](#11-base-vscode).
+You should end up with the same content in `TPIntro1` and `TPIntro2`, without having done any manual code edits. Confirm this by doing a VSCode comparison between both files as seen in [part 2.1](#21-base-vscode).
 
 Now we'll do the same for `TPIntro2` except through VSCode to test the differences. For this, select `add remote` from the three dots next to the `TPIntro2` source control (`1` in image below). Copy the url of your first remote (https://github.com/username/TPIntro1.git) then name it `another_remote`.
 
@@ -355,7 +357,7 @@ Now we'll do the same for `TPIntro2` except through VSCode to test the differenc
 Pressing `2` in the image above will fetch from all remotes and should make it visible that you've now linked to a second remote `another_remote`.
 We are now finished with the two repositories `TPIntro1` and `TPIntro2`, and they can now be deleted locally and on github, unless you want to keep them for further experimentation.
 
-# Part 5 - Setting up your group TP's repository
+# Part 6 - Setting up your group TP's repository
 Now that we've experienced git on our own, it's time to use it on a real example: setting up your group repositories. The following wiki links should guide you through this process.
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs) to set up git for the TPs
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Working-in-groups) to learn how to work in group using Git
@@ -369,14 +371,14 @@ git push origin TPIntro_Exercise --set-upstream
 
 ```
 
-# Part 6 - Tutorial for programming the EPuck2 robot
+# Part 7 - Tutorial for programming the EPuck2 robot
 
-## 6.0 🔌 Preparation 
+## 7.1 🔌 Preparation 
 - Open the folder `TPs` with VSCode Epuck2
 - Make sure you are in the right branch (`TPIntro_Exercise`)
 - Run the task `Link Library ST to workspace`
 
-## 6.1 🔨 Building the Project
+## 7.2 🔨 Building the Project
 - Building the code consists of compiling the **\*.c** and **\*.s** files to create object files, **\*.o**, and then linking the object files to create the **blinky.elf** file
 - More detail on the steps of the build process will be given during TP1
 - The generated **.elf** file contains the data necessary to program the device and additional information that lets you debug at the source code level
@@ -417,7 +419,7 @@ git push origin TPIntro_Exercise --set-upstream
   > Try to find out the meaning of the words **text**, **data**, **bss**, **dec**.<br>
   > Estimate the size of your code in percentage of total Flash and RAM available with this microcontroller.
 
-## 6.2 🐞 Programming and debugging the EPuck2 robot
+## 7.3 🐞 Programming and debugging the EPuck2 robot
 - Now that you have built your code and created an **.elf** file that can be loaded on the microcontroller, you can program the device:
   - Plug the USB cable (no need to turn on the e-puck2 using the dedicated button since the programmer MCU will automatically power the main MCU) 
   - Specify the port to which the EPuck2's gdb-server is connected, click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Communicating-with-the-EPuck2#identify-the-ports) for more info
@@ -427,7 +429,7 @@ Ensure that this code indeed shines an LED on the e-puck2.
 
 💡 click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/IDE-%F0%9F%90%9B-Debugging) for more info about programming and debugging
 
-## 6.3 Testing your EPuck2
+## 7.4 Testing your EPuck2
 You may find it useful to test your EPuck2 at times when the code executed does not match your expectations. Let's jump into such a case and use another LED by **uncommenting** the `TEST_NEEDED` define in `main.h`, that will switch the led used to the `BODY_LED`. Build and upload the code, and notice that no LED is being switched ON.
 
 To ensure that the `BODY_LED` is working properly, read through the wiki section on how to test a robot using the EPuckMonitor. Follow both the demo program 1 and demo program 2.
