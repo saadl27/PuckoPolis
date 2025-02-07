@@ -186,7 +186,8 @@ Read through the following documentation to get acquainted with the e-puck2.
 - 👉 [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Presenting-the-EPuck2)
 
 # Part 5 - Git introduction
-Now that we're familiar with the IDE and the robot, there's a final step before we can start coding. As a mean to facilitate the reviewing, testing, sharing and saving of code, many developers use a code versioning tool. For this course (i.e labs **and miniproject**), we've decided to make use of `git`, which is the most widely used versioning tool. Please read through the following wiki page to get familiar with the basic concepts behind `git`.
+Now that we're familiar with the IDE and the robot, there's a final step before we can start coding. As a mean to facilitate the reviewing, testing, sharing and saving of code, many developers use a code versioning tool. For this course (i.e labs **and miniproject**), we've decided to make use of `git`, which is the most widely used versioning tool. Please read through the following wiki page to get familiar with the basic concepts behind `git`.\
+⚠ We will experiment the concepts within this wiki right after, so just read through it for now.
 - 👉 [Introduction to Git](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Introduction-to-Git)
 
 To experiment what we've just read, we'll again play with the two repositories created earlier. In the terminal `TPIntro1`, enter the following commands and observe what happens after each command in the git tab of the IDE (check out the IDE 👉 [🗔 User Interface](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/IDE-%F0%9F%97%94-User-Interface) wiki page if needed).
@@ -300,7 +301,7 @@ git push origin --all
 ```
 
 Now we've linked the `TPIntro1` local git project with one remote. You can refresh your browser page of github and confirm that your code is now available on there too. What you'll encounter in the labs is typically that local git projects are linked to several remotes, meaning that you can fetch from, pull from and push to different places in the cloud. To test this behaviour, we'll create a github repository for `TPIntro2` too.
-Publishing local branches is typically easier to do with VSCode. In the git tab of VSCode, press `Publish branch`, then select whether to publish it as public or private to publish your branch in a newly created github repository. By comparing both terminals, you should have the same end result through either CLI or VSCode:
+Publishing local branches is typically easier to do with VSCode. In the git tab of VSCode Epuck2, press `Publish branch`, then select whether to publish it as public or private to publish your branch in a newly created github repository. By comparing both terminals, you should have the same end result through either CLI or VSCode:
 
 <p float="left">
     <img src="pictures/remotes.png" alt="drawing" width="800"/>
@@ -348,7 +349,7 @@ which will ask us to resolve merge conficts, as indeed the same variables are be
 
 You should end up with the same content in `TPIntro1` and `TPIntro2`, without having done any manual code edits. Confirm this by doing a VSCode comparison between both files as seen in [part 2.1](#21-base-vscode).
 
-Now we'll do the same for `TPIntro2` except through VSCode to test the differences. For this, select `add remote` from the three dots next to the `TPIntro2` source control (`1` in image below). Copy the url of your first remote (https://github.com/username/TPIntro1.git) then name it `another_remote`.
+Now we'll do the same for `TPIntro2` except through VSCode Epuck2 to test the differences. For this, select `add remote` from the three dots next to the `TPIntro2` source control (`1` in image below). Copy the url of your first remote (https://github.com/username/TPIntro1.git) then name it `another_remote`.
 
 <p float="left">
     <img src="pictures/add_remote.png" alt="drawing" width="800"/>
@@ -363,13 +364,8 @@ Now that we've experienced git on our own, it's time to use it on a real example
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Working-in-groups) to learn how to work in group using Git
 - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Asking-for-support) to check how to ask for support
 
-You should now continue the lab by reading through this README.md on VSCode locally, rather than on GitHub.com. To do this, open the `TPs` folder on VSCode and run the following command on the VSCode terminal:
-
-```shell
-git checkout TPIntro_Exercise # This will create a local version of the TPIntro branch on the reference remote
-git push origin TPIntro_Exercise --set-upstream
-
-```
+You should now continue the lab by reading through this README.md on VSCode Epuck2 locally, rather than on GitHub.com. To do this, open the `TPs` folder on VSCode Epuck2 and read through the following page to add this lab on your group repository.
+ - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Fetching-Exercises-Solutions) to learn how to fetch exercises and solutions from reference 
 
 # Part 7 - Tutorial for programming the EPuck2 robot
 
