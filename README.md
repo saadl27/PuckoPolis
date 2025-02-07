@@ -96,7 +96,13 @@ chThdCreateStatic(waThdBodyLed, sizeof(waThdBodyLed), NORMALPRIO, ThdBodyLed, NU
   </p>
 
 # Task 7: Understanding of the code
-- No correction for this task.
+There's a few concepts that should be taken away from analysing the IMU-related code and threads.
+- The refresh rate of the main thread ```imu_reader_thd``` is set to 250Hz. When collecting data from sensors, a refresh rate is chosen and depends on various factors, such as the sensor's data acquisition rate (for instance, the camera needs some time (exposure time) to acquire a new single reading), the communication speed (in this case I2C 400kHz fast mode) and the other tasks that need to be completed by the microcontroller.
+  - If you take a look at the sensor handling in the e-puck2_main-processor library (under src/sensors/*.c), you'll see that all sensors are designed with a fixed refresh rate;
+  - ⚠ When building on top of sensor threads, you should not design code that fetches sensors values faster than they are refreshed ! By doing so, you would be fetching the same value several times, thus wasting resources of the MCU.
+- The thread makes use of the messagebus to send over sensor values, and as a result, the messagebus needs to be initiateed somewhere. This happens in ```main.c``` with the function call ```messagebus_init(&bus, &bus_lock, &bus_condvar);```. Notice that this function is called before ```imu_start();``` which essentially starts the imu thread. Reversing this order could end up in errors as the thread would try to publish values on an undefined messagebus.
+- In the ```mpu9250``` files, you can see that the microcontroller is communicating with the IMU sensor through I2C. Similarly, this I2C protocol needs be started (linked to I2C timers) and configured (speed, etc.) before it is used, and this is done through the ```i2c_start();``` function call in ```main.c``` before ```imu_start();```.
+
 
 # Task 8: IMU_COMPUTE_OFFSET
 - Here is an example ([code block 5](#code-block-5)) of **imu_compute_offset** implementation: It uses the same way to wait for new data as in the main function
