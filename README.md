@@ -10,16 +10,6 @@
 ## Methodology
 - Understand the RTOS main mechanisms and complete some functions to correct the offset of the IMU, convert the raw measurements into known units and turn on the leds depending on the orientation of the robot
 
-## ⚠ ToDo before starting this Lab
-
->[!IMPORTANT]
->### Update `Lib`
->As we have just made an important correction to the `e-puck2_main-processor` sub-library then you need to update it by running the `Clone Lib` user task.
-
-<p float="left">
-            <img src="pictures/cloneLib.png" alt="drawing" width="200"/>
-</p>
-
 ## ⚠ ToDo before changing branch
 
 >[!IMPORTANT]
