@@ -54,24 +54,18 @@
 
 ## Small tutorial on .gitignore use
 
-The purpose of the .gitignore file is simply to tell to `ignore` (`not track`) specific files or folders. In fact, you may have at some point committed "useless" files to your repository. Such files could be build generated, libraries or anything not relevant to be pushed on the remote. Those files are then pushed on the Github repository, which can greatly increase the downloading and uploading size per commit and unnecessarily polute the repository on both github.com and on every local repository.
-
->***
+The purpose of the .gitignore file is simply to tell git to `ignore` (`not track`) specific files or folders. In fact, you may have at some point committed "useless" files to your repository, such as files from complation or libraries. Those files are then pushed on the Github repository, which can greatly increase the downloading and uploading size per commit and unnecessarily polute the repository on both github.com and on every local repository. To avoid this, files and folders can be added in the .gitignore file to avoid git tracking them.
 
 >[!WARNING]
->From now on, you should **ALWAYS ensure you have a .gitignore and properly configure it**
+>From now on, make sure you manage a .gitignore file in your project in the following way:
 
->***
+  - The `.gitignore` file should be located directly in the root folder of your repository, next to the .git folder;
 
-- Fortunately this process is dead simple:
+  - To ignore a precise folder named `src/func/test/`, simply add the folder path on a newline (simply `src/func/test/`);
 
-    - the file `.gitignore` should be located directly in the root folder of your repository
+  - To ignore a precise file named `src/func/main.o`, simply add the file path on a newline (simply `src/func/main.o`);
 
-    - to ignore a precise folder named `src/func/test/`, simply add the folder path on a newline (simply `src/func/test/`)
-
-    - to ignore a precise file named `src/func/main.o`, simply add the file path on a newline (simply `src/func/main.o`)
-
-    - to ignore any file ending with .elf (like `main.elf`), simply add `*.elf`
+  - To ignore any file ending with .elf (like `main.elf`), simply add `*.elf`.
 
 - To ignore the ST and the e-puck2_main-processor librairies, and all the build files, one's .gitignore should look like:
 
@@ -82,7 +76,7 @@ The purpose of the .gitignore file is simply to tell to `ignore` (`not track`) s
 >***
 
 >[!WARNING]
->Your code should **NEVER use these 2 libraries (`ST` and `e-puck2_main-processor`) simultaneously**. It’s really two separate ways of managing the low level of the STM32F4 microcontroller
+>Your code should **NEVER use these 2 libraries (`ST` and `e-puck2_main-processor`) simultaneously**. They really are two separate ways of managing the low level of the STM32F4 microcontroller.
 
 >***
 
@@ -202,11 +196,7 @@ Read through the 2 following wiki pages:
 >- What has changed now ? Why ?
 
 ## Critical thread zones
-- It would be useful to prevent the system to switch to another thread when we have critical zone that should imperatively be executed in one run
-    - e.g: when you have a strict timing to respect for some operations
-- For this purpose, ChibiOS let us **lock** and **unlock** the system with **chSysLock()** and **chSysUnlock()**
-- These functions are simply toggling the interrupts
-    - ⚠ -> we should be careful when using these functions because other threads or interrupts could be delayed if the system is locked during too much time
+It is sometimes useful to prevent the system to switch to another thread when we are in a critical zone that should imperatively be executed in one run, e.g when you require very strict timings. For this purpose, ChibiOS lets us **lock** and **unlock** the system with **chSysLock()** and **chSysUnlock()**. These functions are simply toggling the possibility of interrupting a thread interrupt, meaning we should be **⚠ careful when using these functions because other threads or interrupts could be delayed if the system is locked during too much time**.
 
 > `Task 6`
 >- Comment the case 2 (lines 92-95) and uncomment the case 3 (lines 102-106) in the thread **ThdBodyLed**
@@ -216,19 +206,18 @@ Read through the 2 following wiki pages:
 
 # Part 3 - Inertial Measurement Unit (IMU)
 ## Introduction
-- In this part of the practical, you are going to use the IMU sensor **MPU 9250** to measure the acceleration and angular speeds of the robot e-puck2
-- All the interfaces to get values from this sensor are already coded. The code uses the files **imu.*** to read the data of the IMU inside a thread. The functions to interact with the IMU are located in the **mpu9250.*** files and finally the functions used to communicate over the I2C bus are located in the **i2c\_bus.*** files
+- In this section, you are going to use the IMU sensor **MPU 9250** to measure the acceleration and angular speeds of the robot e-puck2;
+- The interface to read values from this sensor is already implemented. The code uses the files **imu.*** to read the data of the IMU inside a thread. The low-level functions to interact with the IMU are located in the **mpu9250.*** files and finally the functions used to communicate over the I2C bus are located in the **i2c\_bus.*** files
 
 ## MessageBus
-- In the first TPs, you have probably used for instance global variables to transfer data between an interrupt routine and another function
-- Here, a special mechanism is used to transfer the data between different threads which is called `Messagebus`
-- It uses lock mechanisms and advertises the threads that are waiting on data when new ones are available. If you look inside the thread **imu\_reader\_thd** you will find the function **messagebus\_topic\_publish()** which publishes the new values and in the main function, you will find the function **messagebus\_topic\_wait()** which pauses the thread until new values are available. There are other ways to do this like using semaphores, mutexes, inter-thread messages, etc but this is not the purpose of this practical exercise.
+- In the first labs, you have probably used global variables (or equivalents) to transfer data between an interrupt routine and another function;
+- Here, a special mechanism is used to transfer the data between different threads which is called `Messagebus`. It uses lock mechanisms and advertises the threads that are waiting on data when new ones are available. If you look inside the thread **imu\_reader\_thd** you will find the function **messagebus\_topic\_publish()** which publishes the new values and in the main function, you will find the function **messagebus\_topic\_wait()** which pauses the thread (makes it **sleep**) until new values are available. There are other ways to do this, such as using semaphores, mutexes, inter-thread messages, etc but this lab explores messagebus in particular;
+- Futher reading on messagebus is avaialble at https://github.com/e-puck2/msgbus.
 
-> `Task 7`
->- Take a look at the files and try to understand how the code configures and reads the IMU
->- For this you have really to explore all the libraries linked with the IMU (right click on the function call, then go to declaration, for instance)
 
-- futher reading on messagebus at https://github.com/e-puck2/msgbus
+> `Task 7`\
+>  Take a look at the source files and try to understand how the code configures and reads the IMU. For this you have really to explore all the libraries linked with the IMU (right click on the function call, then go to declaration, for instance). These include the imu.* and mpu9250.* files.
+
 ## Processing the IMU's data
 - If you looked carefully at the **imu.c** file, you should have seen two empty functions which are **imu\_compute\_offset()** and **imu\_compute\_units()**
 - The first one is used to get a given amount of measurements from the IMU and to compute an averaged offset value for all the axis of the accelerometer and of the gyroscope in order to use them later to have measurements without offsets (the IMU is not perfectly calibrated)
@@ -241,12 +230,12 @@ Read through the 2 following wiki pages:
 >- 💡 Take care of which variable's type you will use for each variable in order to optimize the usage of memory. Use for example an **uint8\_t** variable if you only need to store numbers between 0 and 255
 
 > `Task 9`
->- Now fill the function **imu\_compute\_units()** to convert the raw measurements of the accelerometer and of the gyroscope into the good units
->- Store the converted values in the correct fields of the **imu\_values** structure
->- 💡 Don't forget to include the offset previously found to correct the raw measurement used
->- 💡 Look at the code to find how the IMU is configured and look at the function used to read the values (useful to deduce what is received from the IMU)
->- 💡 You can also find the [datasheet of the mpu9250](https://www.invensense.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf) to deduce what represent the raw values (points **4.6** and **4.7**)
->- 💡 Verify you obtain the good values on the terminal program.
+>- Now fill the function **imu\_compute\_units()** to convert the raw measurements of the accelerometer and of the gyroscope into the good units;
+>- Store the converted values in the correct fields of the **imu\_values** structure;
+>- 💡 Don't forget to include the offset previously found to correct the raw measurement used;
+>- 💡 Look at the code to find how the IMU is configured and look at the function used to read the values (useful to deduce what is received from the IMU);
+>- 💡 You can also find the [datasheet of the mpu9250](https://www.invensense.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf) to deduce what represent the raw values (points **4.6** and **4.7**);
+>- 💡 Check that you obtain the right values on the terminal program.
 
 ## Showing the gravity direction
 - Finally, if you look in the **main.c** file, you will see a nearly empty function called **show\_gravity()** which will be used to turn on or off the leds **LED1**, **LED3**, **LED5**, **LED7** depending on the orientation of the robot
