@@ -239,9 +239,9 @@ nothing to commit, working tree clean
 The local configuration of pyenv remains, and as it is not part of the project we will exclude it from version management as follows.
 
 ```shell
-echo .python_version >> .gitignore # tells git to not start tracking files called .python_version
+echo .python-version >> .gitignore # tells git to not start tracking files called .python_version
 git add .gitignore # add the .gitignore file to the next commit
-git commit -m "Git ignore of .python_version" # commit
+git commit -m "Git ignore of .python-version" # commit
 git status
 
 ```
