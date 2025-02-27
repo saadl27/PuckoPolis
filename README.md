@@ -1,10 +1,9 @@
 # Introduction
-- Welcome in lab 1 of MICRO-315
-- Please make sure you're confortable with all the tools covered in the introduction lab : `VSCode IDE`, `pyenv` and `git`
+Welcome in lab 1 of MICRO-315! Please make sure you're comfortable with all the tools covered in the introduction lab : `VSCode IDE`, `pyenv` and `git` before starting with TP1.
 - `⏱ Duration`: 4 hours
 
 ## Goals
-- You will see the compilation process in detail as you have learned during the lecture;
+- You will experiment the compilation process as you learned it during the lecture;
 - Practical work will then show all the necessary steps to program the e-puck2 miniature mobile robot in C, using the standard library provided by ST;
 - The main goal is to gain knowledge of the STM32F4 microcontroller and refresh some concepts about peripherals such as GPIOs and TIMERs.
 
@@ -12,11 +11,11 @@
 To achieve the main goal, we will go through the following steps:
   - Understanding some basic features of the compiler;
   - Writing a first LED blinking program, first with *NOP* loops, then using timers;
-  - Change the LED's blinking sequence using the selector.
+  - Changing the LED's blinking sequence using the selector.
 
 ## ⚠ TODO before starting the Lab
 - Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Setting-up-git-for-TPs) wiki page.
-- Checkout to the branch of the lab:
+- Checkout to the branch of the lab if you are not already reading this through VSCode IDE:
 ```shell
 git fetch reference # Update your local git index
 git checkout reference/TP1_Exercise
@@ -24,13 +23,13 @@ git checkout reference/TP1_Exercise
 ```
 This should create a local version of the remote TP1_Exercise branch and give you access to all the files related to this lab. Alternatively, you can use the VSCode git plug-in or git graph extension to fetch the `reference` remote and checkout to the correct branch.
 
-Then, create a symbolic link to the ST library (won't compile otherwise) by running the `(Link Library ST)` task
+Then, create a symbolic link to the ST library (won't compile otherwise) by running the `(Link Library ST)` task:
     <p float="left">
         <img src="pictures/linkSTLibrary.png" alt="drawing" width="200"/>
     </p>
 
 # Part 1 - C Compiler
-To understand how the code is generated, it is important to understand how the compiler works. The main compilation steps are summarized in [figure 1](#figure-1). In this first exercise we will explore this architecture experimentally.
+To understand how machine code is generated, it is useful to understand how the compiler works. The main compilation steps are summarised in [Figure 1](#figure-1). In this first exercise, we will explore this architecture experimentally.
 > ### Figure 1
 > Compilation steps in GCC
 > <p float="left">
@@ -38,8 +37,8 @@ To understand how the code is generated, it is important to understand how the c
 > </p>
 
 ## 1.1 Generated code
-- Create a new folder called `src` under Workplace/TPs/ and create in it a file named **test.c**;
-- Copy the code in [code block 1](#code-block-1) in it;
+- Create a new folder called `src` under Workplace/TPs/, and within it create a new file named **test.c**;
+- Copy the code in [code block 1](#code-block-1) in **test.c**;
     >### Code block 1
     >```c
     >int main()
@@ -51,21 +50,20 @@ To understand how the code is generated, it is important to understand how the c
     >    return out;
     >}
     >```
-- Now open a terminal using VSCode EPuck2: `Ctrl` + `Shift` + `P` and then type and execute `Terminal: Create New Terminal`;
+- Open a terminal using VSCode EPuck2: `Ctrl` + `Shift` + `P` and then type and execute `Terminal: Create New Terminal`;
 - In the terminal, **cd** in the folder **Workplace/TPs/src**
-  - 💡 executing `ls` or `dir` will display the content of the current folder, verify that the file `test.c` is indeed in there;
-- During the first practical, your code was compiled using the GNU toolchain for ARM processor through the VSCode task `Make`;
-  - this task was executing a Makefile, itself executing GNU toolchain for ARM processor executables;
+  - 💡 executing `ls` or `dir` will display the content of the current folder. Ensure that you do see the file `test.c`;
+- During the introduction practical, your code was compiled using the GNU toolchain for ARM processor through the VSCode task `Make`. This task was executing a Makefile, itself executing GNU toolchain for ARM processor executables;
 - Now, we will compile the code using only the command line in order to see the compilation process in detail. This is the standard and basic way to compile a program;
-- The command to compile the C code and generate an object files and all the intermediate steps is as follows:
+- The command to compile C code and generate an object file as well as all the intermediate steps is the following:
   ```shell
   arm-none-eabi-gcc -save-temps=obj -mcpu=cortex-m4 -c test.c -o test.o
   
   ```
-  - **arm-none-eabi-gcc** is the command to launch the compiler
-  - **-save-temps=obj** is an option used to save the intermediate files of the compilation process
-  - **-mcpu=cortex-m4** is an option called to specify the processor that will execute the code
-  - **-c** specifies to not do the linking step
+  - **arm-none-eabi-gcc** is the command that launches the compiler;
+  - **-save-temps=obj** is an option used to save the intermediate files of the compilation process;
+  - **-mcpu=cortex-m4** is an option used to specify the processor that will execute the code;
+  - **-c** specifies to **not** do the linking step.
 - Compile the test.c file using the latter command in the terminal;
 - When executing the command, the shell searches for an executable named arm-none-eabi-gcc in the folder specified in the **PATH** variables;
   - executing the command in the VSCode EPuck2 internal terminal should not run in errors as this terminal was configured to add the arm-none-eabi toolchain to the **PATH** variable;
@@ -80,10 +78,10 @@ To understand how the code is generated, it is important to understand how the c
     'arm-none-eabi-gcc' is not recognized as an internal or external command, an executable program or a batch file.
     </pre></div>
 
-    - This error occurs because the command line instance doesn't know yet what is this command;
-    - We have to add the path to the folder containing the executable files in the **PATH** environment variable;
-    - 💡 The **PATH** variable is used to store the location of all the known executables the command line can call;
-    - Type the following command (a bit different depending on the OS) to add the ARM toolchain command to the path:
+    - This error occurs when the terminal instance doesn't know what the command is;
+    - To solve the error, one needs to add the path to the folder containing the executable files in the **PATH** environment variable;
+        - 💡 The **PATH** variable is used to store the location of all the known executables the terminal can call;
+    - Type the following command (a bit different depending on the OS) to add the ARM toolchain command to the **PATH**:
 
       ### set PATH for Windows
       <div class="box"><pre>
@@ -96,28 +94,26 @@ To understand how the code is generated, it is important to understand how the c
       </pre></div>
       
     - ⚠ The exact path to the gcc-arm-none-eabi toolchain might depend on your installation;
-    - ⚠ This procedure is temporary, it applies only to this current existing terminal, meaning you will have to repeat this command if you open a new command line window;
+    - ⚠ This procedure is temporary, it applies only to this current existing terminal, meaning you will have to repeat this command if you open a new terminal window.
     
   🚀 Now the compilation command should execute correctly !
 
 
 > `Task 1`
-> - Look at the files generated by the compilation
+> - Look at the files generated by the compilation;
 > - Which files have been generated?
 > - Which file is generated from which step of the compiler?
 
 > `Task 2`
-> - Look in detail at the assembler code generated by the compiler. Understand the assembly language instructions by using the [Cortex-M4 Generic User Guide](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/datasheets/Cortex-M4-generic-user-guide.pdf)
+> - Look in detail at the assembler code generated by the compiler. Understand the assembly language instructions by using the [Cortex-M4 Generic User Guide](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/datasheets/Cortex-M4-generic-user-guide.pdf);
 > - Hints:
->    - Look in particular at the functionality of the instructions **push**, **pop**, **mov**, **add**, **str**, **ldr**, **cmp** and **ble**
+>    - Look in particular at the functionality of the instructions **push**, **pop**, **mov**, **add**, **str**, **ldr**, **cmp** and **ble**;
 >    - What is the purpose of **sub sp, sp, #20** instruction at the beginning of the main function?
->    - Try to initialize more variables in the main function and see how this instruction will change
+>    - Try to initialise more variables in the main function and see how this assembly instruction changes.
 
 > `Task 3`
-> - Remember the role of the instruction **#define** in C
-> - Which step of compilation takes in charge this instruction?
-> - To look at this aspect in a real example, create a source C file **.c** with the [following code](#code-block-2) in it
-> - Then look at the **.i** file generated by the compilation
+> - Remember the role of the instruction **#define** in C. Which step of compilation takes this instruction in charge?
+> - To look at this aspect in a real example, create a source C file **.c** with the [code block 2](#code-block-2) within it. Then, look at the **.i** file generated by the compilation.
 
 >### Code block 2
 >```c
@@ -133,16 +129,16 @@ To understand how the code is generated, it is important to understand how the c
 
 ## 1.2 Compilation process
 > `Task 4`
-> - Use the option **-v** to observe the detailed compilation process
-> - Check the several steps and understand the main mechanisms
+> - Use the option **-v** (verbose) to observe the detailed compilation process;
+> - Check the several steps and understand the main mechanisms;
 > - Verify that you can directly assemble assembler code with the following command:
 >   - ```arm-none-eabi-as test.s -o test.o```
 
 ## 1.3 Compilation options
 > `Task 5`
-> - Change the compiling command (cursor up to repeat the last commands) and the content of the program to check the influence of some compilation options.
-> - Check the warning option described in table [table 1](#table-1) on the code [code block 3](#code-block-3)
-> - Describe the impact of these options and their use with the questions askedd in the table
+> - Change the compiling command (arrow up key to repeat the last commands) and the content of the program to check the influence of some compilation options;
+> - Check the warning option described in table [Table 1](#table-1) on the code within [code block 3](#code-block-3);
+> - Describe the impact of these options and their use through the questions asked in [Table 1](#table-1).
 
 >### Code block 3
 >```c
