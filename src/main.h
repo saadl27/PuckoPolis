@@ -18,7 +18,7 @@ WARNING : Not on the same port !!
 #define BODY_LED	GPIOB, 2
 
 // Uncomment the following line in part 6.3 of the lab
-//# define TEST_NEEDED
+# define TEST_NEEDED
 
 #ifdef TEST_NEEDED
 #define LED_USED	FRONT_LED

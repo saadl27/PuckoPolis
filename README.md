@@ -1,4 +1,4 @@
-# Introduction
+git # Introduction
 Welcome to the very first lab of MICRO-315. As explained in class, labs take place every Thursday from 10.15am to 3pm, and we strongly recommend you to make the best use of those hours as those are the only ones where you can get help from assistants! Feel free to do labs with your project teammate or on your own, as preferred. To ask questions to or get help from teaching assistants, fill in the [request form](https://forms.gle/jFwRktK8T3m1PhtJ9) (*This form accepts submissions only during lab hours and you must log in beforehand on https://www.google.com/ with your EPFL email address*), also available on [Moodle](https://moodle.epfl.ch/course/view.php?id=467).
 
 - `⏱ Duration`: 3 hours
