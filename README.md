@@ -1,434 +1,282 @@
-git # Introduction
-Welcome to the very first lab of MICRO-315. As explained in class, labs take place every Thursday from 10.15am to 3pm, and we strongly recommend you to make the best use of those hours as those are the only ones where you can get help from assistants! Feel free to do labs with your project teammate or on your own, as preferred. To ask questions to or get help from teaching assistants, fill in the [request form](https://forms.gle/jFwRktK8T3m1PhtJ9) (*This form accepts submissions only during lab hours and you must log in beforehand on https://www.google.com/ with your EPFL email address*), also available on [Moodle](https://moodle.epfl.ch/course/view.php?id=467).
+# Introduction
+Welcome in lab 1 of MICRO-315! Please make sure you're comfortable with all the tools covered in the introduction lab : `VSCode IDE`, `pyenv` and `git` before starting with TP1.
+- `⏱ Duration`: 4 hours
 
-- `⏱ Duration`: 3 hours
 ## Goals
-- The main goal of this lab is to install and present the tools that will be used throughought all other labs of this semester regarding e-puck2 programming and debugging.
-- The second goal is to gain knowledge around the STM32F4 microcontroller and refresh some concepts about peripherals such as GPIOs and TIMERs.
-- All in all, this practical work shows all the necessary steps to program the e-puck2 miniature mobile robot in C, using the standard library provided by ST.
+- You will experiment the compilation process as you learned it during the lecture;
+- Practical work will then show all the necessary steps to program the e-puck2 miniature mobile robot in C, using the standard library provided by ST;
+- The main goal is to gain knowledge of the STM32F4 microcontroller and refresh some concepts about peripherals such as GPIOs and TIMERs.
 
 ## Methodology
 To achieve the main goal, we will go through the following steps:
-  - Install the tools used throughought all other labs of this semester: [Part 1](#part-1---installation-of-tools-required-for-the-labs-and-mini-project)
-  - Getting familiar with the IDE (Integrated Development Environment): [Part 2](#part-2---integrated-development-environment-ide)
-  - Getting familiar with python environments and pyenv specifically [Part 3](#part-3---pyenv)
-  - Getting familiar with e-puck2 robot: [Part 4](#part-4---presenting-the-epuck2-robot)
-  - Understand the basic of the version control tool *Git*, **MANDATORY** for this course: [Part 5](#part-5---git-introduction)
-  - Setup the git repository for your group: [Part 6](#part-6---setting-up-your-group-tps-repository)
-  - Getting used to program an e-puck2: use the on board debugger interface for programming and debugging [Part 7](#part-7---tutorial-for-programming-the-epuck2-robot)
+  - Understanding some basic features of the compiler;
+  - Writing a first LED blinking program, first with *NOP* loops, then using timers;
+  - Changing the LED's blinking sequence using the selector.
+
+## ⚠ TODO before starting the Lab
+- Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Setting-up-git-for-TPs) wiki page.
+- Checkout to the branch of the lab if you are not already reading this through VSCode IDE:
+```shell
+git fetch reference # Update your local git index
+git checkout reference/TP1_Exercise
+
+```
+This should create a local version of the remote TP1_Exercise branch and give you access to all the files related to this lab. Alternatively, you can use the VSCode git plug-in or git graph extension to fetch the `reference` remote and checkout to the correct branch.
+
+Then, create a symbolic link to the ST library (won't compile otherwise) by running the `(Link Library ST)` task:
+    <p float="left">
+        <img src="pictures/linkSTLibrary.png" alt="drawing" width="200"/>
+    </p>
+
+# Part 1 - C Compiler
+To understand how machine code is generated, it is useful to understand how the compiler works. The main compilation steps are summarised in [Figure 1](#figure-1). In this first exercise, we will explore this architecture experimentally.
+> ### Figure 1
+> Compilation steps in GCC
+> <p float="left">
+>   <img src="pictures/gcc-struct.png" alt="drawing" width="700"/>
+> </p>
+
+## 1.1 Generated code
+- Create a new folder called `src` under Workplace/TPs/, and within it create a new file named **test.c**;
+- Copy the code in [code block 1](#code-block-1) in **test.c**;
+    >### Code block 1
+    >```c
+    >int main()
+    >{
+    >    int i, j, out = 0;
+    >    for(i=0; i < 10; i++)
+    >        for(j = 0; j < 10; j++)
+    >            out += i + j;
+    >    return out;
+    >}
+    >```
+- Open a terminal using VSCode EPuck2: `Ctrl` + `Shift` + `P` and then type and execute `Terminal: Create New Terminal`;
+- In the terminal, **cd** in the folder **Workplace/TPs/src**
+  - 💡 executing `ls` or `dir` will display the content of the current folder. Ensure that you do see the file `test.c`;
+- During the introduction practical, your code was compiled using the GNU toolchain for ARM processor through the VSCode task `Make`. This task was executing a Makefile, itself executing GNU toolchain for ARM processor executables;
+- Now, we will compile the code using only the command line in order to see the compilation process in detail. This is the standard and basic way to compile a program;
+- The command to compile C code and generate an object file as well as all the intermediate steps is the following:
+  ```shell
+  arm-none-eabi-gcc -save-temps=obj -mcpu=cortex-m4 -c test.c -o test.o
   
-# Part 1 - Installation of tools required for the labs and mini-project
-To install the IDE and tools used in the labs, click on one the links accordingly to your computer's configuration here below and follow the instructions. If you encounter issues with the installation, please request an assistant to help out using this [link](https://forms.gle/jFwRktK8T3m1PhtJ9).
+  ```
+  - **arm-none-eabi-gcc** is the command that launches the compiler;
+  - **-save-temps=obj** is an option used to save the intermediate files of the compilation process;
+  - **-mcpu=cortex-m4** is an option used to specify the processor that will execute the code;
+  - **-c** specifies to **not** do the linking step.
+- Compile the test.c file using the latter command in the terminal;
+- When executing the command, the shell searches for an executable named arm-none-eabi-gcc in the folder specified in the **PATH** variables;
+  - executing the command in the VSCode EPuck2 internal terminal should not run in errors as this terminal was configured to add the arm-none-eabi toolchain to the **PATH** variable;
+  - ⚠ However executing this command from any other terminal might lead to errors:
 
-- 👉 [🍎 MacOS](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Installing-the-IDE-%F0%9F%8D%8E-MacOS)
-- 👉 [❖ Windows](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Installing-the-IDE-%E2%9D%96-Windows)
-- 👉 [🐧 Linux](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Installing-the-IDE-%F0%9F%90%A7-Linux)
+    ```shell
+    arm-none-eabi-gcc -save-temps=obj -mcpu=cortex-m4 -c test.c -o test.o
+    
+    ```
+
+    <div class="box">output console:<pre>
+    'arm-none-eabi-gcc' is not recognized as an internal or external command, an executable program or a batch file.
+    </pre></div>
+
+    - This error occurs when the terminal instance doesn't know what the command is;
+    - To solve the error, one needs to add the path to the folder containing the executable files in the **PATH** environment variable;
+        - 💡 The **PATH** variable is used to store the location of all the known executables the terminal can call;
+    - Type the following command (a bit different depending on the OS) to add the ARM toolchain command to the **PATH**:
+
+      ### set PATH for Windows
+      <div class="box"><pre>
+      set PATH=C:\Users\username\AppData\Roaming\EPuck2_Utils\arm_gcc_toolchain\bin;%PATH%
+      </pre></div>
+
+      ### set PATH for MacOS and Linux
+      <div class="box"><pre>
+      export PATH=/Users/username/Applications/EPuck2_Utils/arm_gcc_toolchain/bin:$PATH
+      </pre></div>
+      
+    - ⚠ The exact path to the gcc-arm-none-eabi toolchain might depend on your installation;
+    - ⚠ This procedure is temporary, it applies only to this current existing terminal, meaning you will have to repeat this command if you open a new terminal window.
+    
+  🚀 Now the compilation command should execute correctly !
 
 
-# Part 2 - Integrated Development Environment (IDE)
-The IDE now freshly installed, let's start by learning how to navigate the IDE and how to make use of it for coding.
+> `Task 1`
+> - Look at the files generated by the compilation;
+> - Which files have been generated? test.i test.o test.s
+> - Which file is generated from which step of the compiler? .i from prepocessor - .s from C compiler - .o from Assember
 
-## 2.1 Base VSCode
-If you are already experienced with VSCode as an IDE, feel free to skip this section and continue towards [Part 2.2](#22-tools-used-throughout-the-labs).
+> `Task 2`
+> - Look in detail at the assembler code generated by the compiler. Understand the assembly language instructions by using the [Cortex-M4 Generic User Guide](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/datasheets/Cortex-M4-generic-user-guide.pdf);
+> - Hints:
+>    - Look in particular at the functionality of the instructions **push**, **pop**, **mov**, **add**, **str**, **ldr**, **cmp** and **ble**;
+>    - What is the purpose of **sub sp, sp, #20** instruction at the beginning of the main function?
+>    - Try to initialise more variables in the main function and see how this assembly instruction changes.
 
-Before diving into practical excercises, please give a thorough read to the wiki page of the IDE that contains most of what you need to know to complete the following exercises: 
-- 👉 [🗔 User Interface](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/IDE-%F0%9F%97%94-User-Interface)
+> `Task 3`
+> - Remember the role of the instruction **#define** in C. Which step of compilation takes this instruction in charge?
+> - To look at this aspect in a real example, create a source C file **.c** with the [code block 2](#code-block-2) within it. Then, look at the **.i** file generated by the compilation.
 
-Make two new folders called `TPIntro1` and `TPIntro2` in the workplace locally on your computer, next to Lib. If you're not sure where the workplace is, read to the wiki page of the installation for your type of OS, as referenced at the end of [Methodology](#methodology). Open `TPIntro1` on VSCode Epuck2 and by rightclicking on the explorer tab, create a src folder that contains a `main.c` file as shown below.
-
-<p float="left">
-    <img src="pictures/TPIntro1.png" alt="drawing" width="800"/>
-</p>
-
-Next we will open a VSCode Workspace, which is nothing more than a collection of folders opened within one window. This enables to easily work on multiple projects and individually compare each file within those. Right click on the explorer tab and click *Add folder to workspace*, then select `TPIntro2`. Fill `TPIntro2` similarly to `TPIntro1` to end up as follows:
-
-<p float="left">
-    <img src="pictures/Workplace.png" alt="drawing" width="800"/>
-</p>
-
-Notice that opened tabs are systematically referenced as follows:
-- <font color="yellow">File type (.c, .py, .ipynb, etc.) (Yellow)</font>
-- <font color="lime">File name including extension (Lime)</font>
-- <font color="blue">Folder within workspace (Blue)</font>
-- <font color="fuchsia">Subfolder(s) (Fuchsia)</font>
-
-One of the advantages of VSCode is the advanced search tool. By pressing `Shift + Ctrl + f` (`Shift + Cmd + f` on MacOS) or by navigating to the search menu, try and search for the `a` variable and notice how the search tool references all variables found throughout the workspace.
-
-<p float="left">
-    <img src="pictures/search.png" alt="drawing" width="300"/>
-</p>
-
-Another advantage of VSCode workplaces is the easy and fast comparison it enables between files of different folders. Select both `main.c` files in either folder, then right-click on either file and go for *compare selected*. This will open a new tab that presents the differences between both files, which will later be extensively used for comparing large codes with each other. Watch out that the order in which you select the files will affect the left/right position of the latter in the comparison tool.
-
-<p float="left">
-    <img src="pictures/compare.png" alt="drawing" width="800"/>
-</p>
-
-## 2.2 Tools used throughout the labs
-For the purpose of this lab, and to facilitate the programming of the e-puck2 robot, additionnal tools have been set up during the installation. Please get familiar with those tools, including VSCode extensions by reading through the wiki:
-- 👉 [🛠 Tools](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/IDE-%F0%9F%9B%A0-Tools)
-
-# Part 3 - Pyenv
-Some labs will require the execution of python scripts, which you may in fact also be interested to develop for your own miniproject. For this purpose, the labs make use of Pyenv (MacOS and Linux) or Pyenv-win (Windows) to facilitate python executions use without disturbing other python projects you may have on your computer. Please read through the [wiki of Pyenv](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/pyenv-basic) before going on to ensure you understand the basics of this tool.
-
-As explained in the wiki, pyenv not only enables us to switch python versions but also keep python modules specific to one project, rather than system-wide. To test this, open a terminal on VSCode Epuck2 by pressing `Shift + Ctrl + p` (`Shift + Cmd + p` on MacOS) and execute the `Terminal: Create New Terminal` command. Select `TPIntro1` as root for the terminal, and do it all again for `TPIntro2` to end up with two terminal windows.
-
-<p float="left">
-    <img src="pictures/two-terminals.png" alt="drawing" width="800"/>
-</p>
-
-Now we will create specific environments based on two different python versions for those two folders. In one of the two terminals just created, install 2 Python versions with PyEnv with the following commands:
-
-```shell
-pyenv install 3.9.1 # intall python 3.9.1 ready to use
-pyenv install 3.10.0 # intall python 3.10.0 ready to use
-
-```
-
-Depending of your OS, create 2 pyenv environments:
-
->[!CAUTION]
->Under Windows ONLY:
->```shell
->pyenv duplicate 3.9.1 TPIntro1-env # Create a pyenv environment
->pyenv duplicate 3.10.0 TPIntro2-env # Create another pyenv environment
->
+>### Code block 2
+>```c
+>#define PI      3.14
+>#define CIRC(R) (2 * PI * R)
+>int main()
+>{
+>    int circonference, rayon = 2;
+>    circonference = CIRC(rayon);
+>    return circonference;
+>}
 >```
 
->[!CAUTION]
->Under MacOS or Linux ONLY:
->```shell
->pyenv virtualenv 3.9.1 TPIntro1-env # Create a pyenv environment
->pyenv virtualenv 3.10.0 TPIntro2-env # Create another pyenv environment
->
+## 1.2 Compilation process
+> `Task 4`
+> - Use the option **-v** (verbose) to observe the detailed compilation process;
+> - Check the several steps and understand the main mechanisms;
+> - Verify that you can directly assemble assembler code with the following command:
+>   - ```arm-none-eabi-as test.s -o test.o```
+
+## 1.3 Compilation options
+> `Task 5`
+> - Change the compiling command (arrow up key to repeat the last commands) and the content of the program to check the influence of some compilation options;
+> - Check the warning option described in table [Table 1](#table-1) on the code within [code block 3](#code-block-3);
+> - Describe the impact of these options and their use through the questions asked in [Table 1](#table-1).
+
+>### Code block 3
+>```c
+>int main()
+>{
+>    int i, j, out = 0, k;
+>    for(i = 0; i < 10; i++)
+>        for(j = 0; j < 10; j++)
+>            out += i + j;
+>}
 >```
 
-In each terminal execute this command by ***replacing `X` by the folder number (1 or 2)*** in order to link a pyenv environment with the folder:
+>### Table 1
+>| Option | Influence on compilation process | When is this option useful ? |
+>|---|---|---|
+>| -Wreturn-type | type answer here | ... |
+>| -Wunused-variable | ... | ... |
+>| -Wall | ... | ... |
 
-<div class="box"><pre>
-# Replace X by 1 and 2 successively:
-pyenv local TPIntroX-env
-</pre></div>
+> `Task 6`
+>- Understand the compiling options described in table [table 2](#table-2) on the following [code block](#code-block-4):
+>- Describe the influence of these options and when they are useful
+>   - What is the impact on code size, use of memory, and execution speed?
+>   - Compare the number of instructions necessary to execute a code with the different levels of optimization:
+>     - no optimization: **-O0**
+>     - optimization level 1: **-O1**
+>     - optimization level 2: **-O2**
+>     - optimization level 3: **-O3**
+>- When could this type of optimization (**-O3** or **-funroll-loops**) generate big problems (imagine an embedded system with sensors and actuators)?
+>- How can we force a correct optimization in this case?
+>
+>Hint: **-funroll-loops** only works when an optimization level is set (**-O1**, **-O2**, **-O3**)
 
-In each terminal execute this command in order to check the Python version:
+>### Code block 4
+>```c
+>int main()
+>{
+>    int i, j, out = 0, k;
+>    for(i = 0 ; i < 10; i++)
+>        for(j = 0; j < 10; j++)
+>          out += i + j;
+>    return out;
+>}
+>```
 
-```shell
-python --version # prints out python version
+>### Table 2
+>| Option | Influence on compilation process | When is this option useful ? |
+>|---|---|---|
+>| -O0 | type answer here | ... |
+>| -O1 | ... | ... |
+>| -O2 | ... | ... |
+>| -O3 | ... | ... |
+>| -funroll-loops | ... | ... |
+>| -funroll-loops -O3 | ... | ... |
 
-```
 
-For the terminal 1 it should print:
+# Part 2 - STM32F4 Microcontroller and GPIO configuration
+First read up to the end of those 2 documentation pages that will greatly help you for the rest of the lab
+  - 👉 [Presenting the STM32](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-Presenting-the-STM32)
+  - 👉 [STM32 GPIO](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-GPIO)
 
-<div class="box">output console:<pre>
-Python 3.9.1
-</pre></div>
+For the rest of the lab, you will need the documentation from STM (user guide and data sheet) as well as from the epuck (electronic diagram, etc.). Keep their respective wiki pages close: 
+- 👉 [Presenting the STM32](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-Presenting-the-STM32): STM documentation
+- 👉 [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Presenting-the-EPuck2): EPuck2 documentation
 
-and for the terminal 2:
+## 2.1 Blink a LED automatically
+> `Task 1`
+> - Use a simple delay function to make **LED7** blink in a while loop at 1 Hz
+> - Hints:
+>   - Consult the electrical schema of the e-puck2 to find the **LED7** IO pin
+>   - Use the functions declared in *gpio.c* to modify the state of the pin on which the LED is connected, and create a function that generate a time delay using assembly nop instructions
 
-<div class="box">output console:<pre>
-Python 3.10.0
-</pre></div>
+💡 keep in mind it is possible to watch the state of the register when the code is running in the EPuck2 !
 
-This shows that pyenv has effectively changed the python version between both terminals, and that you're well able to use different python version in different projects.
-
-Now, open an external terminal (not internal to VSCode) and travel **FROM your EPuck2_Workplace** using `cd`. You should observe the following if you go out your EPuck2_Workplace:
-
-```shell
-cd ..
-python --version
-
-```
-If your system had already Python installed before this TP it will be displayed:
-
-<div class="box">output console:<pre>
-your system wide python
-</pre></div>
-
-else PyEnv will display this message:
-
-<div class="box">output console:<pre>
-No global/local python version has been set yet. Please set the global/local version by typing:
-pyenv global 3.7.4
-pyenv local 3.7.4
-</pre></div>
-
-That's how PyEnv asks to you to define a global or a local environment. 
-
-Then go in again in your EPuck2_Workplace:
-
-```shell
-cd EPuck2_Workplace
-python --version
-
-```
-
-<div class="box">output console:<pre>
-Python 3.11.2
-</pre></div>
-
-then enter in TPIntro1 subfolder:
-
-```shell
-cd TPIntro1
-python --version
-
-```
-
-<div class="box">output console:<pre>
-Python 3.9.1
-</pre></div>
-
-This shows that while travelling between different folders, pyenv in fact dynamically changes the environment (and thus python version) ! All the packages that you install with `pip` (`numpy`, `pandas`, etc.) will be stored independently for all these folders, thus not interferring with other projects you may have.
-
-# Part 4 - Presenting the EPuck2 robot
-Read through the following documentation to get acquainted with the e-puck2.
-
-- 👉 [Presenting the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Presenting-the-EPuck2)
-
-# Part 5 - Git introduction
-Now that we're familiar with the IDE and the robot, there's a final step before we can start coding. As a mean to facilitate the reviewing, testing, sharing and saving of code, many developers use a code versioning tool. For this course (i.e labs **and miniproject**), we've decided to make use of `git`, which is the most widely used versioning tool. Please read through the following wiki page to get familiar with the basic concepts behind `git`.\
-⚠ We will experiment the concepts within this wiki right after, so just read through it for now.
-- 👉 [Introduction to Git](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Introduction-to-Git)
-
-To experiment what we've just read, we'll again play with the two repositories created earlier. In the terminal `TPIntro1`, enter the following commands and observe what happens after each command in the git tab of the IDE (check out the IDE 👉 [🗔 User Interface](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/IDE-%F0%9F%97%94-User-Interface) wiki page if needed).
-
-```shell
-git init # init git. This will typically create a .git folder locally
-git status
-
-```
-
-<div class="box">output console:<pre>
-On branch main
-
-No commits yet
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        src/
-        .python-version
-
-nothing added to commit but untracked files present (use "git add" to track)
-</pre></div>
-
-1. The `src` folder and his content are not tracked.
-2. The file of pyenv configuration `.python-version` is also untracked, but it could be ignored if this pyenv configuration is not part of the project in itself.
-
-The code that we consider as part of the project must be added then commited:
-
-```shell
-git add src/ # add all files in src directory to the next commit
-git commit -m "first commit" # commit
-git status
-
-```
-
-<div class="box">output console:<pre>
-On branch main
-Untracked files:
-  (use "git add <file>..." to include in what will 
-be committed)
-        .python-version
-
-nothing added to commit but untracked files present (use "git add" to track)
-
-On branch main
-nothing to commit, working tree clean
-</pre></div>
-
-The local configuration of pyenv remains, and as it is not part of the project we will exclude it from version management as follows.
-
-```shell
-echo .python-version >> .gitignore # tells git to not start tracking files called .python_version
-git add .gitignore # add the .gitignore file to the next commit
-git commit -m "Git ignore of .python-version" # commit
-git status
-
-```
-
-<div class="box">output console:<pre>
-On branch main
-nothing to commit, working tree clean
-</pre></div>
-
-Making a local git versioning of a piece of code can be done either through command line, as you've just done, or through the VSCode git plugin. To try out the latter approach, press `Shift + Ctrl + p` (`Shift + Cmd + p` on MacOS) to open the command palette tool, then execute the `Git: Initialize repository` command by selecting `TPIntro2` when prompted. You may notice that the src/ repository of `TPIntro2` turned green, and if you open the git tab of VSCode, you'll also notice that the green letter `U` appears next to `main.c`. This stands for `Untracked`, and embodies the fact that this file is not yet being tracked by git: it is new and was never seen before by git (as indeed we just started git). Similarly to command line, press the `+` sign next to the file to add it to the next commit, enter a commit message then press `Commit`. Ensure that the commit is well visible in the git graph extension of VSCode (`4` in the picture below).
-
+## 2.2 Blink only the Front LED
+> `Task 2`
+>- Modify your code to blink only the 5mm red **FRONT_LED**
+>- Hints:
+>    - Consult the electrical schema of the e-puck2 to find the **FRONT_LED** IO pin
+>    - If the LED doesn’t blink, compare the LED driving topology with the previous one and try to play with the **PUPDR** and **OTYPER** GPIO registers from the EmbSys Registers tabular
+>    - Use the oscilloscope to measure the voltage level on the FRONT_LED test point, under the marked **FL** on the transparent cover (see below)
+>    - 💡 **You can connect the GND to the screw that holds the cover**
+>    - Describe the influence of both registers and try to explain the situation
+>    - Adapt your code for this Output topology
+>    - Take the opportunity to use the oscilloscope to measure the influence of 2 extreme values of **OSPEEDR** configuration for this GPIO and take a plot of both for rising and falling edges
 <p float="left">
-    <img src="pictures/git_vscode.png" alt="drawing" width="600"/>
+  <img src="pictures/TestPoint.jpg" alt="drawing" width="700"/>
 </p>
+- 💡 Don’t forget to pause the debugger to be able to change the register value from the EmbSys Registers
 
-Now that we've saved a local version of our code, we might want to share it with teammates to collaborate on a common piece of code. And this is where GitHub comes in handy, as it indeed enables the cloud storage of code that we can share with others through pulls, clones and pushes. If you're not familiar with this vocabulary, you're again encouraged to browse through the [git wiki](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Introduction-to-Git#). We'll need a [Github](https://github.com) account to continue with the rest of the practicals, so make sure you have one before going on.
+## 2.3 Blink only the 4 Body LEDs
+> `Task 3`
+>- Modify your code to blink only the 4 green **BODY_LEDs**
+>- Hints:
+>   - Consult the electrical schema of the e-puck2 to find the **BODY_LED** IO pin
+>   - If the LEDs don’t blink, check in detail all characteristics of this GPIO (port, pins, topology)
+>   - Can you explain why this output topology is used for **BODY_LED** and not the same than the **LED7** one for example?
 
-First, we'll create a remote repository on your GitHub profile. Anywhere on Github, click on your profile top left of the screen, then on *Your repositories*.
+## 2.4 Blink many LEDs automatically with a circular pattern
+> `Task 4`
+>- Blink the **LED1** → **LED3** → **LED5** → **LED7** with the following circular pattern sequence depending on the Selector state:
+>    - ON1→ON3→ON5→ON7→OFF1→OFF3→OFF5→OFF7 or
+>    - ON1→OFF1→ON3→OFF3→ON5→OFF5→ON7→OFF7
+>- Hints:
+>    - Consult the electrical schema of the e-puck2 to find the **LED1**, **LED3**, **LED5** and the **Selector** IO pins
+>    - Create a function that returns the Selector states
+>        - You must obviously configure the correct pins in the correct way to be able to read the Selector state
+>        - You can then visualize the state of the Selector by looking at the IDR register of the related pins with the register tab when debugging
+>    - Have a look on the comment close to the selector on the schema, can you explain it?
+>    - Define different LED sequences depending on the Selector state
+- 💡 The e-puck2 is equipped with a selector that you can use to configure different modes
+  <p float="left">
+    <img src="pictures/Selector.png" alt="drawing" width="700"/>
+  </p>
 
-<p float="left">
-    <img src="pictures/github.png" alt="drawing" width="180"/>
-</p>
+# Part 3 - Timer Interrupt Tutorial
+- In this section, you will use a timer to make the LED blink instead of using a while loop as you did in the previous exercise
+- To do so, we ask you to configure the timer **TIM7** to periodically count up and, when it reaches the value set in the **ARR** register, to update the counter with a reload value and generate an interrupt
+- It is then in the interrupt routine generated by the timer that you will have to change the state of the LED.
+- First read through the 👉 [STM32-Timer documentation page](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-Timer)
+- The configuration of the timer will be done in the file *timer.c*
 
-Click on *New*, name the repository `TPIntro1`, decide whether to make it private or public then click *Create repository* without touching any other option. Now that the repository is created on the remote location (github.com in our case), we need to link our local code to it. Back on the VSCode terminal within `TPIntro1`, enter the following commands:
+## 3.1 Configure TIM7 to have interrupts at 1Hz
+> `Task 5`
+>- Look through the chapter 20 *Basic timers (TIM6 and TIM7)* in the Reference Manual to understand how to configure the **TIM7** timer
+>- Configure **TIM7** for an interrupt frequency of 1Hz
+>- Choose the correct timer prescaler **PSC** and reload value **ARR**
+>- Hint:
+>    - Find out the frequency of the bus on which the TIM7 is connected and deduce the frequency of the timer
 
-```shell
-git remote -v
+## 3.2 Interrupt routine
+- Now, when the timer update event triggers the interrupt, the execution of the main program is halted
+- the processor's registers are saved on the stack and the processor's execution jumps to the corresponding address in the interrupt vector table
+- When the ISR returns, the processor's registers are restored and the execution of the main program continues.
+- In the timer interrupt you have to manually clear the update interrupt flag **UIF** in the timer status register **SR** (see *TIM6/TIM7* status register *(TIMx_SR)* Reference Manual page 708)
 
-```
-
-This command should show nothing as no link with any remote has yet been established.
-
-> [!WARNING]
-> DON'T FORGET to replace `username` with your github username in the following commands
-
-<div class="box"><pre>
-git remote add origin https://github.com/username/TPIntro1.git
-</pre></div>
-
-then check the result:
-
-```shell
-git remote -v
-
-```
-
-<div class="box">output console:<pre>
-origin  https://github.com/username/TPIntro1.git (fetch)
-origin  https://github.com/username/TPIntro1.git (push)
-</pre></div>
-
-and push all branches onto the origin remote:
-
-```shell
-git push origin --all
-
-```
-
-Now we've linked the `TPIntro1` local git project with one remote. You can refresh your browser page of github and confirm that your code is now available on there too. What you'll encounter in the labs is typically that local git projects are linked to several remotes, meaning that you can fetch from, pull from and push to different places in the cloud. To test this behaviour, we'll create a github repository for `TPIntro2` too.
-Publishing local branches is typically easier to do with VSCode. In the git tab of VSCode Epuck2, press `Publish branch`, then select whether to publish it as public or private to publish your branch in a newly created github repository. By comparing both terminals, you should have the same end result through either CLI or VSCode:
-
-<p float="left">
-    <img src="pictures/remotes.png" alt="drawing" width="800"/>
-</p>
-
-Now we'll add the newly created remote repository for `TPIntro2` as second remote to our `TPIntro1` local repository. In the `TPIntro1` terminal session, execute the following:
-
-<div class="box"><pre>
-git remote add another_remote https://github.com/username/TPIntro2.git
-</pre></div>
-
-Take a look to ensure the change has been made:
-
-```shell
-git remote -v
-
-```
-
-<div class="box">output console:<pre>
-another_remote  https://github.com/username/TPIntro2.git (fetch)
-another_remote  https://github.com/username/TPIntro2.git (push)
-origin  https://github.com/username/TPIntro1.git (fetch)
-origin  https://github.com/username/TPIntro1.git (push)
-</pre></div>
-
-then fetch both remotes to have both indexes locally available:
-
-```shell
-git fetch --all
-
-```
-
-Now we can fetch and push to either remote, based on what we want to do. For instance, say we want to merge both repositories, we can execute:
-
-```shell
-git merge --allow-unrelated-histories another_remote/main
-
-```
-
-which will ask us to resolve merge conficts, as indeed the same variables are being renamed in `TPIntro2`. In the confict editor, select to accept the incoming, then resolve the merge confict.
-
-<p float="left">
-    <img src="pictures/merge.png" alt="drawing" width="800"/>
-</p>
-
-You should end up with the same content in `TPIntro1` and `TPIntro2`, without having done any manual code edits. Confirm this by doing a VSCode comparison between both files as seen in [part 2.1](#21-base-vscode).
-
-Now we'll do the same for `TPIntro2` except through VSCode Epuck2 to test the differences. For this, select `add remote` from the three dots next to the `TPIntro2` source control (`1` in image below). Copy the url of your first remote (https://github.com/username/TPIntro1.git) then name it `another_remote`.
-
-<p float="left">
-    <img src="pictures/add_remote.png" alt="drawing" width="800"/>
-</p>
-
-Pressing `2` in the image above will fetch from all remotes and should make it visible that you've now linked to a second remote `another_remote`.
-We are now finished with the two repositories `TPIntro1` and `TPIntro2`, and they can now be deleted locally and on github, unless you want to keep them for further experimentation.
-
-# Part 6 - Setting up your group TP's repository
-Now that we've experienced git on our own, it's time to use it on a real example: setting up your group repositories. The following wiki links should guide you through this process.
-- Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs) to set up git for the TPs
-- Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Working-in-groups) to learn how to work in group using Git
-- Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Asking-for-support) to check how to ask for support
-
-You should now continue the lab by reading through this README.md on VSCode Epuck2 locally, rather than on GitHub.com. To do this, open the `TPs` folder on VSCode Epuck2 and read through the following page to add this lab on your group repository.
- - Click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Fetching-Exercises-Solutions) to learn how to fetch exercises and solutions from reference 
-
-# Part 7 - Tutorial for programming the EPuck2 robot
-
-## 7.1 🔌 Preparation 
-- Open the folder `TPs` with VSCode Epuck2
-- Make sure you are in the right branch (`TPIntro_Exercise`)
-- Run the task `Link Library ST to workspace`
-
-## 7.2 🔨 Building the Project
-- Building the code consists of compiling the **\*.c** and **\*.s** files to create object files, **\*.o**, and then linking the object files to create the **blinky.elf** file
-- More detail on the steps of the build process will be given during TP1
-- The generated **.elf** file contains the data necessary to program the device and additional information that lets you debug at the source code level
-- The additional files **.list**, **.size** and **.mem** are generated containing the disassembly output and the memory layout table with symbol address and size.
-- 👉 To compile the project
-  1. Run the task **TP Intro: Make**
-  2. Observe the progress of the compilation in the Build Console tabular (as in Listing 1).
-  3. When Done is displayed, your code is built and you are ready to program the device. If there are errors in your code, they will be displayed in this console.
-      ```yml
-      > Compiling gpio.c
-      > Compiling main.c   
-      ar> Compiling timer.c
-      m-none-eabi> Compiling stm32f4xx_ll_rcc.c
-      -gcc > Compiling system_clock_config.c
-      -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST gpio.c -o gpio.o
-      > Compiling system_stm32f4xx.c   
-      > Compiling startup_stm32f407xx.s
-      arm-none-eabi-gcc -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST main.c -o main.o
-      arm-none-eabi-gcc -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST timer.c -o timer.o
-      arm-none-eabi-gcc -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST ../ST/system_clock_config.c -o ../ST/system_clock_config.o
-      arm-none-eabi-gcc -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST ../ST/stm32f4xx_ll_rcc.c -o ../ST/stm32f4xx_ll_rcc.o
-      arm-none-eabi-gcc -c -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -Wall -Wextra -Wundef -Wstrict-prototypes -DSTM32F4 -DSTM32F407xx -mthumb -mno-thumb-interwork -MD -MP -I. -I../ST ../ST/system_stm32f4xx.c -o ../ST/system_stm32f4xx.o
-      arm-none-eabi-gcc -x assembler-with-cpp -c -mcpu=cortex-m4 -mthumb -mno-thumb-interwork -I. -I../ST ../ST/startup_stm32f407xx.s -o ../ST/startup_stm32f407xx.o
-      > Linking blinky.elf
-      arm-none-eabi-gcc main.o gpio.o timer.o ../ST/system_clock_config.o ../ST/stm32f4xx_ll_rcc.o ../ST/system_stm32f4xx.o ../ST/startup_stm32f407xx.o   -mcpu=cortex-m4 -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -ffunction-sections -fdata-sections -fno-common -nostartfiles -L./ -mthumb -mno-thumb-interwork -Wl,--no-warn-mismatch,--gc-sections,--script=../ST/STM32F407VGTx_FLASH.ld  -o blinky.elf
-      > Creating blinky.mem
-      > Creating blinky.list
-      > Creating blinky.size
-      arm-none-eabi-nm --numeric-sort --print-size blinky.elf > blinky.mem
-      arm-none-eabi-objdump -d blinky.elf > blinky.list
-      arm-none-eabi-nm --size-sort --print-size blinky.elf > blinky.size
-      arm-none-eabi-size blinky.elf
-         text    data     bss     dec     hex filename
-         1432       4    1540    2976     ba0 blinky.elf
-      > Done
-      ```
-  > `Task 1`<br>
-  > Try to find out the meaning of the words **text**, **data**, **bss**, **dec**.<br>
-  > Estimate the size of your code in percentage of total Flash and RAM available with this microcontroller.
-
-## 7.3 🐞 Programming and debugging the EPuck2 robot
-- Now that you have built your code and created an **.elf** file that can be loaded on the microcontroller, you can program the device:
-  - Plug the USB cable (no need to turn on the e-puck2 using the dedicated button since the programmer MCU will automatically power the main MCU) 
-  - Specify the port to which the EPuck2's gdb-server is connected, click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Communicating-with-the-EPuck2#identify-the-ports) for more info
-  - Program the EPuck2 by clicking on `Run and Debug` tab (in the left side bar)
-
-Ensure that this code indeed shines an LED on the e-puck2.
-
-💡 click 👉 [here](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/IDE-%F0%9F%90%9B-Debugging) for more info about programming and debugging
-
-## 7.4 Testing your EPuck2
-You may find it useful to test your EPuck2 at times when the code executed does not match your expectations. Let's jump into such a case and use another LED by **uncommenting** the `TEST_NEEDED` define in `main.h`, that will switch the led used to the `BODY_LED`. Build and upload the code, and notice that no LED is being switched ON.
-
-To ensure that the `BODY_LED` is working properly, read through the wiki section on how to test a robot using the EPuckMonitor. Follow both the demo program 1 and demo program 2.
-- 👉 [Testing the EPuck2](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/EPuck2-Testing-the-EPuck2#introduction)
-
-You should observe that the light is indeed turning on and off in those test programs, and you can even manually turn it ON through EPuck Monitor (demo program 2). This shows that there is no problem with the hardware of the EPuck2, and that the issue is thus a software one. You will learn in the next lab how different LEDs of the EPuck2 behave differently and how these differences impact the software approach that is required to correctly handle them.
+## 3.3 Toggle LED7 with TIM7 at 1Hz
+> `Task 6`
+>- Write a code that toggles the LED 7 of the e-puck2 robot using timer 7 implemented in the file *timer.c*
+>- Hint:
+>    - Include the *timer.h* header in the *main.c* file
