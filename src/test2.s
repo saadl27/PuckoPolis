@@ -8,7 +8,7 @@
 	.eabi_attribute 30, 6
 	.eabi_attribute 34, 1
 	.eabi_attribute 18, 4
-	.file	"test.c"
+	.file	"test2.c"
 	.text
 	.align	1
 	.global	main
@@ -24,6 +24,8 @@ main:
 	push	{r7}
 	sub	sp, sp, #20
 	add	r7, sp, #0
+	movs	r3, #4
+	str	r3, [r7]
 	movs	r3, #0
 	str	r3, [r7, #4]
 	movs	r3, #0
@@ -36,6 +38,8 @@ main:
 .L4:
 	ldr	r2, [r7, #12]
 	ldr	r3, [r7, #8]
+	add	r2, r2, r3
+	ldr	r3, [r7]
 	add	r3, r3, r2
 	ldr	r2, [r7, #4]
 	add	r3, r3, r2

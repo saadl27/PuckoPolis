@@ -8,7 +8,10 @@
 	.eabi_attribute 30, 6
 	.eabi_attribute 34, 1
 	.eabi_attribute 18, 4
-	.file	"test.c"
+	.file	"task3.c"
+	.global	__aeabi_i2d
+	.global	__aeabi_dmul
+	.global	__aeabi_d2iz
 	.text
 	.align	1
 	.global	main
@@ -18,48 +21,35 @@
 	.fpu softvfp
 	.type	main, %function
 main:
-	@ args = 0, pretend = 0, frame = 16
+	@ args = 0, pretend = 0, frame = 8
 	@ frame_needed = 1, uses_anonymous_args = 0
-	@ link register save eliminated.
-	push	{r7}
-	sub	sp, sp, #20
+	push	{r4, r7, lr}
+	sub	sp, sp, #12
 	add	r7, sp, #0
-	movs	r3, #0
+	movs	r3, #2
 	str	r3, [r7, #4]
-	movs	r3, #0
-	str	r3, [r7, #12]
-	b	.L2
-.L5:
-	movs	r3, #0
-	str	r3, [r7, #8]
-	b	.L3
-.L4:
-	ldr	r2, [r7, #12]
-	ldr	r3, [r7, #8]
-	add	r3, r3, r2
-	ldr	r2, [r7, #4]
-	add	r3, r3, r2
-	str	r3, [r7, #4]
-	ldr	r3, [r7, #8]
-	adds	r3, r3, #1
-	str	r3, [r7, #8]
-.L3:
-	ldr	r3, [r7, #8]
-	cmp	r3, #9
-	ble	.L4
-	ldr	r3, [r7, #12]
-	adds	r3, r3, #1
-	str	r3, [r7, #12]
-.L2:
-	ldr	r3, [r7, #12]
-	cmp	r3, #9
-	ble	.L5
-	ldr	r3, [r7, #4]
+	ldr	r0, [r7, #4]
+	bl	__aeabi_i2d
+	adr	r3, .L3
+	ldrd	r2, [r3]
+	bl	__aeabi_dmul
+	mov	r3, r0
+	mov	r4, r1
 	mov	r0, r3
-	adds	r7, r7, #20
+	mov	r1, r4
+	bl	__aeabi_d2iz
+	mov	r3, r0
+	str	r3, [r7]
+	ldr	r3, [r7]
+	mov	r0, r3
+	adds	r7, r7, #12
 	mov	sp, r7
 	@ sp needed
-	pop	{r7}
-	bx	lr
+	pop	{r4, r7, pc}
+.L4:
+	.align	3
+.L3:
+	.word	1374389535
+	.word	1075388088
 	.size	main, .-main
 	.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2017-q4-major) 7.2.1 20170904 (release) [ARM/embedded-7-branch revision 255204]"
