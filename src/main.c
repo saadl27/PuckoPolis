@@ -30,7 +30,22 @@ int main(void)
     // Enable GPIOD and GPIOE peripheral clock
     RCC->AHB1ENR    |= RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIODEN;
 
+    // Configure PD14 as alternate function (AF2) for TIM4_CH3
+    GPIOD->AFR[1]   = (GPIOD->AFR[1] & ~(0b1111 << 24)) | (2 << 24);
+
+    // enable TIM4 clock
+    RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
+
+    gpio_config_output_af_pushpull(GPIOD, 14);
+
+    timer4_start(1.0f);
+
+
     while (1) {
+        for (float i = 0.0f; i < 1.0f; i += 0.01f) {
+            TIM4->CCR3 = COUNTER_MAX_TIM4 * i;
+            delay(SystemCoreClock / 160);
+        }
         
     }
 }

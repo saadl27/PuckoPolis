@@ -51,6 +51,15 @@ void gpio_config_output_pushpull(GPIO_TypeDef *port, unsigned int pin)
     port->MODER = (port->MODER & ~(3 << (pin * 2))) | (1 << (pin * 2));
 }
 
+void gpio_config_output_af_pushpull(GPIO_TypeDef *port, unsigned int pin)
+{
+    // Output type pushpull : OTy = 0
+    port->OTYPER &= ~(1 << pin);
+
+    // Output mode : MODERy = 10
+    port->MODER = (port->MODER & ~(3 << (pin * 2))) | (2 << (pin * 2));
+}
+
 void gpio_set(GPIO_TypeDef *port, unsigned int pin)
 {
     port->BSRR = (1 << pin);
