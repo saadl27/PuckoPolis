@@ -35,9 +35,17 @@ To achieve the main goal, you will go through the following steps:
 
 ## Take TP5_Exercise branch
 
-- To pull the TP5_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Fetching-Exercises-Solutions)
+- Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs) wiki page;
 
-- Don't forget to push/publish this branch with the set-upstream enabled to your origin remote
+- To pull the TP5_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Fetching-Exercises-Solutions) or execute the following git commands:
+```shell
+git fetch reference # Update your local git index
+git switch --track reference/TP5_Exercise
+
+```
+
+- This should create a local version of the remote TP5_Exercise branch and give you access to all the files of this lab;
+- Don't forget to push this branch with the upstream enabled to your origin remote;
 
 - Once on the branch `TP5_Exercise`, if necessary link the `e-puck2_main-processor` library by running the task `Link Library e-puck2_main-processor`
     <p float="left">
