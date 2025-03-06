@@ -2,7 +2,7 @@
 #include "gpio.h"
 
 #define TIMER_CLOCK 0    	// TODO: configure APB1 clock
-#define PRESCALER   0       // TODO: configure timer frequency
+#define PRESCALER   SystemCoreClock       // TODO: configure timer frequency
 #define COUNTER_MAX 0       // TODO: configure timer max counter
 
 void timer7_start(void)
