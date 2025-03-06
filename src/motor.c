@@ -29,14 +29,14 @@
 *   Complete the right GPIO port and pin to be able to control the motors
 */
 #define MOTOR_RIGHT_A	GPIOE, 13
-#define MOTOR_RIGHT_B
-#define MOTOR_RIGHT_C
-#define MOTOR_RIGHT_D
+#define MOTOR_RIGHT_B   GPIOE, 12
+#define MOTOR_RIGHT_C   GPIOE, 14
+#define MOTOR_RIGHT_D   GPIOE, 15
 
-#define MOTOR_LEFT_A
-#define MOTOR_LEFT_B
-#define MOTOR_LEFT_C
-#define MOTOR_LEFT_D
+#define MOTOR_LEFT_A    GPIOE, 9
+#define MOTOR_LEFT_B    GPIOE, 8
+#define MOTOR_LEFT_C    GPIOE, 11
+#define MOTOR_LEFT_D    GPIOE, 10
 
 
 /*
@@ -45,12 +45,12 @@
 *   step_halt is an array contaning 4 elements describing the state when the motors are off.
 *   step_table is an array of 4 lines of 4 elements. Each line describes a step.
 */
-static const uint8_t step_halt[NB_OF_PHASES] = {, , , };
+static const uint8_t step_halt[NB_OF_PHASES] = {0, 0, 0, 0};
 static const uint8_t step_table[NSTEP_ONE_EL_TURN][NB_OF_PHASES] = {
-    {, , , },
-    {, , , },
-    {, , , },
-    {, , , },
+    {1, 0, 1, 0},
+    {0, 1, 1, 0},
+    {0, 1, 0, 1},
+    {1, 0, 0, 1},
 };
 
 /*
@@ -60,6 +60,8 @@ static const uint8_t step_table[NSTEP_ONE_EL_TURN][NB_OF_PHASES] = {
 *   for example. They will be available only for the code of this file.
 */
 
+static uint8_t counter = 0;
+
 /*
 *
 *   TO COMPLETE
@@ -68,7 +70,33 @@ static const uint8_t step_table[NSTEP_ONE_EL_TURN][NB_OF_PHASES] = {
 */
 void motor_init(void)
 {
+    // Enable GPIOE peripheral clock (used for motors)
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
 
+    // Enable TIM6 and TIM7 peripheral clock
+    RCC->APB1ENR |= MOTOR_RIGHT_TIMER_EN | MOTOR_LEFT_TIMER_EN;
+
+    // Configure the GPIOs
+    gpio_config_output_pushpull(MOTOR_RIGHT_A);
+    gpio_config_output_pushpull(MOTOR_RIGHT_B);
+    gpio_config_output_pushpull(MOTOR_RIGHT_C);
+    gpio_config_output_pushpull(MOTOR_RIGHT_D);
+
+    gpio_config_output_pushpull(MOTOR_LEFT_A);
+    gpio_config_output_pushpull(MOTOR_LEFT_B);
+    gpio_config_output_pushpull(MOTOR_LEFT_C);
+    gpio_config_output_pushpull(MOTOR_LEFT_D);
+
+    // Configure the timers
+    MOTOR_RIGHT_TIMER->PSC = (TIMER_CLOCK / TIMER_FREQ) - 1;
+    MOTOR_RIGHT_TIMER->ARR = 1000 - 1;
+
+    MOTOR_LEFT_TIMER->PSC = (TIMER_CLOCK / TIMER_FREQ) - 1;
+    MOTOR_LEFT_TIMER->ARR = 1000 - 1;
+
+    // Start the timers
+    MOTOR_RIGHT_TIMER->CR1 |= TIM_CR1_CEN;
+    MOTOR_LEFT_TIMER->CR1 |= TIM_CR1_CEN;
 }
 
 /*
@@ -80,7 +108,29 @@ void motor_init(void)
 */
 static void right_motor_update(const uint8_t *out)
 {
+    if (out[0] == 1) {
+        gpio_set(MOTOR_RIGHT_A);
+    } else {
+        gpio_clear(MOTOR_RIGHT_A);
+    }
 
+    if (out[1] == 1) {
+        gpio_set(MOTOR_RIGHT_B);
+    } else {
+        gpio_clear(MOTOR_RIGHT_B);
+    }
+
+    if (out[2] == 1) {
+        gpio_set(MOTOR_RIGHT_C);
+    } else {
+        gpio_clear(MOTOR_RIGHT_C);
+    }
+
+    if (out[3] == 1) {
+        gpio_set(MOTOR_RIGHT_D);
+    } else {
+        gpio_clear(MOTOR_RIGHT_D);
+    }
 }
 
 /*
@@ -92,7 +142,29 @@ static void right_motor_update(const uint8_t *out)
 */
 static void left_motor_update(const uint8_t *out)
 {
+    if (out[0] == 1) {
+        gpio_set(MOTOR_LEFT_A);
+    } else {
+        gpio_clear(MOTOR_LEFT_A);
+    }
 
+    if (out[1] == 1) {
+        gpio_set(MOTOR_LEFT_B);
+    } else {
+        gpio_clear(MOTOR_LEFT_B);
+    }
+
+    if (out[2] == 1) {
+        gpio_set(MOTOR_LEFT_C);
+    } else {
+        gpio_clear(MOTOR_LEFT_C);
+    }
+
+    if (out[3] == 1) {
+        gpio_set(MOTOR_LEFT_D);
+    } else {
+        gpio_clear(MOTOR_LEFT_D);
+    }
 }
 
 /*
@@ -104,7 +176,18 @@ static void left_motor_update(const uint8_t *out)
 */
 void motor_stop(void)
 {
+    gpio_clear(MOTOR_RIGHT_A);
+    gpio_clear(MOTOR_RIGHT_B);
+    gpio_clear(MOTOR_RIGHT_C);
+    gpio_clear(MOTOR_RIGHT_D);
 
+    gpio_clear(MOTOR_LEFT_A);
+    gpio_clear(MOTOR_LEFT_B);
+    gpio_clear(MOTOR_LEFT_C);
+    gpio_clear(MOTOR_LEFT_D);
+
+    MOTOR_RIGHT_TIMER->ARR = 0;
+    MOTOR_LEFT_TIMER->ARR  = 0;
 }
 
 /*
@@ -116,7 +199,46 @@ void motor_stop(void)
 */
 void motor_set_position(float position_r, float position_l, float speed_r, float speed_l)
 {
+    // Compute the number of steps to do for each motor
+    uint16_t nstep_r = (uint16_t)(position_r * NSTEP_ONE_TURN / WHEEL_PERIMETER);
+    uint16_t nstep_l = (uint16_t)(position_l * NSTEP_ONE_TURN / WHEEL_PERIMETER);
 
+    // Compute the number of steps to do for each electrical turn
+    uint16_t nstep_el_r = nstep_r / NSTEP_ONE_EL_TURN;
+    uint16_t nstep_el_l = nstep_l / NSTEP_ONE_EL_TURN;
+
+    // Compute the number of steps to do for each phase
+    uint16_t nstep_phase_r = nstep_el_r / NB_OF_PHASES;
+    uint16_t nstep_phase_l = nstep_el_l / NB_OF_PHASES;
+
+    // Compute the number of steps to do for each phase
+    uint16_t nstep_phase_r = nstep_el_r / NB_OF_PHASES;
+    uint16_t nstep_phase_l = nstep_el_l / NB_OF_PHASES;
+
+    // Compute the number of steps to do for each phase
+    uint16_t nstep_phase_r = nstep_el_r / NB_OF_PHASES;
+    uint16_t nstep_phase_l = nstep_el_l / NB_OF_PHASES;
+
+    // Compute the number of steps to do for each phase
+    uint16_t nstep_phase_r = nstep_el_r / NB_OF_PHASES;
+    uint16_t nstep_phase_l = nstep_el_l / NB_OF_PHASES;
+
+    // Compute the number of steps to do for each phase
+    uint16_t nstep_phase_r = nstep_el_r / NB_OF_PHASES;
+    uint16_t nstep_phase_l = nstep_el_l / NB_OF_PHASES;
+
+    // Compute the number of steps to do for each phase
+    uint16_t nstep_phase_r = nstep_el_r / NB_OF_PHASES;
+    uint16_t nstep_phase_l = nstep_el_l / NB_OF_PHASES;
+
+    // Compute the number of steps to do for each phase
+    uint16_t nstep_phase_r = nstep_el_r / NB_OF_PHASES;
+    uint16_t nstep_phase_l = nstep_el_l / NB_OF_PHASES;
+
+    // Compute the number of steps to do for each phase
+    uint16_t nstep_phase_r = n
+    step_el_r / NB_OF_PHASES;
+    uint16_t nstep_phase_l = nstep_el_l / NB_OF_PHASES;
 }
 
 /*
