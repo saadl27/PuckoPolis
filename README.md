@@ -1,17 +1,18 @@
 # Introduction
-- Welcome to the second lab of MICRO-315;
+Welcome to the second lab of MICRO-315!
 - `⏱ Duration`: 3 hours.
 
 ## Goals
-- Generate a low-level library for the e-puck2 miniature mobile robot written in C;
+- Generate a low-level library for the e-puck2 robot written in C;
 - The library targeted in this exercise is a motor control library allowing to set speed and position targets;
-- 💡 All the documentation concerning the GNU embedded toolchain for ARM processors **arm-none-eabi** and the compiler GCC can be found in the subfolder `installpath/EPuck2_Utils/arm_gcc_toolchain/share/doc/gcc-arm-none-eabi/pdf`.
+
+💡 All the documentation concerning the GNU embedded toolchain for ARM processors **arm-none-eabi** and the compiler GCC can be found in the subfolder `installpath/EPuck2_Utils/arm_gcc_toolchain/share/doc/gcc-arm-none-eabi/pdf`.
 
 ## Methodology
-To achieve the main goal, we will go through the following steps:
+To achieve these goals, we will go through the following steps:
 - Master PWM signals in the context of the EPuck-2 LEDs;
-- Understand how a stepper motor works and programming a stepper motor controller in C;
-- Making a library out of it.
+- Understand how a stepper motor works and leann how to program a stepper motor controller in C;
+- Making a library out of the functions developed.
 
 ## ⚠ TODO before starting the Lab
 - Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Setting-up-git-for-TPs) wiki page;
@@ -23,7 +24,7 @@ git checkout reference/TP2_Exercise
 ```
 This should create a local version of the remote TP2_Exercise branch and give you access to all the files of this lab. Alternatively, you can use the VSCode git plug-in or git graph extension to fetch the `reference` remote and checkout to the correct branch.
 
-Then, create a symbolic link to the ST library (won't compile otherwise) by running the `(Link Library ST)` task
+Then, create a symbolic link to the ST library (won't compile otherwise) by running the `(Link Library ST)` task.
     <p float="left">
         <img src="pictures/linkSTLibrary.png" alt="drawing" width="200"/>
     </p>
@@ -61,18 +62,17 @@ During TP1, you used a timer and an interrupt routine to toggle a LED with a giv
 >   - Use this number in the reference manual (Sec 8.4.10) to identify how to set **AFRH14**
 
 
-- The GPIO is now configured 🥇
-- Now let's configure the **Timer4** and **Channel 3** to obtain the desired PWM on the pin 14 of port D
-- The **Timer 4** should be configured similarly to what was done in Lab 1 with **Timer 6**
--💡 Look at the [wiki on PWM](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-PWM) to configure the timer
+- The GPIO is now configured! Now let's configure the **Timer4** and **Channel 3** to obtain the desired PWM on PD14;
+- The **Timer 4** should be configured similarly to what was done in Lab 1 with **Timer 6**;
+- 💡 Find help on the [PWM wiki](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/STM32-PWM) to configure the timer;
 
-> `Task 9`
+> `Task 3`
 >- Determine the **Prescaler** and **Counter maximum** value for **Timer 4**
 >- The blinking of the LED should be fast (something around **80 - 100Hz**) in order to not be visible to the human eye
 
-- The final step: configure the **Channel 3** of **Timer4** for **Output Compare**
+- The final step: configure the **Channel 3** of **Timer4** for **Output Compare**;
 
-> `Task 10`
+> `Task 4`
 >- Configure the three registers of **TIM4**: **CCMR2**, **CCR3**, **CCER** in order to obtain the PWM signal on pin 14
 >   - Use **PWM mode 1**
 >- Build and run your code
@@ -89,7 +89,7 @@ First read through the wiki to learn more about the EPuck2 Motors.
 
 ## 2.1 Functions implementation
 All the functions are already declared in **motor.c** and **motor.h**, but it is up to you to complete them.
-> `Task 11`
+> `Task 5`
 >- Make sure to be in the branch **TP2_Exercise**
 >- Complete the necessary functions to control the two stepper motors in speed, direction or target position
 >   - **identify** the pins of the MCU linked to the **H-bridges** controlling the left and right motors
@@ -106,38 +106,38 @@ All the functions are already declared in **motor.c** and **motor.h**, but it is
 >⚠⚠ **It is important to set each phase of the motor to 0 when the robot does not have to move, or if the program is stopped, to ensure that no phase is active continuously which might damage the motors!** ⚠⚠
 
 ## 2.2 Library
-- Compile your project again to be sure to have the **.o** files
-- The idea here is in the file explorer window to move out of the project's folder the file **motor.c** but to let **motor.o** and **motor.h**
-- In the Makefile delete the mention to **motor.c** and add **motor.o** to the variable **LIB_OBJS**
-- Make sure the Makefile has been saved and you can now clean the project and recompile it.
+- Compile your project again to be sure to have the **.o** files;
+- The idea here is to move  the **motor.c** file out of the project's folder but to leave **motor.o** and **motor.h**, using the file explorer window;
+- In the Makefile, delete the mention to **motor.c** and add **motor.o** to the variable **LIB_OBJS**;
+- Make sure the Makefile has been saved and you can now clean the project and remake it.
 
-> `Task 12`
->- The effect on the results at the execution is the same, but what is the difference from a developer point of view?
+> `Task 6`
+>- The effect on the results at the execution is the same, but what is the different from a developer point of view?
 >- What are the advantages and disadvantages of this configuration?
 
-- To understand how a library is generated, look at the figure [below](#figure-8)
+- To understand how a library is generated, remember the figure [below](#figure-8) from the classes.
 >### Figure 8
->Path for the generation of a library
+>Compilation process: library generation is highlighted in red.
     <p float="left">
       <img src="pictures/archive.png" alt="drawing" width="700"/>
     </p>
 
-- Now let's create a library archive which will contain **motor.o**, **gpio.o**, **timer.o** and **selector.o**:
-  - Reopen the VSCode terminal (or open an external one and reconfigure the **PATH**)
+- Now, let's create a library archive that will contain **motor.o**, **gpio.o**, **timer.o** and **selector.o**:
+  - Reopen the VSCode terminal (or open an external one and reconfigure the **PATH**);
   - Go to the directory containing the files of the projects (command **cd**) and type the following command:
   ```shell
   arm-none-eabi-ar -q libtp2.a gpio.o motor.o timer.o selector.o
   
   ```
 
-- Now in the file explorer window, a **libtp2.a** file should have appeared
-- Move out of the project's folder **motor.o**, **motor.c**, **gpio.o**, **gpio.c**, **timer.o**, **timer.c**, **selector.o** and **selector.h**
-- Edit the **Makefile** and delete all the mention to these files (.c and .o) and add **libtp2.a** to the variable **LIBS**
+- Now, in the file explorer window, a **libtp2.a** file should have appeared;
+- Move out of the project's folder **motor.o**, **motor.c**, **gpio.o**, **gpio.c**, **timer.o**, **timer.c**, **selector.o** and **selector.h**;
+- Edit the **Makefile** and delete all the mention to these files (.c and .o) and add **libtp2.a** to the variable **LIBS**;
 - You should now be able to compile the project with a library rather than source code.
 
-> `Task 13`
->- Do you see a difference?
->- What is the difference?
->- When do we use a library instead of simply object files?
+> `Task 7`
+>- What difference do you observe?
+>- When do is it best to use a library rather than simple object files?
 >- Understand what **ar** is really doing by looking to its definition under https://en.wikipedia.org/wiki/Ar_(Unix)
->- 💡 Hint: If your program (that includes the library) doesn't work, it might be that you did a mistake in your library.
+> 
+>💡 Hint: If your program (that includes the library) doesn't work, it might be that you made a mistake in your library.
