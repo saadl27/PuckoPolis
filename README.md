@@ -22,7 +22,7 @@
 
 ## Take TP3_Exercise branch
 
-- Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Setting-up-git-for-TPs) wiki page;
+- Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs) wiki page;
 
 - To pull the TP3_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Fetching-Exercises-Solutions) or execute the following git commands:
 ```shell
