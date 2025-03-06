@@ -31,7 +31,9 @@ git switch --track reference/TP3_Exercise
 
 ```
 
-- Don't forget to push this branch with the upstream enabled to your origin remote
+- This should create a local version of the remote TP1_Exercise branch and give you access to all the files of this lab;
+
+- Don't forget to push this branch with the upstream enabled to your origin remote;
 
 - Once on this branch `TP3_Exercise`, normaly the `e-puck2_main-processor` library has certainly not yet been linked and `ST` library from previous TP is still linked. Then you must:
 
