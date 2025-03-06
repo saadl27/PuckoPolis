@@ -26,9 +26,18 @@ To achieve the main goal, you will go through the following steps:
 
 ## Take TP4_Exercise branch
 
-- To pull the TP4_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-PrivateWiki/wiki/Git-Fetching-Exercises-Solutions)
+- Ensure your local repository is correctly set up as indicated in the [Setting up Git for TPs](https://github.com/EPFL-MICRO-315/TPs-Student/wiki/Git-Setting-up-git-for-TPs) wiki page;
 
-- Don't forget to push/publish this branch with the set-upstream enabled to your origin remote
+- To pull the TP4_Exercise branch, please refer to this [wiki page on fetching exercises and solutions](https://github.com/EPFL-MICRO-315/TPs-Wiki/wiki/Git-Fetching-Exercises-Solutions) or execute the following git commands:
+```shell
+git fetch reference # Update your local git index
+git switch --track reference/TP4_Exercise
+
+```
+
+- This should create a local version of the remote TP4_Exercise branch and give you access to all the files of this lab;
+- Don't forget to push this branch with the upstream enabled to your origin remote;
+
 
 # e-puck2_main-processor library
 For TP1 and TP2 you used the `ST` library in order to see how to code works at low level. This allowed you to see how to access and manage the STM32F407 peripheral registers (Clock's module, GPIOs and Timers) in order to communicate properly with the e-puck2 components (LEDs, motors).   
