@@ -239,6 +239,7 @@ void motor_set_position(float position_r, float position_l, float speed_r, float
     uint16_t nstep_phase_r = n
     step_el_r / NB_OF_PHASES;
     uint16_t nstep_phase_l = nstep_el_l / NB_OF_PHASES;
+    
 }
 
 /*
