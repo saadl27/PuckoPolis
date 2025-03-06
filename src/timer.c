@@ -1,13 +1,7 @@
 #include <stm32f4xx.h>
 #include "gpio.h"
 #include "main.h"  // Here only for internal use of BODY_LED but a call-back will be preferable!!
-
-#define TIMER_CLOCK         84000000    // APB1 clock
-#define PRESCALER_TIM7      8400        // timer frequency: 10kHz
-#define COUNTER_MAX_TIM7    10000       // timer max counter -> 1Hz
-
-#define PRESCALER_TIM4		8400		// frequency: 10k
-#define COUNTER_MAX_TIM4	84			// max counter -> 100
+#include "timer.h"
 
 void timer7_start(void)
 {
@@ -24,7 +18,7 @@ void timer7_start(void)
     TIM7->CR1 |= TIM_CR1_CEN;            // Enable timer
 }
 
-void timer4_start(void) {
+void timer4_start(float duty) {
 	 // configure TIM4
     TIM4->PSC = PRESCALER_TIM4 - 1;   // Note: final timer clock  = timer clock / (prescaler + 1)
     TIM4->ARR = COUNTER_MAX_TIM4 - 1; // Note: timer reload takes 1 cycle, thus -1
@@ -33,8 +27,9 @@ void timer4_start(void) {
     TIM4->CR1 |= TIM_CR1_CEN;
 
     // configure TIM4_CH3 as PWM mode 1
-    TIM4->CCMR2 = (TIM4->CCMR2 & ~TIM_CCMR2_OC3M) | (1 << TIM_CCMR2_OC3M_Pos);
-    TIM4->CCR3 = COUNTER_MAX_TIM4 / 2;
+    TIM4->CCMR2 = (TIM4->CCMR2 & ~TIM_CCMR2_OC3M) | (0b110 << TIM_CCMR2_OC3M_Pos)
+												  | (1 << TIM_CCMR2_OC3PE_Pos);
+    TIM4->CCR3 = (uint32_t)((float)COUNTER_MAX_TIM4 * duty);
     TIM4->CCER = (TIM4->CCER & ~TIM_CCER_CC3E)| (TIM_CCER_CC3E);
 }
 

@@ -36,9 +36,16 @@ int main(void)
     // enable TIM4 clock
     RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
 
-    timer4_start();
+    gpio_config_output_af_pushpull(GPIOD, 14);
+
+    timer4_start(1.0f);
+
 
     while (1) {
+        for (float i = 0.0f; i < 1.0f; i += 0.01f) {
+            TIM4->CCR3 = COUNTER_MAX_TIM4 * i;
+            delay(SystemCoreClock / 160);
+        }
         
     }
 }
