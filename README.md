@@ -33,6 +33,7 @@
     chThdCreateStatic(waThdBodyLed, sizeof(waThdBodyLed), NORMALPRIO, ThdBodyLed, NULL);
 ...
 ```
+- **FRONT_LED** does in fact blink, but at a very high frequency and thus appears to be turned on at a low intensity.
 
 # Task 3: Period of the threads using thread sleeps
 - [Figure 1](#figure-1) shows that the periods of the LED's commutations is the same as expected in the code. It is normal as the threads use sleep mechanisms. For most usages, timings obtained with threads are precise enough. Otherwise real interrupts must be used.
