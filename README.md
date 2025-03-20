@@ -168,11 +168,11 @@ Read through the 2 following wiki pages:
 
 > `Task 1`
 >- Look at the two threads and understand what they do
->- What is the difference between **chThdSleepUntilWindowed()** and **chThdSleepMilliseconds()** ?
+>- What is the difference between **chThdSleepUntilWindowed()** and **chThdSleepMilliseconds()** ? SleepUntilWindowed accounts for the task execution while SleepMilliseconds corresponds to the resting time between the execution
 
 > `Task 2`
 >- Compile and run the code on the e-puck2
->- Why are the leds not blinking ?
+>- Why are the leds not blinking ? thread not created in the main (lines were commented)
 >- Resolve the problem and verify that **BODY_LED** and **FRONT_LED** are blinking (**FRONT_LED** will blink too fast and will simply seem to be turned on)
 
 > `Task 3`
