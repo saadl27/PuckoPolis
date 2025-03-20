@@ -7,6 +7,8 @@
 #define STANDARD_GRAVITY    9.80665f
 #define DEG2RAD(deg) (deg / 180 * M_PI)
 
+#define MAX_INT16			0x7fff
+
 extern messagebus_t bus;
 
 static imu_msg_t imu_values;
@@ -25,6 +27,10 @@ void imu_compute_units(void){
 	/*
     *   TASK 10 : TO COMPLETE
     */
+    for (uint8_t i = 0; i < NB_AXIS; ++i) {
+		imu_values.acceleration[i] = (float)(imu_values.acc_raw[i] - imu_values.acc_offset[i]) * 2 * STANDARD_GRAVITY / MAX_INT16;
+		imu_values.gyro_rate[i] = (float)(imu_values.gyro_raw[i] - imu_values.gyro_offset[i]) * DEG2RAD(250) / MAX_INT16;
+	}
 }
 
  /**
@@ -100,6 +106,21 @@ void imu_compute_offset(messagebus_topic_t * imu_topic, uint16_t nb_samples){
     /*
     *   TASK 9 : TO COMPLETE
     */
+   	int16_t off_acc[3] = {0};
+	int16_t off_gyro[3] = {0};
+
+   	for (uint16_t i = 0; i < nb_samples; i++) {
+		messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_values));
+		for (uint8_t j = 0; j < NB_AXIS; j++) {
+			off_acc[j] += imu_values.acc_raw[j];
+			off_gyro[j] += imu_values.gyro_raw[j];
+		}
+	}
+
+	for (uint8_t j = 0; j < NB_AXIS; j++) {
+		imu_values.acc_offset[j] = off_acc[j] / nb_samples;
+		imu_values.gyro_offset[j] = off_gyro[j] / nb_samples;
+	}
 }
 
 int16_t get_acc(uint8_t axis) {
