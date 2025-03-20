@@ -71,7 +71,6 @@ static THD_FUNCTION(ProcessImage, arg) {
 			mean += (float) image[i];
 		}
 		mean /= IMAGE_BUFFER_SIZE;
-		chprintf((BaseSequentialStream*) &SDU1, "mean = %f\n", mean);
 
 		float eps = mean / 4;
 
@@ -92,11 +91,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 		}
 
 
-		float dist = (min == max ? 0 : (float) CALIB_CONSTANT / (max - min));
-		chprintf((BaseSequentialStream*) &SDU1, "min = %d, max = %d\n", min, max);
-		chprintf((BaseSequentialStream*) &SDU1, "image[min] = %d, image[max] = %d\n",
-				image[min], image[max]);
-		chprintf((BaseSequentialStream*) &SDU1, "distance = %f\n", dist);
+		distance_cm = (min == max ? 0 : (float) CALIB_CONSTANT / (max - min));
 
 		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
     }
