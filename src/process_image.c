@@ -7,6 +7,11 @@
 #include "process_image.h"
 #include "main.h"
 
+#define EXTRACT_RED(buf, element)   (*((buf) + 2*(element)) & 0b11111000) >> 3
+#define EXTRACT_GREEN(buf, element) (*((buf) + 2*(element)) & 0b00000111) + ((*((buf) + 2*(element) + 1) & 0b11100000) >> 5)
+#define EXTRACT_BLUE(buf, element)  (*((buf) + 2*(element) + 1) & 0b00011111)
+
+
 
 static float distance_cm = 0;
 
@@ -54,6 +59,15 @@ static THD_FUNCTION(ProcessImage, arg) {
 		/*
 		*	To complete
 		*/
+
+		for (uint16_t i = 0; i < IMAGE_BUFFER_SIZE; ++i) {
+			image[i] = (*(img_buff_ptr + 2*i) & 0b11111000) >> 3;
+		}
+
+		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+
+		// uint8_t buf[1] = {0};
+		// SendUint8ToComputer(buf, 1);
     }
 }
 
