@@ -54,6 +54,13 @@ static THD_FUNCTION(ProcessImage, arg) {
 		/*
 		*	To complete
 		*/
+		for (uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
+			image[i] = (*(img_buff_ptr+2*i) & (0b11111000));
+		}
+		//for (uint16_t i = 0; i<2*IMAGE_BUFFER_SIZE; i+=2){
+		//	image[i/2] = ((uint8_t))
+		//}
+		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
     }
 }
 
