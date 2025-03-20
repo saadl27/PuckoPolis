@@ -12,7 +12,7 @@
 #define EXTRACT_BLUE(buf, element)  (*((buf) + 2*(element) + 1) & 0b00011111)
 
 #define CALIB_CONSTANT 10 * 150 // cm * px
-#define EPSILON 0
+#define IMAGE_OFFSET	100
 
 static float distance_cm = 0;
 
@@ -75,29 +75,27 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 		float eps = mean / 4;
 
-		uint8_t minmin = 0;
-		uint8_t maxmax = 0;
+		uint16_t min = 0;
+		uint16_t max = 0;
 
-		bool found_min = false;
-
-		for (size_t i = 0; i < IMAGE_BUFFER_SIZE; ++i) {
-			if (!found_min) {
-				if (image[i] < mean - eps) {
-					minmin = i;
-					found_min = true;
-				}
-			} if (found_min) {
-				if (image[i] > mean + eps) {
-					maxmax = i;
-					break;
-				}
+		for (size_t i = IMAGE_OFFSET; i < IMAGE_BUFFER_SIZE; ++i) {
+			if ((float) image[i] < mean - eps) {
+				min = i;
+				break;
+			}
+		}
+		for (size_t i = min + 1; i < IMAGE_BUFFER_SIZE-IMAGE_OFFSET; ++i) {
+			if ((float) image[i] > mean + eps) {
+				max = i;
+				break;
 			}
 		}
 
-		float dist = (minmin == maxmax ? 0 : (float) 1.0 / (maxmax - minmin));
-		chprintf((BaseSequentialStream*) &SDU1, "min = %d, max = %d\n", minmin, maxmax);
+
+		float dist = (min == max ? 0 : (float) CALIB_CONSTANT / (max - min));
+		chprintf((BaseSequentialStream*) &SDU1, "min = %d, max = %d\n", min, max);
 		chprintf((BaseSequentialStream*) &SDU1, "image[min] = %d, image[max] = %d\n",
-				image[minmin], image[maxmax]);
+				image[min], image[max]);
 		chprintf((BaseSequentialStream*) &SDU1, "distance = %f\n", dist);
 
 		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
