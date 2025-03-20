@@ -11,7 +11,8 @@
 #define EXTRACT_GREEN(buf, element) (*((buf) + 2*(element)) & 0b00000111) + ((*((buf) + 2*(element) + 1) & 0b11100000) >> 5)
 #define EXTRACT_BLUE(buf, element)  (*((buf) + 2*(element) + 1) & 0b00011111)
 
-
+#define CALIB_CONSTANT 10 * 150 // cm * px
+#define EPSILON 0
 
 static float distance_cm = 0;
 
@@ -32,11 +33,15 @@ static THD_FUNCTION(CaptureImage, arg) {
 
     while(1){
         //starts a capture
+		// systime_t time = chVTGetSystemTime();
 		dcmi_capture_start();
 		//waits for the capture to be done
 		wait_image_ready();
+		// time = chVTGetSystemTime() - time;
 		//signals an image has been captured
 		chBSemSignal(&image_ready_sem);
+		// chprintf((BaseSequentialStream *) &SDU1, "time = %d\n", time);
+		// chThdSleepMilliseconds(12);
     }
 }
 
@@ -55,6 +60,7 @@ static THD_FUNCTION(ProcessImage, arg) {
         chBSemWait(&image_ready_sem);
 		//gets the pointer to the array filled with the last image in RGB565    
 		img_buff_ptr = dcmi_get_last_image_ptr();
+		float mean = 0;
 
 		/*
 		*	To complete
@@ -62,12 +68,39 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 		for (uint16_t i = 0; i < IMAGE_BUFFER_SIZE; ++i) {
 			image[i] = (*(img_buff_ptr + 2*i) & 0b11111000) >> 3;
+			mean += (float) image[i];
+		}
+		mean /= IMAGE_BUFFER_SIZE;
+		chprintf((BaseSequentialStream*) &SDU1, "mean = %f\n", mean);
+
+		float eps = mean / 4;
+
+		uint8_t minmin = 0;
+		uint8_t maxmax = 0;
+
+		bool found_min = false;
+
+		for (size_t i = 0; i < IMAGE_BUFFER_SIZE; ++i) {
+			if (!found_min) {
+				if (image[i] < mean - eps) {
+					minmin = i;
+					found_min = true;
+				}
+			} if (found_min) {
+				if (image[i] > mean + eps) {
+					maxmax = i;
+					break;
+				}
+			}
 		}
 
-		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+		float dist = (minmin == maxmax ? 0 : (float) 1.0 / (maxmax - minmin));
+		chprintf((BaseSequentialStream*) &SDU1, "min = %d, max = %d\n", minmin, maxmax);
+		chprintf((BaseSequentialStream*) &SDU1, "image[min] = %d, image[max] = %d\n",
+				image[minmin], image[maxmax]);
+		chprintf((BaseSequentialStream*) &SDU1, "distance = %f\n", dist);
 
-		// uint8_t buf[1] = {0};
-		// SendUint8ToComputer(buf, 1);
+		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
     }
 }
 
