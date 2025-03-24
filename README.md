@@ -1,6 +1,6 @@
 # Introduction
-- Welcome in lab 5 of MICRO-315
-- `⏱ Duration`: 4 hours
+Welcome to lab 5 of MICRO-315!
+- `⏱ Duration`: 6 hours
 
 # Goals
 - The goal of this practical session is to implement a simple sound remote to control the movements of the robot by detecting the frequency of the sound received by one microphone
