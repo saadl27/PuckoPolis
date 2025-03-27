@@ -82,6 +82,9 @@ git switch --track reference/TP5_Exercise
 >- 💡 Hint: the script emulates a sampling frequency of 300Hz
 >- 💡 Hint: In other words, what is the relation between the frequency the FFT can extract and the sampling frequency of the signal ? (See Shannon / Nyquist)
 
+>- The 2 peaks represent the frequency in the positive and negative parts of the spectrum. For a sine wave, the Fourier transform is the sum of 2 Dirac deltas centered at the positive and negative frequencies.
+>- The max frequency the robot can find is half the sampling frequency, this stems from the Nyquist-Shannon theorem.
+
 > `Task 2`
 >- With the previous answers, find the relation between the positions of the peaks and the real frequency
 >- For example if two peaks are on the positions -200 and 200, what is their frequency
@@ -90,6 +93,8 @@ git switch --track reference/TP5_Exercise
 >   - 💡 Hint: what is the hypothesis made when calculating the DFT and therefore the FFT ?
 >   - 💡 Hint: what is the difference between the signal f = 4.5 Hz and f = 4.7 Hz ?
 >   - You can resize the window if you can't obtain these values with the sliders
+
+>- The transform computed by the algorithm is of the form F(f) = delta(f - f0) + delta(f + f0), f0 being 150 Hz in our case. The positions of the peaks are therefore at f - f0 and f + f0.
 
 ## Code inside the e-puck2
 - Now you are going to see in more details the code used to compute the FFT in the e-puck2. 
@@ -102,6 +107,12 @@ git switch --track reference/TP5_Exercise
 >- Where are they declared ?
 >- What is the goal of the function **arm_cmplx_mag_f32()**
 
+>- **\#ifdef**, **\#else** and **\#endif** are preprocessor directives that tell which part of the code will be compiled. 
+>- **\#ifdef** checks whether a specific symbol is defined at compile time, whereas the **if** directive only checks if a boolean is true.
+>- The buffers are 1024 elements long, resulting in 512 different frequencies (2 per frequency as the FFT returns a real and imaginary part).
+>- They're declared in the main function.
+>- **arm_cmpl_mag_f32()** is an optimized function provided by Arm to compute the magnitude of a complex number, real and imaginary parts being f32 values.
+
 > `Task 4`
 >- Now look at the file **fft.c**, you will find two different implementations of an FFT: **doFFT_optimized()** and **doFFT_c()**
 >- For both implementations, where are stored the results of the FFT ?
@@ -110,6 +121,8 @@ git switch --track reference/TP5_Exercise
 >- You will need to convert the data in order to have the structure needed by the function **doFFT_c()** because you have to give a **complex_float** structure array as argument and you have an array containing float numbers
 >- ⚠ **WARNING:** the array you will probably declare in order to store the converted values need to be declared as **static** if you declare it inside the function, otherwise you will have a stack overflow of the main thread, which is very difficult to debug
 >- Test it with the python script, is the result of the FFT the same ?
+
+>- in **doFFT_optimized()**, the results are stored in a FFT_SIZE sized array of floats, and in **doFFT_c()**, they're stored in a FFT_SIZE / 2 sized array of complex_floats.
 
 > `Task 5`
 >- Measure the execution time of the two implementations of the FFT and of the function **arm_cmplx_mag_f32()**
