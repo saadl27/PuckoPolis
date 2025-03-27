@@ -113,7 +113,7 @@ git switch --track reference/TP5_Exercise
 
 > `Task 5`
 >- Measure the execution time of the two implementations of the FFT and of the function **arm_cmplx_mag_f32()**
->- For this, you can use the timer12, like in the TP2
+>- For this, you can use the timer12, like in the TP2. Remember to launch the python script so that the FFT can actually happen, else you won't obtain any time measurement!
 >- You can find in the listing [Code block 1](#code-block-1) a reminder of how to use a timer to measure time
 >- How many processor cycles represent the times measured ?
 >- Is it worth it to use an optimized FFT function ?
