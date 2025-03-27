@@ -7,6 +7,12 @@
 #include "process_image.h"
 #include "main.h"
 
+#define EXTRACT_RED(buf, element)   (*((buf) + 2*(element)) & 0b11111000) >> 3
+#define EXTRACT_GREEN(buf, element) (*((buf) + 2*(element)) & 0b00000111) + ((*((buf) + 2*(element) + 1) & 0b11100000) >> 5)
+#define EXTRACT_BLUE(buf, element)  (*((buf) + 2*(element) + 1) & 0b00011111)
+
+#define CALIB_CONSTANT 10 * 150 // cm * px
+#define IMAGE_OFFSET	100
 
 static float distance_cm = 0;
 
@@ -27,11 +33,15 @@ static THD_FUNCTION(CaptureImage, arg) {
 
     while(1){
         //starts a capture
+		// systime_t time = chVTGetSystemTime();
 		dcmi_capture_start();
 		//waits for the capture to be done
 		wait_image_ready();
+		// time = chVTGetSystemTime() - time;
 		//signals an image has been captured
 		chBSemSignal(&image_ready_sem);
+		// chprintf((BaseSequentialStream *) &SDU1, "time = %d\n", time);
+		// chThdSleepMilliseconds(12);
     }
 }
 
@@ -50,16 +60,39 @@ static THD_FUNCTION(ProcessImage, arg) {
         chBSemWait(&image_ready_sem);
 		//gets the pointer to the array filled with the last image in RGB565    
 		img_buff_ptr = dcmi_get_last_image_ptr();
+		float mean = 0;
 
 		/*
 		*	To complete
 		*/
-		for (uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
-			image[i] = (*(img_buff_ptr+2*i) & (0b11111000));
+
+		for (uint16_t i = 0; i < IMAGE_BUFFER_SIZE; ++i) {
+			image[i] = (*(img_buff_ptr + 2*i) & 0b11111000) >> 3;
+			mean += (float) image[i];
 		}
-		//for (uint16_t i = 0; i<2*IMAGE_BUFFER_SIZE; i+=2){
-		//	image[i/2] = ((uint8_t))
-		//}
+		mean /= IMAGE_BUFFER_SIZE;
+
+		float eps = mean / 4;
+
+		uint16_t min = 0;
+		uint16_t max = 0;
+
+		for (size_t i = IMAGE_OFFSET; i < IMAGE_BUFFER_SIZE; ++i) {
+			if ((float) image[i] < mean - eps) {
+				min = i;
+				break;
+			}
+		}
+		for (size_t i = min + 1; i < IMAGE_BUFFER_SIZE-IMAGE_OFFSET; ++i) {
+			if ((float) image[i] > mean + eps) {
+				max = i;
+				break;
+			}
+		}
+
+
+		distance_cm = (min == max ? 0 : (float) CALIB_CONSTANT / (max - min));
+
 		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
     }
 }
