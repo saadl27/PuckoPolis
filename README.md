@@ -75,6 +75,11 @@ git switch --track reference/TP5_Exercise
 ## Sending a signal to the robot
 > `Task 1`
 >- Compile the code given and use the python script to connect to the serial port used by the e-puck2 to receive and send the data and try to send signals with different frequencies
+>    - Use the command following command to launch the script:
+>    ```shell
+>    # Replace "SerialMonitorDevice" by your e-puck2 SerialMonitor device name
+>    python plotImage.py SerialMonitorDevice
+>    ```
 >- You can observe two peaks
 >   - What are they representing ?
 >   - Why the zero of the plot is on the center ?
