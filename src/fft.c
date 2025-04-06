@@ -2,7 +2,12 @@
 #include <hal.h>
 #include <math.h>
 #include <arm_math.h>
+
+#ifndef OUEOUE
 #include <arm_const_structs.h>
+#define OUEOUE
+#endif
+
 
 #include "fft.h"
 #include "main.h"

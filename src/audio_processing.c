@@ -5,11 +5,13 @@
 #include <motors.h>
 #include <audio/microphone.h>
 #include <arm_math.h>
+#include <string.h>
 
 #include "audio_processing.h"
 #include "main.h"
 #include "fft.h"
 #include "communications.h"
+
 
 //semaphore
 static BSEMAPHORE_DECL(sendToComputer_sem, TRUE);
@@ -43,7 +45,39 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 	*	1024 samples, then we compute the FFTs.
 	*
 	*/
+	static int k = 0;
 
+	for (uint16_t i=0 ; i < num_samples/4; ++i){
+		micRight_cmplx_input[2*i+160*k] = (float) data[4*i];
+		micLeft_cmplx_input[2*i+160*k] = (float) data[4*i+1];
+		micBack_cmplx_input[2*i+160*k] = (float) data[4*i+2];
+		micFront_cmplx_input[2*i+160*k] = (float) data[4*i+3];
+
+		micRight_cmplx_input[2*i+160*k+1] = 0;
+		micLeft_cmplx_input[2*i+160*k+1] = 0;
+		micBack_cmplx_input[2*i+160*k+1] = 0;
+		micFront_cmplx_input[2*i+160*k+1] = 0;
+		k++;
+		if (i+160*k == 2*FFT_SIZE){
+			//arm_cfft_f32(&arm_cfft_sR_f32_len1024, micRight_cmplx_input, 0, 1);
+			//arm_cfft_f32(&arm_cfft_sR_f32_len1024, micFront_cmplx_input, 0, 1);
+			//arm_cfft_f32(&arm_cfft_sR_f32_len1024, micBack_cmplx_input, 0, 1);
+			//arm_cfft_f32(&arm_cfft_sR_f32_len1024, micFront_cmplx_input, 0, 1);
+			doFFT_optimized(FFT_SIZE, micRight_cmplx_input);
+			doFFT_optimized(FFT_SIZE, micLeft_cmplx_input);
+			doFFT_optimized(FFT_SIZE, micBack_cmplx_input);
+			doFFT_optimized(FFT_SIZE, micFront_cmplx_input);
+
+			arm_cmplx_mag_f32(micRight_cmplx_input, micRight_output, FFT_SIZE);
+			arm_cmplx_mag_f32(micLeft_cmplx_input, micLeft_output, FFT_SIZE);
+			arm_cmplx_mag_f32(micBack_cmplx_input, micBack_output, FFT_SIZE);
+			arm_cmplx_mag_f32(micFront_cmplx_input, micFront_output, FFT_SIZE);
+
+			chBSemSignal(&sendToComputer_sem);
+			k=0;
+			break;
+		}
+	}
 }
 
 void wait_send_to_computer(void){
