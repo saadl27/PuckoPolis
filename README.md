@@ -75,6 +75,11 @@ git switch --track reference/TP5_Exercise
 ## Sending a signal to the robot
 > `Task 1`
 >- Compile the code given and use the python script to connect to the serial port used by the e-puck2 to receive and send the data and try to send signals with different frequencies
+>    - Use the command following command to launch the script:
+>    ```shell
+>    # Replace "SerialMonitorDevice" by your e-puck2 SerialMonitor device name
+>    python plotImage.py SerialMonitorDevice
+>    ```
 >- You can observe two peaks
 >   - What are they representing ?
 >   - Why the zero of the plot is on the center ?
@@ -126,7 +131,7 @@ git switch --track reference/TP5_Exercise
 
 > `Task 5`
 >- Measure the execution time of the two implementations of the FFT and of the function **arm_cmplx_mag_f32()**
->- For this, you can use the timer12, like in the TP2
+>- For this, you can use the timer12, like in the TP2. Remember to launch the python script so that the FFT can actually happen, else you won't obtain any time measurement!
 >- You can find in the listing [Code block 1](#code-block-1) a reminder of how to use a timer to measure time
 >- How many processor cycles represent the times measured ?
 >- Is it worth it to use an optimized FFT function ?
