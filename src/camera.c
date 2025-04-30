@@ -7,7 +7,7 @@
 //RGB LED used for interaction with plotImage Python code
 #include <leds.h>
 
-#include "camera"
+#include "camera.h"
 #include "main.h"
 
 static float distance_cm = 0;
