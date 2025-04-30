@@ -12,6 +12,18 @@
 // These funtcions are handled by the ESP32 and the communication with the uC is done via SPI
 #include <spi_comm.h>
 
+/*
+	C standard lib-like printf helper wrapper around chprintf 
+	to avoid having to provide stream
+*/
+
+void epuck_printf(const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    chvprintf((BaseSequentialStream *)&SD3, fmt, args);
+    va_end(args);
+}
+
 void SendUint8ToComputer(uint8_t* data, uint16_t size) 
 {
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"START", 5);
