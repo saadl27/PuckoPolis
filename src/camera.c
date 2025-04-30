@@ -104,6 +104,10 @@ uint16_t extract_line_width(uint8_t *buffer){
 	}
 }
 
+uint16_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint8_t *blue_buffer){
+
+}
+
 static THD_WORKING_AREA(waCaptureImage, 256);
 static THD_FUNCTION(CaptureImage, arg) {
 
@@ -133,7 +137,10 @@ static THD_FUNCTION(ProcessImage, arg) {
     (void)arg;
 
 	uint8_t *img_buff_ptr;
-	uint8_t image[IMAGE_BUFFER_SIZE] = {0};
+	uint8_t red_buffer[IMAGE_BUFFER_SIZE] = {0};
+	uint8_t green_buffer[IMAGE_BUFFER_SIZE] = {0};
+	uint8_t blue_buffer[IMAGE_BUFFER_SIZE] = {0};
+
 	uint16_t lineWidth = 0;
 
 	bool send_to_computer = true;
@@ -144,39 +151,32 @@ static THD_FUNCTION(ProcessImage, arg) {
 		//gets the pointer to the array filled with the last image in RGB565    
 		img_buff_ptr = dcmi_get_last_image_ptr();
 
-		switch (detect_color) {
-			case RED_COLOR:
-				toggle_rgb_led(USED_RGB_LED, RED_LED, INTENSITY_RGB_LED);
-				//Extracts only the red pixels
-				for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
-					//extracts 5 MSbits of the MSbyte (First byte in big-endian format)
-					//takes nothing from the second byte
-					image[i/2] = (uint8_t)img_buff_ptr[i] & 0xF8;
-				}
-				break;
-			case GREEN_COLOR:
-				toggle_rgb_led(USED_RGB_LED, GREEN_LED, INTENSITY_RGB_LED);
-				//Extracts only the green pixels
-				for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
-					//extracts 3 LSbits of the first byte and the 3 MSbits of second byte
-					image[i/2] = (((uint8_t)img_buff_ptr[i] & 0x07) << 5 )
-							   + (((uint8_t)img_buff_ptr[i+1] & 0xE0) >> 3);
-				}
-				break;
-			case BLUE_COLOR:
-				toggle_rgb_led(USED_RGB_LED, BLUE_LED, INTENSITY_RGB_LED);
-				//Extracts only the blue pixels
-				for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
-					//extracts 5 LSbits of the LSByte (Second byte in big-endian format)
-					//and rescale to 8 bits
-					//takes nothing from the first byte
-					image[i/2] = ((uint8_t)img_buff_ptr[i+1] & 0x1F) << 3;
-				}
-				break;
+		
+		for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
+			//extracts 5 MSbits of the MSbyte (First byte in big-endian format)
+			//takes nothing from the second byte
+			red_buffer[i/2] = (uint8_t)img_buff_ptr[i] & 0xF8;
 		}
 
+		//Extracts only the green pixels
+		for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
+			//extracts 3 LSbits of the first byte and the 3 MSbits of second byte
+			green_buffer[i/2] = (((uint8_t)img_buff_ptr[i] & 0x07) << 5 )
+							   + (((uint8_t)img_buff_ptr[i+1] & 0xE0) >> 3);
+		}
+			
+		//Extracts only the blue pixels
+		for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
+			//extracts 5 LSbits of the LSByte (Second byte in big-endian format)
+			//and rescale to 8 bits
+			//takes nothing from the first byte
+			blue_buffer[i/2] = ((uint8_t)img_buff_ptr[i+1] & 0x1F) << 3;
+		}
 		//search for a line in the image and gets its width in pixels
-		lineWidth = extract_line_width(image);
+
+		colorDetected = extract_color(red_buffer, green_buffer, blue_buffer);
+
+		lineWidth = extract_line_width(red_buffer);
 
 		//converts the width into a distance between the robot and the camera
 		if(lineWidth){
@@ -189,8 +189,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 		}
 		//invert the bool
 		send_to_computer = !send_to_computer;
-    }
+	}
 }
+
 
 float get_distance_cm(void){
 	return distance_cm;
