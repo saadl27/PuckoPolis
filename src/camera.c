@@ -104,19 +104,6 @@ uint16_t extract_line_width(uint8_t *buffer){
 	}
 }
 
-uint16_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint8_t *blue_buffer){
-	
-}
-
-bool detect_color(uint8_t *buffer){
-	mean = 0
-	for(uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++){
-		mean += buffer[i];
-	}
-	mean /= IMAGE_BUFFER_SIZE;
-
-}
-
 static THD_WORKING_AREA(waCaptureImage, 256);
 static THD_FUNCTION(CaptureImage, arg) {
 
@@ -168,22 +155,20 @@ static THD_FUNCTION(ProcessImage, arg) {
 		}
 
 		//Extracts only the green pixels
-		for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
-			//extracts 3 LSbits of the first byte and the 3 MSbits of second byte
-			green_buffer[i/2] = (((uint8_t)img_buff_ptr[i] & 0x07) << 5 )
-							   + (((uint8_t)img_buff_ptr[i+1] & 0xE0) >> 3);
-		}
+		//for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
+		//	//extracts 3 LSbits of the first byte and the 3 MSbits of second byte
+		//	green_buffer[i/2] = (((uint8_t)img_buff_ptr[i] & 0x07) << 5 )
+		//					   + (((uint8_t)img_buff_ptr[i+1] & 0xE0) >> 3);
+		//}
 			
 		//Extracts only the blue pixels
-		for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
+		//for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
 			//extracts 5 LSbits of the LSByte (Second byte in big-endian format)
 			//and rescale to 8 bits
 			//takes nothing from the first byte
-			blue_buffer[i/2] = ((uint8_t)img_buff_ptr[i+1] & 0x1F) << 3;
-		}
-		//search for a line in the image and gets its width in pixels
-
-		colorDetected = extract_color(red_buffer, green_buffer, blue_buffer);
+		//	blue_buffer[i/2] = ((uint8_t)img_buff_ptr[i+1] & 0x1F) << 3;
+		//}
+		//search for a line in the image and /gets its width in pixels
 
 		lineWidth = extract_line_width(red_buffer);
 
@@ -194,7 +179,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 		if(send_to_computer){
 			//sends to the computer the image
-			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+			SendUint8ToComputer(red_buffer, IMAGE_BUFFER_SIZE);
 		}
 		//invert the bool
 		send_to_computer = !send_to_computer;
@@ -230,5 +215,4 @@ void select_color_detection(color_detection_t choice_detect_color){
 
     //init color detection mode: see process_image.h for values
 	//the color detection can be controled from plotImage Python code
-	select_color_detection(GREEN_COLOR);
  }

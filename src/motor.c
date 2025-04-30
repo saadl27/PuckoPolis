@@ -38,6 +38,7 @@ int16_t pi_regulator(float distance, float goal){
 	}
 
 	speed = KP * error + KI * sum_error;
+	//speed = KP * error;
 
     return (int16_t)speed;
 }
@@ -59,7 +60,7 @@ static THD_FUNCTION(PiRegulator, arg) {
         //computes the speed to give to the motors
         //distance_cm is modified by the image processing thread
         //speed = pi_regulator(get_distance_cm(), GOAL_DISTANCE);
-		speed = 150;
+		speed = 200;
         //computes a correction factor to let the robot rotate to be in front of the line
         speed_correction = pi_regulator(get_line_position(), (IMAGE_BUFFER_SIZE/2));
 
