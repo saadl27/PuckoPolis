@@ -6,11 +6,10 @@
 #include <hal.h>
 #include <memory_protection.h>
 #include <motors.h>
-#include <camera/po8030.h>
 
 #include "main.h"
 #include "pi_regulator.h"
-#include "process_image.h"
+#include "camera.h"
 #include "telemetry.h"
 
 int main(void)
@@ -20,16 +19,10 @@ int main(void)
     mpu_init();
 
 	telemetry_init();
-	
-    //starts the camera
-    dcmi_start();
-	po8030_start();
+	camera_init();
+
 	//inits the motors
 	motors_init();
-
-	//init color detection mode: see process_image.h for values
-	//the color detection can be controled from plotImage Python code
-	select_color_detection(GREEN_COLOR);
 
 	//enable motors by default. Can be chnaged from plotImage Python code
 	set_enabled_motors(true);
