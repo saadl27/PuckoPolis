@@ -5,9 +5,9 @@
 #include <chprintf.h>
 #include <motors.h>
 
-#include "pi_regulator.h"
+#include "motor.h"
 #include "main.h"
-#include "process_image.h"
+#include "camera.h"
 
 static bool enabled_motors = false;
 
@@ -83,14 +83,26 @@ static THD_FUNCTION(PiRegulator, arg) {
     }
 }
 
-void pi_regulator_start(void) {
+static void pi_regulator_start(void) {
 	chThdCreateStatic(waPiRegulator, sizeof(waPiRegulator), NORMALPRIO, PiRegulator, NULL);
 }
 
-void set_enabled_motors(bool enable) {
+static void set_enabled_motors(bool enable) {
 	enabled_motors = enable;
 }
 
 void toogle_enabled_motors() {
 	enabled_motors = !enabled_motors;
+}
+
+void motor_init(){
+    //inits the motors
+	motors_init();
+
+	//enable motors by default. Can be chnaged from plotImage Python code
+	set_enabled_motors(true);
+
+	//stars the threads for the pi regulator and the processing of the image
+	pi_regulator_start();
+
 }
