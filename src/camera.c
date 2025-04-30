@@ -105,6 +105,15 @@ uint16_t extract_line_width(uint8_t *buffer){
 }
 
 uint16_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint8_t *blue_buffer){
+	
+}
+
+bool detect_color(uint8_t *buffer){
+	mean = 0
+	for(uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++){
+		mean += buffer[i];
+	}
+	mean /= IMAGE_BUFFER_SIZE;
 
 }
 
