@@ -8,18 +8,19 @@
 #include "memory_protection.h"
 #include <main.h>
 
+#include "modules/include/telemetry.h"
 
-int main(void)
-{
 
+int main(void) {
     halInit();
     chSysInit();
     mpu_init();
 
-
+	telemetry_init();
     /* Infinite loop. */
     while (1) {
     	//waits 1 second
+		epuck_printf("Hello world\n");
         chThdSleepMilliseconds(1000);
     }
 }

@@ -7,4 +7,8 @@
     // MacOS: use the command "ls /dev/cu.*" and use the lowest one
     //      -> "com_port": "/dev/cu.usbmodemEPUCKx"
     "com_port": "/dev/cu.usbmodemEPUCK1",
+    "files.associations": {
+        "memory_protection.h": "c",
+        "telemetry.h": "c"
+    },
 }

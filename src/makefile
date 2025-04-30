@@ -3,7 +3,8 @@ PROJECT = TOF_Logging
 
 GLOBAL_PATH = ../e-puck2_main-processor
 
-CSRC += ./main.c
+CSRC += ./main.c \
+		$(wildcard modules/src/*.c)
 
 INCDIR += modules/include
 
