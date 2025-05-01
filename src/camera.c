@@ -107,18 +107,19 @@ bool detect_color(uint8_t *buffer){
     uint16_t i_min = 0;
     uint16_t i_max = 0;
 
-    for(uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++){
+    for(volatile uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++){
         mean += buffer[i];
         if (buffer[i] < buffer[i_min]){
             i_min = i;
         }
         if (buffer[i] > buffer[i_max]){
-           i_max = i;
+            i_max = i;
         }   
     }
+
     mean /= IMAGE_BUFFER_SIZE;
 
-    uint8_t drop = buffer[i_max] - buffer[i_min];
+    volatile uint8_t drop = buffer[i_max] - buffer[i_min];
 
     if (drop > mean/4){
         return 0; 
@@ -134,9 +135,9 @@ color_detection_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint
     bool green = detect_color(green_buffer);
     bool blue = detect_color(blue_buffer);
 
-    //bool red = 0;
-    //bool green = 0;
-    //bool blue = 0;
+    // bool red = 0;
+    // bool green = 0;
+    // bool blue = 0;
     if (green){
         return GREEN_COLOR;
     }
@@ -173,7 +174,7 @@ static THD_FUNCTION(CaptureImage, arg) {
     }
 }
 
-static THD_WORKING_AREA(waProcessImage, 1536);
+static THD_WORKING_AREA(waProcessImage, 2048);
 static THD_FUNCTION(ProcessImage, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -218,22 +219,22 @@ static THD_FUNCTION(ProcessImage, arg) {
 		    case RED_COLOR:
                 //Analyze a buffer with a drop in the pixel intensity
                 //lineWidth = extract_line_width(green_buffer);
-                epuck_printf("Red");
+                epuck_printf("Red\n");
 				break;
             
             case GREEN_COLOR:
                 //lineWidth = extract_line_width(red_buffer);
-                epuck_printf("Green");
+                epuck_printf("Green\n");
 				break;
 
             case BLUE_COLOR:
                 //lineWidth = extract_line_width(red_buffer);
-                epuck_printf("Blue");
+                epuck_printf("Blue\n");
 				break;
 
             case BLACK_COLOR:
                 //lineWidth = extract_line_width(red_buffer);
-                epuck_printf("Black");
+                epuck_printf("Black\n");
 				break;
         //
         }
