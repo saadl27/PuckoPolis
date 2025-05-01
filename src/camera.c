@@ -112,8 +112,8 @@ bool detect_color(uint8_t *buffer){
         if (buffer[i] < buffer[i_min]){
             i_min = i;
         }
-        if (buffer[i] > buffer[i_min]){
-            i_max = i;
+        if (buffer[i] > buffer[i_max]){
+           i_max = i;
         }   
     }
     mean /= IMAGE_BUFFER_SIZE;
@@ -134,11 +134,14 @@ color_detection_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint
     bool green = detect_color(green_buffer);
     bool blue = detect_color(blue_buffer);
 
-    if (red){
-        return RED_COLOR;
-    }
-    else if (green){
+    //bool red = 0;
+    //bool green = 0;
+    //bool blue = 0;
+    if (green){
         return GREEN_COLOR;
+    }
+    else if (red){
+        return RED_COLOR;
     }
     else if (blue){
         return BLUE_COLOR;
@@ -170,7 +173,7 @@ static THD_FUNCTION(CaptureImage, arg) {
     }
 }
 
-static THD_WORKING_AREA(waProcessImage, 1024);
+static THD_WORKING_AREA(waProcessImage, 1536);
 static THD_FUNCTION(ProcessImage, arg) {
 
     chRegSetThreadName(__FUNCTION__);
