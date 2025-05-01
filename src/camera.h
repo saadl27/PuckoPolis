@@ -11,6 +11,7 @@ typedef enum {
 	RED_COLOR,
 	GREEN_COLOR,
 	BLUE_COLOR,
+	BLACK_COLOR,
 } color_detection_t;
 
 

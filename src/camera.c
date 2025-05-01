@@ -9,13 +9,11 @@
 
 #include "camera.h"
 #include "main.h"
+#include "telemetry.h"
 
 static float distance_cm = 0;
 static uint16_t line_position = IMAGE_BUFFER_SIZE/2;    //middle
 
-// Extracts only the red pixels by default
-// But the color can be changed with plotImage Python code
-static color_detection_t detect_color = RED_COLOR;
 
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
@@ -104,6 +102,33 @@ uint16_t extract_line_width(uint8_t *buffer){
     }
 }
 
+bool detect_color(uint8_t *buffer){
+    uint32_t mean = 0;
+    uint16_t i_min = 0;
+    uint16_t i_max = 0;
+
+    for(uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++){
+        mean += buffer[i];
+        if (buffer[i] < buffer[i_min]){
+            i_min = i;
+        }
+        if (buffer[i] > buffer[i_min]){
+            i_max = i;
+        }   
+    }
+    mean /= IMAGE_BUFFER_SIZE;
+
+    uint8_t drop = buffer[i_max] - buffer[i_min];
+
+    if (drop > mean/4){
+        return 0; 
+    }
+    else {
+        return 1;
+    }
+}
+
+
 color_detection_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint8_t *blue_buffer){
     bool red = detect_color(red_buffer);
     bool green = detect_color(green_buffer);
@@ -120,34 +145,6 @@ color_detection_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint
     }
     else {
         return BLACK_COLOR;
-    }
-}
-
-bool detect_color(uint8_t *buffer){
-    uint32_t mean = 0;
-    uint16_t i_min = 0;
-    uint16_t i_max = 0;
-    uint8_t min = 0;
-    uint8_t max = 0;
-
-    for(uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++){
-        mean += buffer[i];
-        if (buffer[i] < buffer[i_min]){
-            i_min = i;
-            min = buffer[i];
-        }
-        if (buffer[i] > buffer[i_min]){
-            i_max = i;
-            max = buffer[i];
-        }   
-    }
-    mean /= IMAGE_BUFFER_SIZE;
-
-    if (buffer[i_max] - buffer[i_min] > mean/4){
-        return 1; 
-    }
-    else {
-        return 0;
     }
 }
 
@@ -199,37 +196,54 @@ static THD_FUNCTION(ProcessImage, arg) {
             //extracts 5 MSbits of the MSbyte (First byte in big-endian format)
             //takes nothing from the second byte
             red_buffer[i/2] = (uint8_t)img_buff_ptr[i] & 0xF8;
-        }
 
-        //Extracts only the green pixels
-        for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
             //extracts 3 LSbits of the first byte and the 3 MSbits of second byte
             green_buffer[i/2] = (((uint8_t)img_buff_ptr[i] & 0x07) << 5 )
                                + (((uint8_t)img_buff_ptr[i+1] & 0xE0) >> 3);
-        }
-            
-        //Extracts only the blue pixels
-        for(uint16_t i = 0 ; i < (2 * IMAGE_BUFFER_SIZE) ; i+=2){
+
             //extracts 5 LSbits of the LSByte (Second byte in big-endian format)
             //and rescale to 8 bits
             //takes nothing from the first byte
             blue_buffer[i/2] = ((uint8_t)img_buff_ptr[i+1] & 0x1F) << 3;
         }
+
         //search for a line in the image and gets its width in pixels
 
-        colorDetected = extract_color(red_buffer, green_buffer, blue_buffer);
+        color_detection_t colorDetected = extract_color(red_buffer, green_buffer, blue_buffer);
 
-        lineWidth = extract_line_width(red_buffer);
+        switch (colorDetected) {
+		    case RED_COLOR:
+                //Analyze a buffer with a drop in the pixel intensity
+                //lineWidth = extract_line_width(green_buffer);
+                epuck_printf("Red");
+				break;
+            
+            case GREEN_COLOR:
+                //lineWidth = extract_line_width(red_buffer);
+                epuck_printf("Green");
+				break;
 
-        //converts the width into a distance between the robot and the camera
+            case BLUE_COLOR:
+                //lineWidth = extract_line_width(red_buffer);
+                epuck_printf("Blue");
+				break;
+
+            case BLACK_COLOR:
+                //lineWidth = extract_line_width(red_buffer);
+                epuck_printf("Black");
+				break;
+        //
+        }
+        //lineWidth = extract_line_width(red_buffer);
+
         if(lineWidth){
             distance_cm = PXTOCM/lineWidth;
         }
 
-        if(send_to_computer){
+        //if(send_to_computer){
             //sends to the computer the image
-            SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-        }
+            //SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+        //}
         //invert the bool
         send_to_computer = !send_to_computer;
     }
@@ -249,20 +263,11 @@ void process_image_start(void){
     chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
 }
 
-void select_color_detection(color_detection_t choice_detect_color){
-    // Set off the RGB LED
-    set_rgb_led(USED_RGB_LED, 0, 0, 0);
-    detect_color = choice_detect_color;
-}
  
- void camera_init(void)
- {
-     //starts the camera
+void camera_init(void)
+{
+    //starts the camera
     dcmi_start();
     po8030_start();
     process_image_start();
-
-    //init color detection mode: see process_image.h for values
-    //the color detection can be controled from plotImage Python code
-    select_color_detection(GREEN_COLOR);
- }
+}
