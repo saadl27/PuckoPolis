@@ -11,6 +11,9 @@
 #include "main.h"
 #include "telemetry.h"
 
+#define INDEX_OFFSET 50
+#define THRESHOLD_SCALE 1.2f
+
 static float distance_cm = 0;
 static uint16_t line_position = IMAGE_BUFFER_SIZE/2;    //middle
 
@@ -107,7 +110,7 @@ bool detect_color(uint8_t *buffer){
     uint16_t i_min = 0;
     uint16_t i_max = 0;
 
-    for(volatile uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++){
+    for(uint16_t i = INDEX_OFFSET; i < IMAGE_BUFFER_SIZE - INDEX_OFFSET ; i++){
         mean += buffer[i];
         if (buffer[i] < buffer[i_min]){
             i_min = i;
@@ -119,10 +122,13 @@ bool detect_color(uint8_t *buffer){
 
     mean /= IMAGE_BUFFER_SIZE;
 
-    volatile uint8_t drop = buffer[i_max] - buffer[i_min];
+    uint32_t drop = (uint32_t) (buffer[i_max] - buffer[i_min]);
+    uint32_t threshold = mean * THRESHOLD_SCALE;
 
-    if (drop > mean/4){
-        return 0; 
+    epuck_printf("drop = %lu, threshold = %lu\n", drop, threshold);
+
+    if (drop > threshold){
+        return 0;
     }
     else {
         return 1;
@@ -174,7 +180,7 @@ static THD_FUNCTION(CaptureImage, arg) {
     }
 }
 
-static THD_WORKING_AREA(waProcessImage, 2048);
+static THD_WORKING_AREA(waProcessImage, 4096);
 static THD_FUNCTION(ProcessImage, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -218,36 +224,35 @@ static THD_FUNCTION(ProcessImage, arg) {
         switch (colorDetected) {
 		    case RED_COLOR:
                 //Analyze a buffer with a drop in the pixel intensity
-                //lineWidth = extract_line_width(green_buffer);
+                lineWidth = extract_line_width(green_buffer);
                 epuck_printf("Red\n");
 				break;
             
             case GREEN_COLOR:
-                //lineWidth = extract_line_width(red_buffer);
+                lineWidth = extract_line_width(red_buffer);
                 epuck_printf("Green\n");
 				break;
 
             case BLUE_COLOR:
-                //lineWidth = extract_line_width(red_buffer);
+                lineWidth = extract_line_width(red_buffer);
                 epuck_printf("Blue\n");
 				break;
 
             case BLACK_COLOR:
-                //lineWidth = extract_line_width(red_buffer);
+                lineWidth = extract_line_width(red_buffer);
                 epuck_printf("Black\n");
 				break;
-        //
         }
-        //lineWidth = extract_line_width(red_buffer);
+        // lineWidth = extract_line_width(red_buffer);
 
         if(lineWidth){
             distance_cm = PXTOCM/lineWidth;
         }
 
-        //if(send_to_computer){
-            //sends to the computer the image
-            //SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-        //}
+        if(send_to_computer){
+            // sends to the computer the image
+            SendUint8ToComputer(green_buffer, IMAGE_BUFFER_SIZE);
+        }
         //invert the bool
         send_to_computer = !send_to_computer;
     }
