@@ -10,6 +10,7 @@
     "files.associations": {
         "memory_protection.h": "c",
         "telemetry.h": "c",
-        "vl53l0x.h": "c"
+        "vl53l0x.h": "c",
+        "messagebus.h": "c"
     },
 }

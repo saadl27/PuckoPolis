@@ -12,7 +12,7 @@
 #include "modules/include/telemetry.h"
 #include "modules/include/distance.h"
 
-#define DIST_OFFSET_MM 60
+#define DIST_OFFSET_MM 50
 
 
 int main(void) {
@@ -32,7 +32,7 @@ int main(void) {
             MEASURES SEEM TO BE A BIT OFF
         */
 		epuck_printf("dist = %d [mm]\n", dist_mm - DIST_OFFSET_MM);
-        chThdSleepMilliseconds(1000);
+        chThdSleepMilliseconds(100);
     }
 }
 
