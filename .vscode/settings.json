@@ -11,6 +11,7 @@
         "memory_protection.h": "c",
         "telemetry.h": "c",
         "vl53l0x.h": "c",
-        "messagebus.h": "c"
+        "messagebus.h": "c",
+        "distance.h": "c"
     },
 }
