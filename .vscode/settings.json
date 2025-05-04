@@ -12,6 +12,7 @@
         "telemetry.h": "c",
         "vl53l0x.h": "c",
         "messagebus.h": "c",
-        "distance.h": "c"
+        "distance.h": "c",
+        "stdbool.h": "c"
     },
 }

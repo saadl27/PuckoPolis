@@ -12,8 +12,6 @@
 #include "modules/include/telemetry.h"
 #include "modules/include/distance.h"
 
-#define DIST_OFFSET_MM 60
-
 
 int main(void) {
     halInit();
@@ -26,18 +24,30 @@ int main(void) {
 	telemetry_init();
 	tof_init();
 
-    //kalman init
-    tof_set_kalman_params(2.0f, 10.0f, 100.0f);
+    uint16_t i = 0;
+    float mean = 0;
+    float filt_mean = 0;
     /* Infinite loop. */
     while (1) {
-        uint16_t dist_mm = tof_get_dist_mm();
+        int16_t dist_mm = tof_get_dist_mm();
         uint16_t filtered_dist_mm = tof_get_filtered_dist_mm();
-        /*  CONSIDER OFFSET + CALIB FACTOR IN FORMULA BELOW
-            MEASURES SEEM TO BE A BIT OFF
-        */
-		epuck_printf("dist = %d [mm] \t filt = %d [mm]\n", dist_mm - DIST_OFFSET_MM,
-                                                           filtered_dist_mm - DIST_OFFSET_MM);
+        mean += dist_mm;
+        filt_mean += filtered_dist_mm;
+        i++;
+
+		epuck_printf("dist = %4d [mm] \t filt = %4d [mm]\n", dist_mm,
+                                                           filtered_dist_mm);
+        // epuck_printf("distance = %d [mm]\n", dist_mm);
         chThdSleepMilliseconds(100);
+
+        if (i % 100 == 0) {
+            mean /= 100;
+            filt_mean /= 100;
+            // epuck_printf("mean = %f \t filt_mean = %f\n", mean, filt_mean);
+            i = 0;
+            mean = 0;
+            filt_mean = 0;
+        }
     }
 }
 
