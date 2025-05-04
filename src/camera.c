@@ -128,13 +128,12 @@ bool detect_color(uint8_t *buffer){
     epuck_printf("drop = %lu, threshold = %lu\n", drop, threshold);
 
     if (drop > threshold){
-        return 0;
+        return 0; 
     }
     else {
         return 1;
     }
 }
-
 
 color_detection_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint8_t *blue_buffer){
     bool red = detect_color(red_buffer);
@@ -186,6 +185,15 @@ static THD_FUNCTION(ProcessImage, arg) {
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
+    messagebus_topic_t color_topic;
+    color_msg_t color_values;
+
+    MUTEX_DECL(color_topic_lock);
+    CONDVAR_DECL(color_topic_condvar);
+    messagebus_topic_init(&color_topic, &color_topic_lock, &color_topic_condvar, &color_values, sizeof(color_values));
+    messagebus_advertise_topic(&bus, &color_topic, "/color");
+
+
     uint8_t *img_buff_ptr;
     uint8_t red_buffer[IMAGE_BUFFER_SIZE] = {0};
     uint8_t green_buffer[IMAGE_BUFFER_SIZE] = {0};
@@ -220,6 +228,9 @@ static THD_FUNCTION(ProcessImage, arg) {
         //search for a line in the image and gets its width in pixels
 
         color_detection_t colorDetected = extract_color(red_buffer, green_buffer, blue_buffer);
+        color_values.color = colorDetected;
+
+        messagebus_topic_publish(&color_topic, &color_values, sizeof(color_values));
 
         switch (colorDetected) {
 		    case RED_COLOR:
@@ -242,6 +253,7 @@ static THD_FUNCTION(ProcessImage, arg) {
                 lineWidth = extract_line_width(red_buffer);
                 epuck_printf("Black\n");
 				break;
+        //
         }
         // lineWidth = extract_line_width(red_buffer);
 

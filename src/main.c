@@ -12,6 +12,10 @@
 #include "camera.h"
 #include "telemetry.h"
 
+messagebus_t bus;
+MUTEX_DECL(bus_lock);
+CONDVAR_DECL(bus_condvar);
+
 int main(void)
 {
     halInit();

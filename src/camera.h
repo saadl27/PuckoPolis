@@ -15,6 +15,11 @@ typedef enum {
 } color_detection_t;
 
 
+typedef struct {
+	color_detection_t color
+} color_msg_t;
+
+
 float get_distance_cm(void);
 uint16_t get_line_position(void);
 void select_color_detection(color_detection_t choice_detect_color);
