@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "main.h"
 #include "telemetry.h"
+#include "brain.h"
 
 #define INDEX_OFFSET 50
 #define THRESHOLD_SCALE 1.2f
@@ -253,7 +254,6 @@ static THD_FUNCTION(ProcessImage, arg) {
                 lineWidth = extract_line_width(red_buffer);
                 epuck_printf("Black\n");
 				break;
-        //
         }
         // lineWidth = extract_line_width(red_buffer);
 
@@ -263,7 +263,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 
         if(send_to_computer){
             // sends to the computer the image
-            SendUint8ToComputer(green_buffer, IMAGE_BUFFER_SIZE);
+            // SendUint8ToComputer(green_buffer, IMAGE_BUFFER_SIZE);
         }
         //invert the bool
         send_to_computer = !send_to_computer;

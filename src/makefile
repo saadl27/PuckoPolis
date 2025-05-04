@@ -13,6 +13,7 @@ CSRC += ./main.c \
 		./motor.c \
 		./camera.c \
 		./telemetry.c \
+		./brain.c \
 #Header folders to include
 INCDIR += 
 
