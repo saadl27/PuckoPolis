@@ -7,16 +7,23 @@
 #include "hal.h"
 #include "memory_protection.h"
 #include "i2c_bus.h"
-#include <main.h>
+#include "main.h"
 
 #include "modules/include/telemetry.h"
 #include "modules/include/distance.h"
 
+/* temporary */
+#define LOOP_PERIOD_MS 100
+
+messagebus_t bus;
+MUTEX_DECL(bus_lock);
+CONDVAR_DECL(bus_condvar);
 
 int main(void) {
     halInit();
     chSysInit();
     mpu_init();
+    messagebus_init(&bus, &bus_lock, &bus_condvar);
 
 	// /* start peripherals */
 	// i2c_start();
@@ -24,30 +31,23 @@ int main(void) {
 	telemetry_init();
 	tof_init();
 
-    uint16_t i = 0;
-    float mean = 0;
-    float filt_mean = 0;
+
+    messagebus_topic_t* dist_topic = messagebus_find_topic_blocking(&bus, "/distance");
+    tof_msg_t dist;
+
+    systime_t time;
+
     /* Infinite loop. */
     while (1) {
-        int16_t dist_mm = tof_get_dist_mm();
-        uint16_t filtered_dist_mm = tof_get_filtered_dist_mm();
-        mean += dist_mm;
-        filt_mean += filtered_dist_mm;
-        i++;
+        time = chVTGetSystemTime();
+        int16_t unfiltered = tof_get_dist_mm();
+        messagebus_topic_wait(dist_topic, &dist, sizeof(tof_msg_t));
 
-		epuck_printf("dist = %4d [mm] \t filt = %4d [mm]\n", dist_mm,
-                                                           filtered_dist_mm);
+        epuck_printf("dist = %4d [mm] \t, filt = %4d [mm]\n", unfiltered, dist.dist_mm);
+		// epuck_printf("dist = %4d [mm] \t filt = %4d [mm]\n", dist_mm,
+        //                                                    filtered_dist_mm);
         // epuck_printf("distance = %d [mm]\n", dist_mm);
-        chThdSleepMilliseconds(100);
-
-        if (i % 100 == 0) {
-            mean /= 100;
-            filt_mean /= 100;
-            // epuck_printf("mean = %f \t filt_mean = %f\n", mean, filt_mean);
-            i = 0;
-            mean = 0;
-            filt_mean = 0;
-        }
+        chThdSleepUntilWindowed(time, time + LOOP_PERIOD_MS);
     }
 }
 

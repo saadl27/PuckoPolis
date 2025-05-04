@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+typedef struct {
+    uint16_t dist_mm;
+} tof_msg_t;
+
 void tof_init(void);
 int16_t tof_get_dist_mm(void);
 
