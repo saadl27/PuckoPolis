@@ -10,6 +10,7 @@
     "files.associations": {
         "motors.h": "c",
         "telemetry.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "messagebus.h": "c"
     },
 }

@@ -18,6 +18,7 @@ CONDVAR_DECL(bus_condvar);
 
 int main(void)
 {
+    messagebus_init(&bus, &bus_lock, &bus_condvar);
     halInit();
     chSysInit();
     mpu_init();
