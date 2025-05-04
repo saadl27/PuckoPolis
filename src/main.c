@@ -11,6 +11,7 @@
 #include "motor.h"
 #include "camera.h"
 #include "telemetry.h"
+#include "brain.h"
 
 messagebus_t bus;
 MUTEX_DECL(bus_lock);
@@ -22,10 +23,12 @@ int main(void)
     halInit();
     chSysInit();
     mpu_init();
+    messagebus_init(&bus, &bus_lock, &bus_condvar);
 
 	telemetry_init();
 	camera_init();
 	motor_init();
+    brain_init();
 }
 
 #define STACK_CHK_GUARD 0xe2dee396

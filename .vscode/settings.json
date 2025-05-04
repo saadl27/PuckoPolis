@@ -12,5 +12,6 @@
         "telemetry.h": "c",
         "main.h": "c",
         "messagebus.h": "c"
+        "brain.h": "c"
     },
 }

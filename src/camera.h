@@ -16,7 +16,7 @@ typedef enum {
 
 
 typedef struct {
-	color_detection_t color
+	color_detection_t color;
 } color_msg_t;
 
 
