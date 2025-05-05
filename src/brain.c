@@ -1,11 +1,18 @@
 #include <ch.h>
 #include <hal.h>
 #include <chprintf.h>
+#include <stdbool.h>>
 
 #include "brain.h"
 #include "main.h"
 #include "telemetry.h"
 #include "camera.h"
+
+static bool moving = true;
+
+bool get_moving() {
+    return moving;
+}
 
 static THD_WORKING_AREA(waColorDecision, 4096);
 static THD_FUNCTION(ColorDecision, arg) {

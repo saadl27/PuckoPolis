@@ -9,7 +9,7 @@
 #include "main.h"
 #include "camera.h"
 
-static bool enabled_motors = false;
+#define FWD_SPEED 200
 
 //simple PI regulator implementation
 int16_t pi_regulator(float distance, float goal){
@@ -60,7 +60,7 @@ static THD_FUNCTION(PiRegulator, arg) {
         //computes the speed to give to the motors
         //distance_cm is modified by the image processing thread
         //speed = pi_regulator(get_distance_cm(), GOAL_DISTANCE);
-		speed = 200;
+		speed = get_moving() ? FWD_SPEED : 0;
         //computes a correction factor to let the robot rotate to be in front of the line
         speed_correction = pi_regulator(get_line_position(), (IMAGE_BUFFER_SIZE/2));
 
@@ -69,17 +69,9 @@ static THD_FUNCTION(PiRegulator, arg) {
         	speed_correction = 0;
         }
 
-		if (enabled_motors){
-			//applies the speed from the PI regulator and the correction for the rotation
-			right_motor_set_speed(speed - speed_correction);
-			left_motor_set_speed(speed + speed_correction);
-		}
-		else {
-			//stop the motors
-			right_motor_set_speed(0);
-			left_motor_set_speed(0);
-		}
-
+		right_motor_set_speed(speed - speed_correction);
+		left_motor_set_speed(speed + speed_correction);
+		
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));
     }
