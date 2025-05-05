@@ -5,9 +5,9 @@
 #include <chprintf.h>
 #include <motors.h>
 
-#include "motor.h"
 #include "main.h"
-#include "camera.h"
+#include "modules/include/motor.h"
+#include "modules/include/camera.h"
 
 static bool enabled_motors = false;
 

@@ -7,10 +7,10 @@
 //RGB LED used for interaction with plotImage Python code
 #include <leds.h>
 
-#include "camera.h"
 #include "main.h"
-#include "telemetry.h"
-#include "brain.h"
+#include "modules/include/camera.h"
+#include "modules/include/telemetry.h"
+#include "modules/include/brain.h"
 
 #define INDEX_OFFSET 50
 #define THRESHOLD_SCALE 1.2f

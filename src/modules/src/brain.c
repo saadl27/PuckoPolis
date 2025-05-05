@@ -2,10 +2,10 @@
 #include <hal.h>
 #include <chprintf.h>
 
-#include "brain.h"
 #include "main.h"
-#include "telemetry.h"
-#include "camera.h"
+#include "modules/include/brain.h"
+#include "modules/include/telemetry.h"
+#include "modules/include/camera.h"
 
 static THD_WORKING_AREA(waColorDecision, 4096);
 static THD_FUNCTION(ColorDecision, arg) {
