@@ -1,3 +1,5 @@
+# pip install svgpathtools
+
 import os
 import json
 import xml.etree.ElementTree as ET
@@ -11,8 +13,8 @@ from threading import Thread
 import time
 
 # Paths to your data files
-CITY_JSON_PATH = os.path.expanduser('~/Documents/EPuck2_Workplace/TPs/.vscode/city2.json')
-CITY_SVG_PATH = os.path.expanduser('~/Documents/EPuck2_Workplace/TPs/.vscode/city.drawio.svg')
+CITY_JSON_PATH = os.path.expanduser('gui_files/city.json')
+CITY_SVG_PATH = os.path.expanduser('gui_files/city.drawio.svg')
 
 # Global destination node
 dest_node = None
