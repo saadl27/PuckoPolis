@@ -1,5 +1,4 @@
-
-PROJECT = TOF_Logging
+PROJECT = epuck_driver
 
 GLOBAL_PATH = ../e-puck2_main-processor
 

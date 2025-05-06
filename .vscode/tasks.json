@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "TOF_Logging: Make",
+            "label": "epuck_driver: Make",
             "type": "shell",
             "command": "${config:make_path} -j",
             "group": {
@@ -26,7 +26,7 @@
             }
         },
         {
-            "label": "TOF_Logging: Clean",
+            "label": "epuck_driver: Clean",
             "type": "shell",
             "command": "${config:make_path} clean",
             "group": {
@@ -47,7 +47,7 @@
             }
         },
         {
-            "label": "TOF_Logging:(Link Library e-puck2_main-processor)",
+            "label": "epuck_driver:(Link Library e-puck2_main-processor)",
             "type": "shell",
             "command": "LIB=e-puck2_main-processor; if [ -d $LIB ] ; then echo -n -e '\\033[0;91m'Link $LIB already present ; echo '\\033[0m'>>/dev/null ; else ln -s ${config:workplace}/EPuck2_Workplace/Lib/$LIB . ; echo -n -e '\\033[1;32m'Link $LIB done ! ; echo '\\033[0m'>>/dev/null ; fi ; echo '\n'",
             "windows": {
