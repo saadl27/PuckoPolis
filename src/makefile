@@ -1,5 +1,4 @@
-
-PROJECT = TOF_Logging
+PROJECT = Sensors
 
 GLOBAL_PATH = ../e-puck2_main-processor
 
