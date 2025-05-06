@@ -28,21 +28,26 @@ int main(void) {
 
 	telemetry_init();
 
-    Graph graph = {0};
+    Graph* graph = (Graph*) malloc(sizeof(Graph));
 
-    a_star_init_graph(&graph, 5);
-    a_star_add_edge(&graph, 1, 2, 1);
-    a_star_add_edge(&graph, 1, 3, 3);
-    a_star_add_edge(&graph, 3, 4, 1);
-    a_star_add_edge(&graph, 4, 5, 2);
-    a_star_add_edge(&graph, 2, 5, 4);
+    a_star_init_graph(graph, 5);
+    a_star_add_edge(graph, 1, 2, 1);
+    a_star_add_edge(graph, 1, 3, 3);
+    a_star_add_edge(graph, 3, 4, 1);
+    a_star_add_edge(graph, 4, 5, 2);
+    a_star_add_edge(graph, 2, 5, 4);
 
     /* Infinite loop. */
     while (1) {
-        Path path = {0};
+        Path* path = (Path*) malloc(sizeof(Path));
 
-        test_path(&graph, &path, 1, 5);
-        test_path(&graph, &path, 1, 4);
+        test_path(graph, path, 1, 5);
+        test_path(graph, path, 1, 4);
+        test_path(graph, path, 2, 1);
+        test_path(graph, path, 2, 4);
+        test_path(graph, path, 4, 2);
+
+        free(path);
         
         epuck_printf("Hello world\n");
         chThdSleepMilliseconds(LOOP_PERIOD_MS);

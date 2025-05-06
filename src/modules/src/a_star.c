@@ -1,4 +1,5 @@
 #include "modules/include/a_star.h"
+#include "modules/include/telemetry.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -55,17 +56,20 @@ uint8_t find_lowest_f_cost(Node* nodes, bool* open_set, uint8_t num_nodes) {
 void reconstruct_path(Path* path, Node* nodes, uint8_t current) {
     uint8_t count = 0;
     uint8_t path_reverse[NUM_NODES];
-    
+    uint8_t path_cost = 0;
+
     while (current != path->start) {
         path_reverse[count++] = current;
+        path_cost += nodes[current].g_cost - nodes[nodes[current].parent].g_cost;
         current = nodes[current].parent;
     }
-    
+
     // add start node
     path_reverse[count++] = path->start;
-    
+
     // reverse path to get from start to end
     path->path_len = count;
+    path->path_cost = path_cost;
     for (uint8_t i = 0; i < count; i++) {
         path->path[i] = path_reverse[count - i - 1];
     }
@@ -76,7 +80,8 @@ bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end) {
     path->start = start;
     path->end = end;
     path->path_len = 0;
-    
+    path->path_cost = 0;
+
     // create node array
     Node nodes[NUM_NODES];
     for (uint8_t i = 0; i < graph->num_nodes; i++) {
@@ -153,6 +158,7 @@ void test_path(Graph* graph, Path* path, uint8_t _start, uint8_t _end) {
     if (a_star_find_path(graph, path, _start, _end)) {
         epuck_printf("Path found from node %d to node %d:\n", path->start, path->end);
         epuck_printf("Path length: %d\n", path->path_len);
+        epuck_printf("Total path weight: %d\n", path->path_cost);
         epuck_printf("Path: ");
         for (uint8_t i = 0; i < path->path_len; i++) {
             epuck_printf("%d", path->path[i]);

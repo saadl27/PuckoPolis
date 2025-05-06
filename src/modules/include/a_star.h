@@ -23,6 +23,7 @@ typedef struct {
     uint8_t end;
     uint8_t path[NUM_NODES];
     uint8_t path_len;
+    uint8_t path_cost; // total weight of the path
 } Path;
 
 typedef struct {
