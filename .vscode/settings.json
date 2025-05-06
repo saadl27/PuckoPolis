@@ -14,6 +14,11 @@
         "messagebus.h": "c",
         "distance.h": "c",
         "stdbool.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "i2c_bus.h": "c",
+        "hal.h": "c",
+        "imu.h": "c",
+        "mpu9250.h": "c",
+        "inertial.h": "c"
     },
 }
