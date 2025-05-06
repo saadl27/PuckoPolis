@@ -1,4 +1,4 @@
-# pip install svgpathtools
+# pip install svgpathtools matplotlib numpy pyserial
 
 import os
 import json
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     current_text = panel.text(0.1, 0.7, 'Current node: --', fontsize=12)
     dest_text = panel.text(0.1, 0.5, 'Destination: --', fontsize=12)
     tb_ax = fig.add_axes([0.05, 0.2, 0.3, 0.05], facecolor='#f0f0f0')
-    text_box = TextBox(tb_ax, 'Go to node:', initial='')
+    text_box = TextBox(tb_ax, '         Go to node:', initial='')
     btn_ax = fig.add_axes([0.05, 0.1, 0.15, 0.05], facecolor='#66c2a5')
     go_button = Button(btn_ax, 'Go', color='#66c2a5', hovercolor='#4da077')
 
