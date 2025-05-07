@@ -19,6 +19,8 @@
         "hal.h": "c",
         "imu.h": "c",
         "mpu9250.h": "c",
-        "inertial.h": "c"
+        "inertial.h": "c",
+        "stdint.h": "c",
+        "math.h": "c"
     },
 }
