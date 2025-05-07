@@ -46,7 +46,7 @@ int main(void) {
 
         messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_data_t));
 
-        epuck_printf("%f,\t%f,\t%f\n%f,\t%f,\t%f\n\n",
+        epuck_printf("Filtered:\n%f,\t%f,\t%f\n%f,\t%f,\t%f\n\n",
         imu_values.acc[0], imu_values.acc[1], imu_values.acc[2],
         imu_values.ang_vel[0], imu_values.ang_vel[1], imu_values.ang_vel[2]);
 
