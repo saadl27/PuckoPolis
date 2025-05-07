@@ -11,6 +11,7 @@
 
 #include "modules/include/telemetry.h"
 #include "modules/include/distance.h"
+#include "modules/include/inertial.h"
 
 /* temporary */
 #define LOOP_PERIOD_MS 100
@@ -25,28 +26,30 @@ int main(void) {
     mpu_init();
     messagebus_init(&bus, &bus_lock, &bus_condvar);
 
-	// /* start peripherals */
-	// i2c_start();
-
 	telemetry_init();
 	tof_init();
+    imu_init();
 
 
-    messagebus_topic_t* dist_topic = messagebus_find_topic_blocking(&bus, "/distance");
-    tof_msg_t dist;
+    // messagebus_topic_t* dist_topic = messagebus_find_topic_blocking(&bus, "/distance");
+    // tof_msg_t dist;
+
+    messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_processed");
 
     systime_t time;
 
     /* Infinite loop. */
     while (1) {
         time = chVTGetSystemTime();
-        int16_t unfiltered = tof_get_dist_mm();
-        messagebus_topic_wait(dist_topic, &dist, sizeof(tof_msg_t));
 
-        epuck_printf("dist = %4d [mm] \t, filt = %4d [mm]\n", unfiltered, dist.dist_mm);
-		// epuck_printf("dist = %4d [mm] \t filt = %4d [mm]\n", dist_mm,
-        //                                                    filtered_dist_mm);
-        // epuck_printf("distance = %d [mm]\n", dist_mm);
+        imu_data_t imu_values = {0};
+
+        messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_data_t));
+
+        epuck_printf("Filtered:\n%f,\t%f,\t%f\n%f,\t%f,\t%f\n\n",
+        imu_values.acc[0], imu_values.acc[1], imu_values.acc[2],
+        imu_values.ang_vel[0], imu_values.ang_vel[1], imu_values.ang_vel[2]);
+
         chThdSleepUntilWindowed(time, time + LOOP_PERIOD_MS);
     }
 }
