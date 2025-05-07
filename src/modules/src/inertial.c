@@ -1,5 +1,6 @@
 /* C Standard Library */
 #include <stdbool.h>
+#include <stdlib.h>
 
 /* ChibiOS Library */
 #include "ch.h"
@@ -15,32 +16,49 @@
 /* e-puck2 main processor Library */
 #include "sensors/imu.h"
 
-void init_imu(void) {
-    // i2c_start();
-    // int8_t status = mpu9250_setup(MPU9250_ACC_FULL_RANGE_2G
-	// 	                        | MPU9250_GYRO_FULL_RANGE_250DPS
-	// 	                        | MPU9250_SAMPLE_RATE_DIV(100));
+#define IMU_THD_PERIOD_MS 100
 
-    // epuck_printf("status = %d\n", status);
+
+static THD_WORKING_AREA(waIMUThd, 4096);
+static THD_FUNCTION(IMUThd, arg)
+{
+    (void) arg;
+    chRegSetThreadName(__FUNCTION__);
+
+    messagebus_topic_t* imu_sub = messagebus_find_topic_blocking(&bus, "/imu"); // subscriber to reader thd
+
+    messagebus_topic_t* imu_pub = (messagebus_topic_t*) malloc(sizeof(messagebus_topic_t)); // publishes filtered data
+
+    imu_data_t msg = {0};
+
+    MUTEX_DECL(imu_pub_lock);
+    CONDVAR_DECL(imu_pub_condvar);
+
+    messagebus_topic_init(imu_pub, &imu_pub_lock, &imu_pub_condvar, &msg, sizeof(imu_data_t));
+    messagebus_advertise_topic(&bus, imu_pub, "/imu_processed");
+
+    systime_t time;
+
+    while (true) {
+        time = chVTGetSystemTime();
+
+        imu_msg_t imu_values = {0};
+        messagebus_topic_wait(imu_sub, &imu_values, sizeof(imu_msg_t));
+
+        imu_data_t data = {
+            .acc = { imu_values.acceleration[0], imu_values.acceleration[1], imu_values.acceleration[2] },
+            .ang_vel = { imu_values.gyro_rate[0], imu_values.gyro_rate[1], imu_values.gyro_rate[2] }
+        };
+
+        messagebus_topic_publish(imu_pub, &data, sizeof(imu_data_t));
+        chThdSleepUntilWindowed(time, time + IMU_THD_PERIOD_MS);
+    }
+}
+
+void imu_init(void) {
     imu_start();
     calibrate_acc();
 	calibrate_gyro();
+
+    chThdCreateStatic(waIMUThd, sizeof(waIMUThd), NORMALPRIO, IMUThd, NULL);
 }
-
-// imu_data_t imu_read(void) {
-    // imu_msg_t data = {0};
-    // int8_t status = mpu9250_read(data.ang_velocity, data.acceleration, &data.temperature,
-    //                              data.magnetometer, data.gyro_raw, data.acc_raw,
-    //                              data.gyro_offset, data.acc_offset, &data.status);
-
-    // imu_data_t res = {
-    //     .acc = { data.acceleration[0], data.acceleration[1], data.acceleration[2] },
-    //     .ang_vel = { data.gyro_raw[0], data.gyro_raw[1], data.gyro_raw[2] },
-    //     .mag = { data.magnetometer[0], data.magnetometer[1], data.magnetometer[2] },
-    //     .temperature = data.temperature
-    // };
-
-    // return res;
-
-
-// }

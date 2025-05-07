@@ -26,18 +26,15 @@ int main(void) {
     mpu_init();
     messagebus_init(&bus, &bus_lock, &bus_condvar);
 
-	// /* start peripherals */
-	// i2c_start();
-
 	telemetry_init();
 	tof_init();
-    init_imu();
+    imu_init();
 
 
     // messagebus_topic_t* dist_topic = messagebus_find_topic_blocking(&bus, "/distance");
     // tof_msg_t dist;
 
-    messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu");
+    messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_processed");
 
     systime_t time;
 
@@ -45,28 +42,14 @@ int main(void) {
     while (1) {
         time = chVTGetSystemTime();
 
-        imu_msg_t imu_values;
+        imu_data_t imu_values = {0};
 
-        messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_msg_t));
+        messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_data_t));
 
         epuck_printf("%f,\t%f,\t%f\n%f,\t%f,\t%f\n\n",
-        imu_values.acceleration[0], imu_values.acceleration[1], imu_values.acceleration[2],
-        imu_values.gyro_rate[0], imu_values.gyro_rate[1], imu_values.gyro_rate[2]);
+        imu_values.acc[0], imu_values.acc[1], imu_values.acc[2],
+        imu_values.ang_vel[0], imu_values.ang_vel[1], imu_values.ang_vel[2]);
 
-        // imu_data_t data = imu_read();
-
-        // epuck_printf("%f,\t%f,\t%f\n%f,\t%f,\t%f\n%f,\t%f,\t%f\n%f\n", data.acc[0], data.acc[1], data.acc[2],
-                                                                //  data.ang_vel[0], data.ang_vel[1], data.ang_vel[2],
-                                                                //  data.mag[0], data.mag[1], data.mag[2],
-                                                                //  data.temperature);
-
-        // int16_t unfiltered = tof_get_dist_mm();
-        // messagebus_topic_wait(dist_topic, &dist, sizeof(tof_msg_t));
-
-        // epuck_printf("dist = %4d [mm] \t, filt = %4d [mm]\n", unfiltered, dist.dist_mm);
-		// epuck_printf("dist = %4d [mm] \t filt = %4d [mm]\n", dist_mm,
-        //                                                    filtered_dist_mm);
-        // epuck_printf("distance = %d [mm]\n", dist_mm);
         chThdSleepUntilWindowed(time, time + LOOP_PERIOD_MS);
     }
 }

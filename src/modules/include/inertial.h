@@ -9,7 +9,7 @@ typedef struct {
     float ang_vel[NB_AXIS];
 } imu_data_t;
 
-void init_imu(void);
+void imu_init(void);
 // imu_data_t imu_read(void);
 
 #endif /* __IMU_H__ */
