@@ -6,9 +6,6 @@
 /* ChibiOS Library */
 #include "ch.h"
 
-/* e-puck2 Library */
-#include "i2c_bus.h"
-
 /* Modules Library */
 #include "main.h"
 #include "modules/include/telemetry.h"
