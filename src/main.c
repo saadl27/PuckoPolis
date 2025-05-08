@@ -29,8 +29,6 @@ int main(void) {
 	telemetry_init();
 	tof_init();
     imu_init();
-    epuck_printf("hello\n");
-
 
     messagebus_topic_t* dist_topic = messagebus_find_topic_blocking(&bus, "/distance");
     messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_processed");
