@@ -5,34 +5,14 @@
 extern "C" {
 #endif
 
-#include <camera/dcmi_camera.h>
-#include <msgbus/messagebus.h>
-#include <parameter/parameter.h>
-
-
-//constants for the differents parts of the project
-#define IMAGE_BUFFER_SIZE		640
-#define WIDTH_SLOPE				5
-#define MIN_LINE_WIDTH			40
-#define ROTATION_THRESHOLD		10
-#define PXTOCM					1570.0f //experimental value
-#define GOAL_DISTANCE 			10.0f
-#define MAX_DISTANCE 			25.0f
-#define ERROR_THRESHOLD			0.1f	//[cm] because of the noise of the camera
-#define KP						0.5f
-#define KI 						0.001f	//must not be zero
-#define MAX_SUM_ERROR 			(MOTOR_SPEED_LIMIT/KI)
-
-//RGB LED used for interaction with plotImage Python code
-#define USED_RGB_LED            LED4
-#define INTENSITY_RGB_LED       10
+#include "camera/dcmi_camera.h"
+#include "msgbus/messagebus.h"
+#include "parameter/parameter.h"
 
 /** Robot wide IPC bus. */
 extern messagebus_t bus;
 
 extern parameter_namespace_t parameter_root;
-
-void SendUint8ToComputer(uint8_t* data, uint16_t size);
 
 #ifdef __cplusplus
 }
