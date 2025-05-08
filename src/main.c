@@ -33,8 +33,8 @@ int main(void) {
     a_star_init_graph(graph, 15);
 
     a_star_add_edge(graph, 1,  5,  120);
-    a_star_add_edge(graph, 1,  3,  7);
-    a_star_add_edge(graph, 1,  2,  90);
+    a_star_add_edge(graph, 1,  3,  90);
+    a_star_add_edge(graph, 1,  2,  7);
     a_star_add_edge(graph, 2,  6,  60);
     a_star_add_edge(graph, 2,  4,  35);
     a_star_add_edge(graph, 4,  10, 95);
@@ -56,6 +56,8 @@ int main(void) {
     a_star_add_edge(graph, 11, 14, 15);
     a_star_add_edge(graph, 9,  11, 9);
 
+    epuck_printf("hello world\n");
+
 
     /* Infinite loop. */
     while (1) {
@@ -63,8 +65,15 @@ int main(void) {
 
         // test_path(graph, path, 1, 3);
         // test_path(graph, path, 4, 10);
-        test_path(graph, path, 12, 15);
+        // test_path(graph, path, 12, 15);
         // test_path(graph, path, 7, 5);
+        // test_path(graph, path, 14, 15);
+        // test_path(graph, path, 1, 15);
+        epuck_printf("==========================================\n");
+        test_path(graph, path, 1, 6);
+        test_path(graph, path, 4, 11);
+        test_path(graph, path, 10, 13);
+        test_path(graph, path, 3, 13);
 
 
         free(path);

@@ -7,7 +7,7 @@
 // A* algorithm for pathfinding for the robot
 
 #define NUM_NODES 15
-#define MAX_EDGES_PER_NODE 5
+#define MAX_EDGES_PER_NODE 4
 
 typedef struct {
     uint8_t index;
