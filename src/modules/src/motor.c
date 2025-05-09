@@ -10,8 +10,6 @@
 #include "modules/include/camera.h"
 #include "modules/include/brain.h"
 
-static bool rotating = false; 
-
 //simple PI regulator implementation
 int16_t pi_regulator(float distance, float goal){
 
@@ -58,11 +56,11 @@ static THD_FUNCTION(PiRegulator, arg) {
     while(1){
         time = chVTGetSystemTime();
         
-		if (!rotating){
+		if (get_state() == MISSION){
 			//computes the speed to give to the motors
 			//distance_cm is modified by the image processing thread
 			//speed = pi_regulator(get_distance_cm(), GOAL_DISTANCE);
-			speed = get_moving() ? FWD_SPEED : 0;
+			speed = FWD_SPEED;
 			//computes a correction factor to let the robot rotate to be in front of the line
 			speed_correction = pi_regulator(get_line_position(), (IMAGE_BUFFER_SIZE/2));
 
@@ -81,8 +79,12 @@ static THD_FUNCTION(PiRegulator, arg) {
     }
 }
 
+//implement thread to rotate using filtered gyro yaw (should take desired heading as input and return true when completed)
+bool correct_heading(uint16_t target_heading){
+	return false;
+}
+
 static void rotate(int16_t left_speed, int16_t right_speed){
-	rotating = true; 
 	right_motor_set_speed(FWD_SPEED);
 	left_motor_set_speed(FWD_SPEED);
 	//about 500ms at 168MHz
@@ -101,7 +103,6 @@ static void rotate(int16_t left_speed, int16_t right_speed){
 	for(uint32_t i = 0 ; i < 21000000 ; i++){
         __asm__ volatile ("nop");
     }
-	rotating = false;
 }
 
 void rotate_ccw(void){

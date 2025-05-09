@@ -12,5 +12,6 @@
 void motor_init(void);
 void rotate_ccw(void);
 void rotate_cw(void);
+bool correct_heading(uint16_t target);
 
 #endif 

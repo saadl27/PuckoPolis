@@ -159,7 +159,6 @@ bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end) {
     return false;
 }
 
-
 uint8_t get_heading(Graph* graph, uint8_t node1, uint8_t node2) {
     bool inverse = false;
     uint8_t edge_nb = 0;

@@ -34,8 +34,8 @@ int main(void) {
 	motor_init();
     brain_init();
 
-    Graph* graph = (Graph*) malloc(sizeof(Graph));
-    a_star_init(graph);
+    //Graph* graph = (Graph*) malloc(sizeof(Graph));
+    //a_star_init(graph);
 
 /*     Graph* graph = (Graph*) malloc(sizeof(Graph));
 
