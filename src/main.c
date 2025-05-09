@@ -17,10 +17,6 @@ int main(void)
     mpu_init();
 
 	telemetry_init();
-    while (true) {
-        uint8_t data = ReceiveDestinationFromComputer();
-        epuck_printf("oueoueeee dest received :%u\n", data);
-    }
 }
 
 #define STACK_CHK_GUARD 0xe2dee396
