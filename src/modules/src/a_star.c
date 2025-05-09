@@ -159,6 +159,24 @@ bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end) {
     return false;
 }
 
+
+uint8_t get_heading(Graph* graph, uint8_t node1, uint8_t node2) {
+    bool inverse = false;
+    uint8_t edge_nb = 0;
+    for (uint16_t i = 0; i < (graph->num_edges); ++i ){
+        if (graph->edges[i][0] == node1 & graph->edges[i][1] == node2){
+            edge_nb = i; 
+            break;
+        } else if (graph->edges[i][1] == node1 & graph->edges[i][0] == node2){
+            edge_nb = i;
+            inverse = true;
+            break;
+        }
+    } 
+    uint16_t heading = graph->angles[edge_nb][inverse];
+    return heading;
+}
+
 void test_path(Graph* graph, Path* path, uint8_t _start, uint8_t _end) {
     if (a_star_find_path(graph, path, _start, _end)) {
         epuck_printf("Path found from node %d to node %d:\n", path->start, path->end);
