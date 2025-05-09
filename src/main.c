@@ -35,6 +35,9 @@ int main(void) {
     brain_init();
 
     Graph* graph = (Graph*) malloc(sizeof(Graph));
+    a_star_init(graph);
+
+/*     Graph* graph = (Graph*) malloc(sizeof(Graph));
 
     a_star_init_graph(graph, 15);
 
@@ -66,7 +69,7 @@ int main(void) {
 
 
     /* Infinite loop. */
-    while (1) {
+/*     while (1) {
         Path* path = (Path*) malloc(sizeof(Path));
 
         // test_path(graph, path, 1, 3);
@@ -85,7 +88,7 @@ int main(void) {
         free(path);
         
         chThdSleepMilliseconds(LOOP_PERIOD_MS);
-    }
+    } */ 
 }
 
 #define STACK_CHK_GUARD 0xe2dee396

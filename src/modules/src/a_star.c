@@ -171,3 +171,32 @@ void test_path(Graph* graph, Path* path, uint8_t _start, uint8_t _end) {
         epuck_printf("No path found from node %d to node %d\n", _start, _end);
     }
 }
+
+void a_star_init(Graph* graph){
+
+    a_star_init_graph(graph, 15);
+
+    a_star_add_edge(graph, 1,  5,  120);
+    a_star_add_edge(graph, 1,  3,  90);
+    a_star_add_edge(graph, 1,  2,  7);
+    a_star_add_edge(graph, 2,  6,  60);
+    a_star_add_edge(graph, 2,  4,  35);
+    a_star_add_edge(graph, 4,  10, 95);
+    a_star_add_edge(graph, 4,  9,  120);
+    a_star_add_edge(graph, 5,  6,  15);
+    a_star_add_edge(graph, 5,  7,  8);
+    a_star_add_edge(graph, 7,  8,  30);
+    a_star_add_edge(graph, 6,  8,  17);
+    a_star_add_edge(graph, 7,  13, 107);
+    a_star_add_edge(graph, 8,  9,  76);
+    a_star_add_edge(graph, 11, 13, 63);
+    a_star_add_edge(graph, 13, 14, 66);
+    a_star_add_edge(graph, 14, 15, 36);
+    a_star_add_edge(graph, 9,  10, 20);
+    a_star_add_edge(graph, 10, 12, 47);
+    a_star_add_edge(graph, 3,  12, 90);
+    a_star_add_edge(graph, 12, 15, 25);
+    a_star_add_edge(graph, 3,  15, 235);
+    a_star_add_edge(graph, 11, 14, 15);
+    a_star_add_edge(graph, 9,  11, 9);
+}
