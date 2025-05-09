@@ -8,9 +8,7 @@
 #include <motors.h>
 
 #include "main.h"
-#include "motor.h"
-#include "camera.h"
-#include "telemetry.h"
+#include "modules/include/telemetry.h"
 
 int main(void)
 {
@@ -19,8 +17,9 @@ int main(void)
     mpu_init();
 
 	telemetry_init();
-	camera_init();
-	motor_init();
+
+    uint8_t data = 1;
+    SendNodeToComputer(data);
 }
 
 #define STACK_CHK_GUARD 0xe2dee396

@@ -31,6 +31,18 @@ void SendUint8ToComputer(uint8_t* data, uint16_t size)
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)data, size);
 }
 
+/* void SendNodeToComputer(uint8_t* data, uint8_t size) 
+{
+	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"CURRENT_NODE:", 13);
+	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)&size, sizeof(uint8_t));
+	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)data, size);
+} */
+
+void SendNodeToComputer(uint8_t node) {
+    // This will send "CURRENT_NODE:<node>\n"
+    chprintf((BaseSequentialStream *)&SD3, "CURRENT_NODE:%u\n", node);
+}
+
 static void serial_start(void)
 {
 	static SerialConfig ser_cfg = {
