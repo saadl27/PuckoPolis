@@ -26,8 +26,7 @@ static THD_FUNCTION(ColorDecision, arg) {
 
     while (1) {
         messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
-        char* color_s = NULL;
-
+        
         switch (color_values.color) {
             case RED_COLOR: 
                 moving = true;
@@ -39,16 +38,13 @@ static THD_FUNCTION(ColorDecision, arg) {
 
             case BLUE_COLOR: 
                 moving = false;
-                rotate(); 
+                //rotate_cw(); 
                 break;
 
             case BLACK_COLOR: 
                 moving = true; 
                 break;
         }
-
-        if (color_s) epuck_printf("Color = %s\n", color_s);
-        else epuck_printf("No color\n");
     }
 }
 

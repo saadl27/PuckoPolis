@@ -4,11 +4,7 @@
 #include <usbcfg.h>
 #include <camera/po8030.h>
 
-//RGB LED used for interaction with plotImage Python code
-#include <leds.h>
-
 #include "modules/include/camera.h"
-#include "main.h"
 #include "modules/include/telemetry.h"
 #include "modules/include/brain.h"
 
@@ -32,7 +28,7 @@ uint16_t extract_line_width(uint8_t *buffer){
     uint8_t stop = 0, wrong_line = 0, line_not_found = 0;
     uint32_t mean = 0;
 
-    static uint16_t last_width = PXTOCM/GOAL_DISTANCE;
+    //static uint16_t last_width = PXTOCM/GOAL_DISTANCE;
 
     //performs an average
     for(uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++){
@@ -92,9 +88,9 @@ uint16_t extract_line_width(uint8_t *buffer){
     if(line_not_found){
         begin = 0;
         end = 0;
-        width = last_width;
+        //width = last_width;
     }else{
-        last_width = width = (end - begin);
+        //last_width = width = (end - begin);
         line_position = (begin + end)/2; //gives the line position.
     }
 
