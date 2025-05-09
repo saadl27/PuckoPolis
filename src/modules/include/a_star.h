@@ -9,6 +9,17 @@
 #define NUM_NODES 15
 #define MAX_EDGES_PER_NODE 4
 
+enum Orientation {
+    EAST,
+    NORTH_EAST,
+    NORTH,
+    NORTH_WEST,
+    WEST,
+    SOUTH_WEST,
+    SOUTH,
+    SOUTH_EAST 
+};
+
 typedef struct {
     uint8_t index;
     uint16_t g_cost; // cost from start to this node
@@ -29,8 +40,9 @@ typedef struct {
 typedef struct {
     uint8_t num_nodes;
     uint8_t num_edges;
-    uint8_t edges[NUM_NODES * MAX_EDGES_PER_NODE][3]; // each edge is a pair of node indices
+    uint8_t edges[NUM_NODES * MAX_EDGES_PER_NODE][2]; // each edge is a pair of node indices
     uint16_t weights[NUM_NODES * MAX_EDGES_PER_NODE];
+    uint8_t angles[NUM_NODES * MAX_EDGES_PER_NODE][2];
     uint8_t adjacency[NUM_NODES][MAX_EDGES_PER_NODE];
     uint8_t adjacency_count[NUM_NODES];
 } Graph;

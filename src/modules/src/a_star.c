@@ -12,14 +12,19 @@ void a_star_init_graph(Graph* graph, uint8_t num_nodes) {
     }
 }
 
-void a_star_add_edge(Graph* graph, uint8_t node1, uint8_t node2, uint16_t weight) {
+void a_star_add_edge(Graph* graph, uint8_t node1, uint8_t node2, uint16_t weight, uint8_t angle12, uint8_t angle21) {
     if (graph->num_edges >= NUM_NODES * MAX_EDGES_PER_NODE) {
         return;
     }
 
     graph->edges[graph->num_edges][0] = node1;
     graph->edges[graph->num_edges][1] = node2;
+
     graph->weights[graph->num_edges] = weight;
+
+    graph->angles[graph->num_edges][0] = angle12;
+    graph->angles[graph->num_edges][1] = angle21;
+
 
     if (graph->adjacency_count[node1 - 1] < MAX_EDGES_PER_NODE) {
         graph->adjacency[node1 - 1][graph->adjacency_count[node1 - 1]] = node2;
@@ -176,27 +181,27 @@ void a_star_init(Graph* graph){
 
     a_star_init_graph(graph, 15);
 
-    a_star_add_edge(graph, 1,  5,  120);
-    a_star_add_edge(graph, 1,  3,  90);
-    a_star_add_edge(graph, 1,  2,  7);
-    a_star_add_edge(graph, 2,  6,  60);
-    a_star_add_edge(graph, 2,  4,  35);
-    a_star_add_edge(graph, 4,  10, 95);
-    a_star_add_edge(graph, 4,  9,  120);
-    a_star_add_edge(graph, 5,  6,  15);
-    a_star_add_edge(graph, 5,  7,  8);
-    a_star_add_edge(graph, 7,  8,  30);
-    a_star_add_edge(graph, 6,  8,  17);
-    a_star_add_edge(graph, 7,  13, 107);
-    a_star_add_edge(graph, 8,  9,  76);
-    a_star_add_edge(graph, 11, 13, 63);
-    a_star_add_edge(graph, 13, 14, 66);
-    a_star_add_edge(graph, 14, 15, 36);
-    a_star_add_edge(graph, 9,  10, 20);
-    a_star_add_edge(graph, 10, 12, 47);
-    a_star_add_edge(graph, 3,  12, 90);
-    a_star_add_edge(graph, 12, 15, 25);
-    a_star_add_edge(graph, 3,  15, 235);
-    a_star_add_edge(graph, 11, 14, 15);
-    a_star_add_edge(graph, 9,  11, 9);
+    a_star_add_edge(graph, 1,  5,  120, SOUTH, NORTH_WEST);
+    a_star_add_edge(graph, 1,  3,  90, EAST, NORTH);
+    a_star_add_edge(graph, 1,  2,  7, SOUTH, NORTH);
+    a_star_add_edge(graph, 2,  6,  60, WEST, NORTH_EAST);
+    a_star_add_edge(graph, 2,  4,  35, SOUTH, WEST);
+    a_star_add_edge(graph, 4,  10, 95, EAST, EAST);
+    a_star_add_edge(graph, 4,  9,  120, SOUTH, NORTH);
+    a_star_add_edge(graph, 5,  6,  15, NORTH_EAST, NORTH_WEST);
+    a_star_add_edge(graph, 5,  7,  8, SOUTH_WEST, NORTH);
+    a_star_add_edge(graph, 7,  8,  30, SOUTH, SOUTH_WEST);
+    a_star_add_edge(graph, 6,  8,  17, SOUTH_EAST, NORTH_EAST);
+    a_star_add_edge(graph, 7,  13, 107, EAST, EAST);
+    a_star_add_edge(graph, 8,  9,  76, SOUTH_EAST, WEST);
+    a_star_add_edge(graph, 11, 13, 63, WEST, NORTH);
+    a_star_add_edge(graph, 13, 14, 66, SOUTH, WEST);
+    a_star_add_edge(graph, 14, 15, 36, EAST, WEST);
+    a_star_add_edge(graph, 9,  10, 20, EAST, WEST);
+    a_star_add_edge(graph, 10, 12, 47, SOUTH, WEST);
+    a_star_add_edge(graph, 3,  12, 90, SOUTH, NORTH);
+    a_star_add_edge(graph, 12, 15, 25, SOUTH, EAST);
+    a_star_add_edge(graph, 3,  15, 235, EAST, SOUTH);
+    a_star_add_edge(graph, 11, 14, 15, SOUTH, NORTH);
+    a_star_add_edge(graph, 9,  11, 9, SOUTH, NORTH);
 }
