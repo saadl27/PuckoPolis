@@ -4,7 +4,6 @@
 #include <stdbool.h>
 
 #include "modules/include/brain.h"
-#include "main.h"
 #include "modules/include/telemetry.h"
 #include "modules/include/camera.h"
 #include "modules/include/motor.h"

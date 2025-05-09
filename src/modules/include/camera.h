@@ -29,7 +29,6 @@ typedef struct {
 
 float get_distance_cm(void);
 uint16_t get_line_position(void);
-void select_color_detection(color_detection_t choice_detect_color);
 
 void camera_init(void);
 
