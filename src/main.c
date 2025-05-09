@@ -12,6 +12,9 @@
 #include "modules/include/telemetry.h"
 #include "modules/include/distance.h"
 #include "modules/include/a_star.h"
+#include "modules/include/brain.h"
+#include "modules/include/motor.h"
+#include "modules/include/camera.h"
 
 /* temporary */
 #define LOOP_PERIOD_MS 100
@@ -27,6 +30,9 @@ int main(void) {
     messagebus_init(&bus, &bus_lock, &bus_condvar);
 
 	telemetry_init();
+    camera_init();
+	motor_init();
+    brain_init();
 
     Graph* graph = (Graph*) malloc(sizeof(Graph));
 
