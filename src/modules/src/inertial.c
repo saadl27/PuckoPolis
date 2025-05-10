@@ -16,7 +16,8 @@
 /* e-puck2 main processor Library */
 #include "sensors/imu.h"
 
-#define IMU_THD_PERIOD_MS 100
+#define IMU_THD_PERIOD_MS 0.100
+#define RAD_DEG (180/3.14)
 
 /* Kalman calibration (all measured from empirical data) 
    & Kalman filter variables */
@@ -94,14 +95,15 @@ static THD_FUNCTION(IMUThd, arg)
         
         imu_data_t unfiltered = {
             .acc = { raw.acceleration[0], raw.acceleration[1], raw.acceleration[2] },
-            .ang_vel = { raw.gyro_rate[0], raw.gyro_rate[1], raw.gyro_rate[2] }
+            .ang_vel = { raw.gyro_rate[0], raw.gyro_rate[1], raw.gyro_rate[2]*RAD_DEG}
         };
         
         kalman_update(unfiltered.ang_vel[2],&yaw_estimate, &rate_estimate, &yaw_uncertainty, &rate_uncertainty);
 
         odometry_t odometry_data;
         
-        odometry_data.yaw = yaw_estimate;
+        odometry_data.yaw = ((uint16_t) yaw_estimate) % 360;
+        //odometry_data.yaw = yaw_estimate;
 
         messagebus_topic_publish(odo_pub, &odometry_data, sizeof(odometry_t));
 
