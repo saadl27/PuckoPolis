@@ -33,19 +33,26 @@ typedef struct {
 static kalman_axis_t acc_filter[3] = {0};
 static kalman_axis_t gyro_filter[3] = {0};
 
-static float kalman_update(kalman_axis_t* kf, float measurement) {
-    if (!kf->init) {
-        kf->est = measurement;
-        kf->err = IMU_INIT_ERR;
-        kf->init = true;
-        return measurement;
-    }
+static void kalman_update(float measurement, float *yaw_estimate, float *rate_estimate, 
+                            float *yaw_uncertainty, float *rate_uncertainty) {
 
-    kf->err += IMU_PROC_NOISE;
-    float gain = kf->err / (kf->err + IMU_MEAS_NOISE);
-    kf->est += gain * (measurement - kf->est);
-    kf->err = (1.0f - gain) * kf->err;
-    return kf->est;
+    float gain_yaw = *yaw_uncertainty/(*yaw_uncertainty + IMU_MEAS_NOISE);
+    float gain_rate = *rate_uncertainty/(*rate_uncertainty + IMU_MEAS_NOISE);
+
+    *yaw_estimate = *yaw_estimate + gain_yaw*IMU_THD_PERIOD_MS*(measurement - *rate_estimate);
+    *rate_estimate = *rate_estimate + gain_rate*(measurement - *rate_estimate);
+
+    *yaw_uncertainty = (1-gain_yaw)*(*yaw_uncertainty);
+    *rate_uncertainty = (1-gain_rate)*(*rate_uncertainty);
+}
+
+static void kalman_predict(float *yaw_estimate, float *rate_estimate, 
+                            float *yaw_uncertainty, float *rate_uncertainty) {
+
+    *yaw_estimate = *yaw_estimate + IMU_THD_PERIOD_MS*(*rate_estimate);
+    *rate_estimate = *rate_estimate;
+    *yaw_uncertainty = *yaw_uncertainty + IMU_THD_PERIOD_MS*IMU_THD_PERIOD_MS*(*rate_uncertainty);
+    *rate_uncertainty = *rate_uncertainty;
 }
 
 
@@ -56,48 +63,50 @@ static THD_FUNCTION(IMUThd, arg)
     chRegSetThreadName(__FUNCTION__);
 
     messagebus_topic_t* imu_sub = messagebus_find_topic_blocking(&bus, "/imu"); // subscriber to reader thd
-    messagebus_topic_t* imu_pub = (messagebus_topic_t*) malloc(sizeof(messagebus_topic_t)); // publishes filtered data
+    //messagebus_topic_t* imu_pub = (messagebus_topic_t*) malloc(sizeof(messagebus_topic_t)); // publishes filtered data
+    messagebus_topic_t* odo_pub = (messagebus_topic_t*) malloc(sizeof(messagebus_topic_t));
 
-    imu_data_t msg = {0};
+    //imu_data_t msg = {0};
+    odometry_t msg = {0};
 
-    MUTEX_DECL(imu_pub_lock);
-    CONDVAR_DECL(imu_pub_condvar);
+    //MUTEX_DECL(imu_pub_lock);
+    //CONDVAR_DECL(imu_pub_condvar);
+    MUTEX_DECL(odo_pub_lock);
+    CONDVAR_DECL(odo_pub_condvar);
 
-    messagebus_topic_init(imu_pub, &imu_pub_lock, &imu_pub_condvar, &msg, sizeof(imu_data_t));
-    messagebus_advertise_topic(&bus, imu_pub, "/imu_processed");
+    messagebus_topic_init(odo_pub, &odo_pub_lock, &odo_pub_condvar, &msg, sizeof(odometry_t));
+    messagebus_advertise_topic(&bus, odo_pub, "/odometry");
 
     systime_t time;
+
+    float yaw_estimate = 0;
+    float yaw_uncertainty = 4;
+    float rate_estimate = 0;
+    float rate_uncertainty = 1;
+
+    kalman_predict(&yaw_estimate, &rate_estimate, &yaw_uncertainty, &rate_uncertainty);
 
     while (true) {
         time = chVTGetSystemTime();
 
-        // imu_msg_t imu_values = {0};
-        // messagebus_topic_wait(imu_sub, &imu_values, sizeof(imu_msg_t));
-
-        // imu_data_t data = {
-        //     .acc = { imu_values.acceleration[0], imu_values.acceleration[1], imu_values.acceleration[2] },
-        //     .ang_vel = { imu_values.gyro_rate[0], imu_values.gyro_rate[1], imu_values.gyro_rate[2] }
-        // };
-
         imu_msg_t raw = {0};
         messagebus_topic_wait(imu_sub, &raw, sizeof(imu_msg_t));
-
+        
         imu_data_t unfiltered = {
             .acc = { raw.acceleration[0], raw.acceleration[1], raw.acceleration[2] },
             .ang_vel = { raw.gyro_rate[0], raw.gyro_rate[1], raw.gyro_rate[2] }
         };
         
-        epuck_printf("Unfiltered:\n%f,\t%f,\t%f\n%f,\t%f,\t%f\n\n",
-        unfiltered.acc[0], unfiltered.acc[1], unfiltered.acc[2],
-        unfiltered.ang_vel[0], unfiltered.ang_vel[1], unfiltered.ang_vel[2]);
+        kalman_update(unfiltered.ang_vel[2],&yaw_estimate, &rate_estimate, &yaw_uncertainty, &rate_uncertainty);
 
-        imu_data_t filtered;
-        for (int i = 0; i < NB_AXIS; ++i) {
-            filtered.acc[i]     = kalman_update(&acc_filter[i], raw.acceleration[i]);
-            filtered.ang_vel[i] = kalman_update(&gyro_filter[i], raw.gyro_rate[i]);
-        }
+        odometry_t odometry_data;
+        
+        odometry_data.yaw = yaw_estimate;
 
-        messagebus_topic_publish(imu_pub, &filtered, sizeof(imu_data_t));
+        messagebus_topic_publish(odo_pub, &odometry_data, sizeof(odometry_t));
+
+        kalman_predict(&yaw_estimate, &rate_estimate, &yaw_uncertainty, &rate_uncertainty);
+
         chThdSleepUntilWindowed(time, time + IMU_THD_PERIOD_MS);
     }
 }

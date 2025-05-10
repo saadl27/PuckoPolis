@@ -9,6 +9,12 @@ typedef struct {
     float ang_vel[NB_AXIS];
 } imu_data_t;
 
+typedef struct {
+    uint16_t x;
+    uint16_t y;
+    float yaw;
+} odometry_t;
+
 void imu_init(void);
 // imu_data_t imu_read(void);
 

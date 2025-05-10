@@ -34,7 +34,7 @@ int main(void) {
     // messagebus_topic_t* dist_topic = messagebus_find_topic_blocking(&bus, "/distance");
     // tof_msg_t dist;
 
-    messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_processed");
+    messagebus_topic_t* odo_topic = messagebus_find_topic_blocking(&bus, "/odometry");
 
     systime_t time;
 
@@ -42,13 +42,11 @@ int main(void) {
     while (1) {
         time = chVTGetSystemTime();
 
-        imu_data_t imu_values = {0};
+        odometry_t odometry_values = {0};
 
-        messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_data_t));
+        messagebus_topic_wait(odo_topic, &odometry_values, sizeof(odometry_t));
 
-        epuck_printf("Filtered:\n%f,\t%f,\t%f\n%f,\t%f,\t%f\n\n",
-        imu_values.acc[0], imu_values.acc[1], imu_values.acc[2],
-        imu_values.ang_vel[0], imu_values.ang_vel[1], imu_values.ang_vel[2]);
+        epuck_printf("YAW:\n%f\n", odometry_values.yaw);
 
         chThdSleepUntilWindowed(time, time + LOOP_PERIOD_MS);
     }
