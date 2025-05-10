@@ -40,7 +40,7 @@ static void kalman_update(float measurement, float *yaw_estimate, float *rate_es
     float gain_yaw = *yaw_uncertainty/(*yaw_uncertainty + IMU_MEAS_NOISE);
     float gain_rate = *rate_uncertainty/(*rate_uncertainty + IMU_MEAS_NOISE);
 
-    *yaw_estimate = *yaw_estimate + gain_yaw*IMU_THD_PERIOD_MS*(measurement - *rate_estimate);
+    *yaw_estimate = *yaw_estimate + gain_yaw*(measurement - *rate_estimate);
     *rate_estimate = *rate_estimate + gain_rate*(measurement - *rate_estimate);
 
     *yaw_uncertainty = (1-gain_yaw)*(*yaw_uncertainty);
@@ -50,10 +50,12 @@ static void kalman_update(float measurement, float *yaw_estimate, float *rate_es
 static void kalman_predict(float *yaw_estimate, float *rate_estimate, 
                             float *yaw_uncertainty, float *rate_uncertainty) {
 
-    *yaw_estimate = *yaw_estimate + IMU_THD_PERIOD_MS*(*rate_estimate);
-    *rate_estimate = *rate_estimate;
-    *yaw_uncertainty = *yaw_uncertainty + IMU_THD_PERIOD_MS*IMU_THD_PERIOD_MS*(*rate_uncertainty);
-    *rate_uncertainty = *rate_uncertainty;
+    /* integrate angle with correct dt */
+    *yaw_estimate += IMU_THD_PERIOD_MS * (*rate_estimate);
+
+    /* inject process noise Q */
+    *yaw_uncertainty  += IMU_PROC_NOISE * IMU_THD_PERIOD_MS * IMU_THD_PERIOD_MS;
+    *rate_uncertainty += IMU_PROC_NOISE * IMU_THD_PERIOD_MS;
 }
 
 
