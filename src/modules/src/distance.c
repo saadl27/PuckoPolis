@@ -47,7 +47,7 @@ static THD_FUNCTION(DistanceThd, arg)
         time = chVTGetSystemTime();
         distance.dist_mm = tof_get_filtered_dist_mm();
         messagebus_topic_publish(&tof_topic, &distance, sizeof(tof_msg_t));
-        chThdSleepUntilWindowed(time, time + TOF_THD_PERIOD_MS);
+        chThdSleepUntilWindowed(time, time + MS2ST(TOF_THD_PERIOD_MS));
     }
 }
 
