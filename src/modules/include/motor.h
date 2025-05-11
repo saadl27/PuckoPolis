@@ -8,6 +8,7 @@
 #define KP						1.0f
 #define KI 						0.001f	//must not be zero
 #define MAX_SUM_ERROR 			(MOTOR_SPEED_LIMIT/KI)
+#define ERROR_ANGLE             1       //degree
 
 void motor_init(void);
 void rotate_ccw(void);
