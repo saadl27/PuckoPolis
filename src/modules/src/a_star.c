@@ -41,6 +41,8 @@ void a_star_add_edge(Graph* graph, uint8_t node1, uint8_t node2, uint16_t weight
 
 uint16_t a_star_calculate_heuristic(uint8_t node, uint8_t goal) {
     // return (node > goal) ? (node - goal) : (goal - node);
+    (void) node;
+    (void) goal;
     return 0; // djikstra heuristic
 }
 
@@ -90,10 +92,10 @@ bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end) {
     // create node array
     Node nodes[NUM_NODES];
     for (uint8_t i = 0; i < graph->num_nodes; i++) {
-        nodes[i].index = i + 1; // 1-based label
-        nodes[i].g_cost = 0xFFFF; // high value
+        nodes[i].index = i + 1;
+        nodes[i].g_cost = 0xffff; // high value
         nodes[i].h_cost = a_star_calculate_heuristic(i + 1, end);
-        nodes[i].f_cost = 0xFFFF;
+        nodes[i].f_cost = 0xffff;
         nodes[i].visited = false;
     }
 
@@ -159,21 +161,20 @@ bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end) {
     return false;
 }
 
-uint8_t get_heading(Graph* graph, uint8_t node1, uint8_t node2) {
+Orientation get_heading(Graph* graph, uint8_t node1, uint8_t node2) {
     bool inverse = false;
     uint8_t edge_nb = 0;
     for (uint16_t i = 0; i < (graph->num_edges); ++i ){
-        if ((graph->edges[i][0] == node1) & (graph->edges[i][1] == node2)){
+        if ((graph->edges[i][0] == node1) && (graph->edges[i][1] == node2)){
             edge_nb = i; 
             break;
-        } else if ((graph->edges[i][1] == node1) & (graph->edges[i][0] == node2)){
+        } else if ((graph->edges[i][1] == node1) && (graph->edges[i][0] == node2)){
             edge_nb = i;
             inverse = true;
             break;
         }
-    } 
-    uint16_t heading = graph->angles[edge_nb][inverse];
-    return heading;
+    }
+    return graph->angles[edge_nb][inverse];
 }
 
 void test_path(Graph* graph, Path* path, uint8_t _start, uint8_t _end) {

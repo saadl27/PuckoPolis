@@ -2,15 +2,15 @@
 #define __BRAIN_H__
 
 
-enum State {
-    READING,
+typedef enum {
+    READING = 0,
     MISSION, 
     INTERMEDIATE,
     STOP,
     DONE
-};
+} State;
 
 void brain_init(void);
-bool get_state(void);
+State get_state(void);
 
 #endif /* __BRAIN_H__ */

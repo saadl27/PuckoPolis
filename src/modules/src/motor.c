@@ -10,6 +10,7 @@
 #include "modules/include/camera.h"
 #include "modules/include/brain.h"
 #include "modules/include/inertial.h"
+#include "modules/include/telemetry.h"
 
 //simple PI regulator implementation
 int16_t pi_regulator(float distance, float goal){
@@ -95,27 +96,32 @@ void stop_motors(void){
 }
 
 //implement thread to rotate using filtered gyro yaw (should take desired heading as input and return true when completed)
-void correct_heading(uint16_t target_heading){
+void correct_heading(float target_heading){
+	epuck_printf("[motors] before moving straight\n");
 	translate();
+	epuck_printf("[motors] AFTER moving straight\n");
 	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
     yaw_msg_t angle;
 	float error = 0;
 
-	while (true){
+	while (true) {
 		messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
 		error = angle.yaw_rad - target_heading;
-		if (fabs(error) < ERROR_ANGLE) break;
-		while (error >= M_PI) error -= 2*M_PI;
-		while (error < -M_PI) error += 2*M_PI; 
 
-		if (error >= 0){
+		if (fabsf(error) < ERROR_ANGLE) break;
+		while (error >= M_PI) error -= 2.0f * M_PI;
+		while (error < -M_PI) error += 2.0f * M_PI; 
+
+		epuck_printf("[motors] current = %f, \t target = %f, \t, error = %f\n",
+						angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
+
+		if (error >= 0) {
 			right_motor_set_speed(ROT_SPEED);
 			left_motor_set_speed(-ROT_SPEED);
 		} else {
 			right_motor_set_speed(-ROT_SPEED);
 			left_motor_set_speed(ROT_SPEED);
 		}
-		
 	} 
 }
 
