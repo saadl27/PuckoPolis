@@ -11,7 +11,7 @@
 #include "main.h"
 
 #define INDEX_OFFSET 50
-#define THRESHOLD_SCALE 1.2f
+#define THRESHOLD_SCALE 1.4f
 
 static float distance_cm = 0;
 static uint16_t line_position = IMAGE_BUFFER_SIZE/2;    //middle

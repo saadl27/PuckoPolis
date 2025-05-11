@@ -2,6 +2,7 @@
 #include <hal.h>
 #include <chprintf.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "modules/include/brain.h"
 #include "modules/include/telemetry.h"
@@ -61,7 +62,7 @@ static THD_FUNCTION(FSM, arg) {
             case BLUE_COLOR: 
                 //epuck_printf("color = blue\n");
                 state = INTERMEDIATE;
-                uint8_t target_heading = get_heading(graph, path->path[path_step], path->path[path_step+1]);
+                float target_heading = (get_heading(graph, path->path[path_step], path->path[path_step+1]))*(M_PI/4);
                 correct_heading(target_heading);
                 state = MISSION; 
                 ++path_step;

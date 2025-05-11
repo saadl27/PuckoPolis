@@ -95,7 +95,7 @@ void stop_motors(void){
 }
 
 //implement thread to rotate using filtered gyro yaw (should take desired heading as input and return true when completed)
-void correct_heading(uint16_t target_heading){
+void correct_heading(float target_heading){
 	translate();
 	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
     yaw_msg_t angle;
