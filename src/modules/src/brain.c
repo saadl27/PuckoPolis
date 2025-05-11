@@ -11,9 +11,9 @@
 #include "modules/include/a_star.h"
 #include "main.h"
 
-static uint8_t state = READING;
+static State state = READING;
 
-bool get_state() {
+State get_state() {
     return state;
 }
 
@@ -32,50 +32,55 @@ static THD_FUNCTION(FSM, arg) {
     messagebus_topic_t* color_topic = messagebus_find_topic_blocking(&bus, "/color");
     color_msg_t color_values;
 
-    while (state == READING){
-        uint8_t start = ReceiveStartFromComputer();
-        uint8_t end = ReceiveDestinationFromComputer();
+    while (true) {
+        if (state == READING) {
+            uint8_t start = ReceiveStartFromComputer();
+            uint8_t end = ReceiveDestinationFromComputer();
 
-        if (a_star_find_path(graph, path, start, end)){
-            state = MISSION;
-            SendNodeToComputer(start);
+            if (a_star_find_path(graph, path, start, end)){
+                state = MISSION;
+                SendNodeToComputer(start);
+                test_path(graph, path, start, end);
+            }
         }
-    }
 
-    while (state == MISSION) {
-        messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
-        
-        switch (color_values.color) {
-            case RED_COLOR:
-                //epuck_printf("color = red\n");
-                state = STOP;
-                stop_motors();
-                break;
+        if (state == MISSION) {
+            messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
+            
+            switch (color_values.color) {
+                case RED_COLOR:
+                    //epuck_printf("color = red\n");
+                    state = STOP;
+                    stop_motors();
+                    break;
 
-            case GREEN_COLOR: 
-                //epuck_printf("color = green\n");
-                if (state == STOP){
+                case GREEN_COLOR: 
+                    //epuck_printf("color = green\n");
+                    if (state == STOP){
+                        state = MISSION;
+                    }
+                    break;
+
+                case BLUE_COLOR: 
+                    //epuck_printf("color = blue\n");
+                    state = INTERMEDIATE;
+                    ++path_step;
+                    float target_heading = (float) get_heading(graph, path->path[path_step], path->path[path_step+1]) * M_PI_4;
+                    epuck_printf("[brain] heading = %f\nbefore loop\n", target_heading);
+                    correct_heading(target_heading);
+                    epuck_printf("[brain] AFTER loop\n");
                     state = MISSION;
-                }
-                break;
+                    SendNodeToComputer(path->path[path_step]);
+                    if (path_step == path->path_len) {
+                        state = DONE;
+                    }
+                    //rotate_cw(); 
+                    break;
 
-            case BLUE_COLOR: 
-                //epuck_printf("color = blue\n");
-                state = INTERMEDIATE;
-                float target_heading = (get_heading(graph, path->path[path_step], path->path[path_step+1]))*(M_PI/4);
-                correct_heading(target_heading);
-                state = MISSION; 
-                ++path_step;
-                SendNodeToComputer(path->path[path_step]);
-                if (path_step == path->path_len){
-                    state = DONE;
-                }
-                //rotate_cw(); 
-                break;
-
-            case BLACK_COLOR: 
-                //epuck_printf("color = black\n");
-                break;
+                case BLACK_COLOR: 
+                    //epuck_printf("color = black\n");
+                    break;
+            }
         }
     }
 }

@@ -9,8 +9,8 @@
 #define NUM_NODES 15
 #define MAX_EDGES_PER_NODE 4
 
-enum Orientation {
-    EAST,
+typedef enum {
+    EAST = 0,
     NORTH_EAST,
     NORTH,
     NORTH_WEST,
@@ -18,7 +18,7 @@ enum Orientation {
     SOUTH_WEST,
     SOUTH,
     SOUTH_EAST 
-};
+} Orientation;
 
 typedef struct {
     uint8_t index;
@@ -42,14 +42,14 @@ typedef struct {
     uint8_t num_edges;
     uint8_t edges[NUM_NODES * MAX_EDGES_PER_NODE][2]; // each edge is a pair of node indices
     uint16_t weights[NUM_NODES * MAX_EDGES_PER_NODE];
-    uint8_t angles[NUM_NODES * MAX_EDGES_PER_NODE][2];
+    Orientation angles[NUM_NODES * MAX_EDGES_PER_NODE][2];
     uint8_t adjacency[NUM_NODES][MAX_EDGES_PER_NODE];
     uint8_t adjacency_count[NUM_NODES];
 } Graph;
 
 void a_star_init(Graph* graph);
 bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end);
-uint8_t get_heading(Graph* graph, uint8_t node1, uint8_t node2);
+Orientation get_heading(Graph* graph, uint8_t node1, uint8_t node2);
 // uint16_t a_star_calculate_heuristic(uint16_t node, uint16_t goal);
 
 //testing purposes
