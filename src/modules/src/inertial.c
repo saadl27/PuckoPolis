@@ -1,6 +1,7 @@
 /* C Standard Library */
 #include <stdbool.h>
 #include <stdlib.h>
+#include <math.h>
 
 /* ChibiOS Library */
 #include "ch.h"
@@ -16,96 +17,128 @@
 /* e-puck2 main processor Library */
 #include "sensors/imu.h"
 
-#define IMU_THD_PERIOD_MS 100
+#define IMU_THD_PERIOD_MS 4
+#define DT IMU_THD_PERIOD_MS / 1000.0f
 
-/* Kalman calibration (all measured from empirical data) 
-   & Kalman filter variables */
-#define IMU_PROC_NOISE 0.05f
-#define IMU_MEAS_NOISE 0.5f
-#define IMU_INIT_ERR 100.0f
+#define GZ_MEAS_NOISE 0.0000051610f
 
-typedef struct {
-    float est;
-    float err;
-    bool init;
-} kalman_axis_t;
 
-static kalman_axis_t acc_filter[3] = {0};
-static kalman_axis_t gyro_filter[3] = {0};
+static ekf_state_t ekf;
 
-static float kalman_update(kalman_axis_t* kf, float measurement) {
-    if (!kf->init) {
-        kf->est = measurement;
-        kf->err = IMU_INIT_ERR;
-        kf->init = true;
-        return measurement;
+
+void ekf_init(ekf_state_t* ekf) {
+    for (int i = 0; i < IMU_STATE_SIZE; i++) {
+        ekf->x[i] = 0.0f;
+        for (int j = 0; j < IMU_STATE_SIZE; j++) {
+            ekf->P[i][j] = (i == j) ? 0.01f : 0.0f;
+        }
     }
-
-    kf->err += IMU_PROC_NOISE;
-    float gain = kf->err / (kf->err + IMU_MEAS_NOISE);
-    kf->est += gain * (measurement - kf->est);
-    kf->err = (1.0f - gain) * kf->err;
-    return kf->est;
 }
 
+// compute Jacobian F and process noise Q
+static void compute_jacobians(float F[IMU_STATE_SIZE][IMU_STATE_SIZE], float Q[IMU_STATE_SIZE][IMU_STATE_SIZE]) {
+    /* 
+        zero F and Q
+        set F = I
+     */
+    for (int i = 0; i < IMU_STATE_SIZE; i++) {
+        for (int j = 0; j < IMU_STATE_SIZE; j++) {
+            F[i][j] = (i == j) ? 1.0f : 0.0f;
+            Q[i][j] = 0.0f;
+        }
+    }
+
+    // dtheta/dbgz = -dt
+    F[0][1] = -DT;
+
+    // process noise Q: gyro noise + bias walk
+    Q[0][0] = GZ_MEAS_NOISE; // variance of gz
+    Q[1][1] = 1e-7f;         // variance of gyro bias random walk (models slow drift of bias over time)
+}
+
+
+void ekf_predict(ekf_state_t* ekf, float wz) {
+    float bgz = ekf->x[1];
+    float theta_dot = wz - bgz;
+
+    // state prediction
+    ekf->x[0] += theta_dot * DT;
+    // bias remains unchanged (random walk, zero mean gaussian)
+
+    // cov prediction
+    float F[IMU_STATE_SIZE][IMU_STATE_SIZE], Q[IMU_STATE_SIZE][IMU_STATE_SIZE];
+    compute_jacobians(F, Q);
+
+    float P_tmp[IMU_STATE_SIZE][IMU_STATE_SIZE] = {{0}};
+
+    /*
+        P_{n+1} = F * P_n​ * F.T + G * Q_n * G.T
+        Q = diag(gyro bias, random walk)
+    */
+    for (int i = 0; i < IMU_STATE_SIZE; i++)
+        for (int k = 0; k < IMU_STATE_SIZE; k++)
+            for (int j = 0; j < IMU_STATE_SIZE; j++)
+                P_tmp[i][j] += F[i][k] * ekf->P[k][j];
+
+    for (int i = 0; i < IMU_STATE_SIZE; i++) {
+        for (int j = 0; j < IMU_STATE_SIZE; j++) {
+            float sum = Q[i][j];
+            for (int k = 0; k < IMU_STATE_SIZE; k++)
+                sum += P_tmp[i][k] * F[j][k];
+            ekf->P[i][j] = sum;
+        }
+    }
+
+    while (ekf->x[0] >= 2.0f * M_PI)    ekf->x[0] -= 2.0f * M_PI;
+    while (ekf->x[0] <  0)              ekf->x[0] += 2.0f * M_PI;
+}
+
+
+MUTEX_DECL(imu_pub_lock);
+CONDVAR_DECL(imu_pub_condvar);
 
 static THD_WORKING_AREA(waIMUThd, 512);
 static THD_FUNCTION(IMUThd, arg)
 {
-    (void) arg;
+    (void)arg;
     chRegSetThreadName(__FUNCTION__);
 
-    messagebus_topic_t* imu_sub = messagebus_find_topic_blocking(&bus, "/imu"); // subscriber to reader thd
-    messagebus_topic_t* imu_pub = (messagebus_topic_t*) malloc(sizeof(messagebus_topic_t)); // publishes filtered data
+    messagebus_topic_t* imu_sub = messagebus_find_topic_blocking(&bus, "/imu");
+    messagebus_topic_t* imu_pub = (messagebus_topic_t*)malloc(sizeof(messagebus_topic_t));
 
-    imu_data_t msg = {0};
+    imu_data_t raw;
+    yaw_msg_t angle;
+    messagebus_topic_init(imu_pub, &imu_pub_lock, &imu_pub_condvar, &angle, sizeof(yaw_msg_t));
+    messagebus_advertise_topic(&bus, imu_pub, "/imu_yaw");
 
-    MUTEX_DECL(imu_pub_lock);
-    CONDVAR_DECL(imu_pub_condvar);
-
-    messagebus_topic_init(imu_pub, &imu_pub_lock, &imu_pub_condvar, &msg, sizeof(imu_data_t));
-    messagebus_advertise_topic(&bus, imu_pub, "/imu_processed");
-
+    ekf_init(&ekf);
     systime_t time;
 
     while (true) {
         time = chVTGetSystemTime();
 
-        // imu_msg_t imu_values = {0};
-        // messagebus_topic_wait(imu_sub, &imu_values, sizeof(imu_msg_t));
+        imu_msg_t in = {0};
+        messagebus_topic_wait(imu_sub, &in, sizeof(in));
 
-        // imu_data_t data = {
-        //     .acc = { imu_values.acceleration[0], imu_values.acceleration[1], imu_values.acceleration[2] },
-        //     .ang_vel = { imu_values.gyro_rate[0], imu_values.gyro_rate[1], imu_values.gyro_rate[2] }
-        // };
+        raw.acc[0]     = in.acceleration[0];
+        raw.acc[1]     = in.acceleration[1];
+        raw.acc[2]     = in.acceleration[2];
+        raw.ang_vel[0] = in.gyro_rate[0];
+        raw.ang_vel[1] = in.gyro_rate[1];
+        raw.ang_vel[2] = in.gyro_rate[2];
 
-        imu_msg_t raw = {0};
-        messagebus_topic_wait(imu_sub, &raw, sizeof(imu_msg_t));
+        ekf_predict(&ekf, raw.ang_vel[2]);
+        angle.yaw_rad = ekf.x[0];
 
-        imu_data_t unfiltered = {
-            .acc = { raw.acceleration[0], raw.acceleration[1], raw.acceleration[2] },
-            .ang_vel = { raw.gyro_rate[0], raw.gyro_rate[1], raw.gyro_rate[2] }
-        };
-        
-        epuck_printf("Unfiltered:\n%f,\t%f,\t%f\n%f,\t%f,\t%f\n\n",
-        unfiltered.acc[0], unfiltered.acc[1], unfiltered.acc[2],
-        unfiltered.ang_vel[0], unfiltered.ang_vel[1], unfiltered.ang_vel[2]);
+        messagebus_topic_publish(imu_pub, &angle, sizeof(angle));
 
-        imu_data_t filtered;
-        for (int i = 0; i < NB_AXIS; ++i) {
-            filtered.acc[i]     = kalman_update(&acc_filter[i], raw.acceleration[i]);
-            filtered.ang_vel[i] = kalman_update(&gyro_filter[i], raw.gyro_rate[i]);
-        }
-
-        messagebus_topic_publish(imu_pub, &filtered, sizeof(imu_data_t));
-        chThdSleepUntilWindowed(time, time + IMU_THD_PERIOD_MS);
+        chThdSleepUntilWindowed(time, time + MS2ST(IMU_THD_PERIOD_MS));
     }
 }
 
 void imu_init(void) {
     imu_start();
     calibrate_acc();
-	calibrate_gyro();
-
+    calibrate_gyro();
     chThdCreateStatic(waIMUThd, sizeof(waIMUThd), NORMALPRIO, IMUThd, NULL);
 }
