@@ -85,8 +85,29 @@ static THD_FUNCTION(PiRegulator, arg) {
 
 //implement thread to rotate using filtered gyro yaw (should take desired heading as input and return true when completed)
 bool correct_heading(uint16_t target_heading){
+	uint8_t error; 
+	static uint8_t sum_error = 0;
+
+	while (true){
+		
+		
+		
+	} 
 	return false;
 }
+
+static THD_WORKING_AREA(waRotate, 4096);
+static THD_FUNCTION(Rotate, arg) {
+	chRegSetThreadName(__FUNCTION__);
+    (void)arg;
+
+	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
+    yaw_msg_t angle;
+
+	while(1){
+		
+	}
+
 
 static void rotate(int16_t left_speed, int16_t right_speed){
 	right_motor_set_speed(FWD_SPEED);
