@@ -16,10 +16,21 @@
         "stdbool.h": "c",
         "main.h": "c",
         "a_star.h": "c"
-        "motors.h": "c",
+        "motor.h": "c",
         "telemetry.h": "c",
         "main.h": "c",
         "messagebus.h": "c"
         "brain.h": "c"
+        "i2c_bus.h": "c",
+        "hal.h": "c",
+        "imu.h": "c",
+        "mpu9250.h": "c",
+        "inertial.h": "c",
+        "stdint.h": "c",
+        "math.h": "c"
+        "inertial.h": "c",
+        "stdint.h": "c",
+        "stdlib.h": "c",
+        "math.h": "c"
     },
 }

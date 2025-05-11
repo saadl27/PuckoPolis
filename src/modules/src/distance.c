@@ -18,7 +18,7 @@
 /* Kalman calibration (all measured from empirical data) 
    & Kalman filter variables */
 #define DIST_OFFSET_MM 50
-#define PROC_NOISE 0.3f  // process noise (variance)
+#define PROC_NOISE 5.0f  // process noise (variance)
 #define MEAS_NOISE 8.52f // measurement noise (variance)
 
 static float kalman_gain = 0.0f;
@@ -26,7 +26,7 @@ static float estimated_dist = 0.0f;
 static float estimation_err = 100.0f; // high initial uncertainty
 static bool filter_initialized = false;
 
-static THD_WORKING_AREA(waDistanceThd, 256);
+static THD_WORKING_AREA(waDistanceThd, 512);
 static THD_FUNCTION(DistanceThd, arg)
 {
     (void) arg;
