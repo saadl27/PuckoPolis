@@ -9,6 +9,7 @@
 #include "main.h"
 #include "modules/include/camera.h"
 #include "modules/include/brain.h"
+#include "modules/include/inertial.h"
 
 //simple PI regulator implementation
 int16_t pi_regulator(float distance, float goal){
@@ -56,7 +57,7 @@ static THD_FUNCTION(PiRegulator, arg) {
     while(1){
         time = chVTGetSystemTime();
         
-		if (get_state() == MISSION){
+		if (get_state() == MISSION) {
 			//computes the speed to give to the motors
 			//distance_cm is modified by the image processing thread
 			//speed = pi_regulator(get_distance_cm(), GOAL_DISTANCE);
@@ -72,42 +73,71 @@ static THD_FUNCTION(PiRegulator, arg) {
 			right_motor_set_speed(speed - speed_correction);
 			left_motor_set_speed(speed + speed_correction);
 		
-		} else {
-			right_motor_set_speed(0);
-			left_motor_set_speed(0);
-		}
-			
+		} 
 		//100Hz
 		chThdSleepUntilWindowed(time, time + MS2ST(10));
 
     }
 }
 
-//implement thread to rotate using filtered gyro yaw (should take desired heading as input and return true when completed)
-bool correct_heading(uint16_t target_heading){
-	uint8_t error; 
-	static uint8_t sum_error = 0;
-
-	while (true){
-		
-		
-		
-	} 
-	return false;
+static void translate(void) {
+	right_motor_set_speed(FWD_SPEED);
+	left_motor_set_speed(FWD_SPEED);
+	//about 500ms at 168MHz
+    for(uint32_t i = 0 ; i < 21000000 ; i++){
+        __asm__ volatile ("nop");
+    }
 }
 
-static THD_WORKING_AREA(waRotate, 4096);
+void stop_motors(void){
+	right_motor_set_speed(0);
+	left_motor_set_speed(0);
+}
+
+//implement thread to rotate using filtered gyro yaw (should take desired heading as input and return true when completed)
+void correct_heading(uint16_t target_heading){
+	translate();
+	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
+    yaw_msg_t angle;
+	float error = 0;
+
+	while (true){
+		messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
+		error = angle.yaw_rad - target_heading;
+		if (fabs(error) < ERROR_ANGLE) break;
+		while (error >= M_PI) error -= 2*M_PI;
+		while (error < -M_PI) error += 2*M_PI; 
+
+		if (error >= 0){
+			right_motor_set_speed(ROT_SPEED);
+			left_motor_set_speed(-ROT_SPEED);
+		} else {
+			right_motor_set_speed(-ROT_SPEED);
+			left_motor_set_speed(ROT_SPEED);
+		}
+		
+	} 
+}
+
+/* static THD_WORKING_AREA(waRotate, 4096);
 static THD_FUNCTION(Rotate, arg) {
 	chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
 	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
     yaw_msg_t angle;
+	float error = 0;
 
 	while(1){
-		
-	}
+		if (get_state() == INTERMEDIATE){
+			messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
+			error = angle.yaw_rad - 
+			
 
+		}
+
+	}
+} */
 
 static void rotate(int16_t left_speed, int16_t right_speed){
 	right_motor_set_speed(FWD_SPEED);
@@ -139,7 +169,7 @@ void rotate_cw(void){
 }
 
 static void pi_regulator_start(void) {
-	chThdCreateStatic(waPiRegulator, sizeof(waPiRegulator), NORMALPRIO, PiRegulator, NULL);
+	chThdCreateStatic(waPiRegulator, sizeof(waPiRegulator), NORMALPRIO+1, PiRegulator, NULL);
 }
 
 void motor_init(){

@@ -36,8 +36,6 @@ int main(void) {
     brain_init();
     imu_init();
     tof_init();
-
-
 }
 
 #define STACK_CHK_GUARD 0xe2dee396

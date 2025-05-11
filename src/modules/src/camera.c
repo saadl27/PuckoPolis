@@ -124,7 +124,7 @@ bool detect_color(uint8_t *buffer){
     uint32_t drop = (uint32_t) (buffer[i_max] - buffer[i_min]);
     uint32_t threshold = mean * THRESHOLD_SCALE;
 
-    epuck_printf("drop = %lu, threshold = %lu\n", drop, threshold);
+    //epuck_printf("drop = %lu, threshold = %lu\n", drop, threshold);
 
     if (drop > threshold){
         return 0; 

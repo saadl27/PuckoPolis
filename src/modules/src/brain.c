@@ -37,6 +37,7 @@ static THD_FUNCTION(FSM, arg) {
 
         if (a_star_find_path(graph, path, start, end)){
             state = MISSION;
+            SendNodeToComputer(start);
         }
     }
 
@@ -45,30 +46,34 @@ static THD_FUNCTION(FSM, arg) {
         
         switch (color_values.color) {
             case RED_COLOR:
-                state = STOP; 
+                //epuck_printf("color = red\n");
+                state = STOP;
+                stop_motors();
                 break;
 
             case GREEN_COLOR: 
+                //epuck_printf("color = green\n");
                 if (state == STOP){
                     state = MISSION;
                 }
                 break;
 
             case BLUE_COLOR: 
+                //epuck_printf("color = blue\n");
                 state = INTERMEDIATE;
                 uint8_t target_heading = get_heading(graph, path->path[path_step], path->path[path_step+1]);
-                if (correct_heading(target_heading)){
-                    state = MISSION; 
-                    ++path_step;
-                    SendNodeToComputer(path->path[path_step]);
-                    if (path_step == path->path_len){
-                        state = DONE;
-                    }
+                correct_heading(target_heading);
+                state = MISSION; 
+                ++path_step;
+                SendNodeToComputer(path->path[path_step]);
+                if (path_step == path->path_len){
+                    state = DONE;
                 }
                 //rotate_cw(); 
                 break;
 
             case BLACK_COLOR: 
+                //epuck_printf("color = black\n");
                 break;
         }
     }
