@@ -39,6 +39,7 @@ void SendUint8ToComputer(uint8_t* data, uint16_t size)
 } */
 
 void SendNodeToComputer(uint8_t node) {
+    epuck_printf("SENT NODE: %d\n", node);
     chprintf((BaseSequentialStream *)&SD3, "CURRENT_NODE:%u\n", node);
 }
 

@@ -36,6 +36,14 @@ int main(void) {
     brain_init();
     imu_init();
     tof_init();
+
+    systime_t time;
+
+    while (true) {
+        time = chVTGetSystemTime();
+
+        chThdSleepUntilWindowed(time, time + MS2ST(LOOP_PERIOD_MS));
+    }
 }
 
 #define STACK_CHK_GUARD 0xe2dee396

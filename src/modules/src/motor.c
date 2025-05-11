@@ -85,7 +85,7 @@ static void translate(void) {
 	right_motor_set_speed(FWD_SPEED);
 	left_motor_set_speed(FWD_SPEED);
 	//about 500ms at 168MHz
-    for(uint32_t i = 0 ; i < 21000000 ; i++){
+    for(uint32_t i = 0 ; i < 21000000 * 2; i++){
         __asm__ volatile ("nop");
     }
 }
@@ -116,13 +116,15 @@ void correct_heading(float target_heading){
 						angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
 
 		if (error >= 0) {
-			right_motor_set_speed(ROT_SPEED);
-			left_motor_set_speed(-ROT_SPEED);
-		} else {
 			right_motor_set_speed(-ROT_SPEED);
 			left_motor_set_speed(ROT_SPEED);
+		} else {
+			right_motor_set_speed(ROT_SPEED);
+			left_motor_set_speed(-ROT_SPEED);
 		}
-	} 
+	}
+	right_motor_set_speed(FWD_SPEED);
+	left_motor_set_speed(FWD_SPEED);
 }
 
 /* static THD_WORKING_AREA(waRotate, 4096);
@@ -175,7 +177,7 @@ void rotate_cw(void){
 }
 
 static void pi_regulator_start(void) {
-	chThdCreateStatic(waPiRegulator, sizeof(waPiRegulator), NORMALPRIO+1, PiRegulator, NULL);
+	chThdCreateStatic(waPiRegulator, sizeof(waPiRegulator), NORMALPRIO, PiRegulator, NULL);
 }
 
 void motor_init(){
