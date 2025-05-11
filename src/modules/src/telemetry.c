@@ -42,8 +42,16 @@ void SendNodeToComputer(uint8_t node) {
     chprintf((BaseSequentialStream *)&SD3, "CURRENT_NODE:%u\n", node);
 }
 
-uint8_t ReceiveDestinationFromComputer(void) {
-    static const char prefix[] = "DEST:";
+uint8_t ReceiveDestinationFromComputer(void){
+	ReceiveFromComputer("DEST:");
+}
+
+uint8_t ReceiveStartFromComputer(void){
+	ReceiveFromComputer("START:");
+}
+
+static uint8_t ReceiveFromComputer(const char* mess) {
+    const char prefix[] = mess;
     const size_t prefix_len = sizeof(prefix) - 1;
     size_t match_idx = 0;
     char c;

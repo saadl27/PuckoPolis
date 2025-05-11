@@ -8,6 +8,7 @@
 #include "modules/include/camera.h"
 #include "modules/include/motor.h"
 #include "modules/include/a_star.h"
+#include "main.h"
 
 static uint8_t state = READING;
 
@@ -31,7 +32,7 @@ static THD_FUNCTION(FSM, arg) {
     color_msg_t color_values;
 
     while (state == READING){
-        uint8_t start = 1; //from computer later
+        uint8_t start = ReceiveStartFromComputer();
         uint8_t end = ReceiveDestinationFromComputer();
 
         if (a_star_find_path(graph, path, start, end)){
@@ -47,7 +48,6 @@ static THD_FUNCTION(FSM, arg) {
                 break;
 
             case GREEN_COLOR: 
- 
                 break;
 
             case BLUE_COLOR: 
@@ -56,6 +56,10 @@ static THD_FUNCTION(FSM, arg) {
                 if (correct_heading(target_heading)){
                     state = MISSION; 
                     ++path_step;
+                    SendNodeToComputer(path->path[path_step]);
+                    if (path_step == path->path_len){
+                        state = DONE;
+                    }
                 }
                 //rotate_cw(); 
                 break;

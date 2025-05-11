@@ -48,7 +48,8 @@ typedef struct {
 } Graph;
 
 void a_star_init(Graph* graph);
-// bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end);
+bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end);
+uint8_t get_heading(Graph* graph, uint8_t node1, uint8_t node2);
 // uint16_t a_star_calculate_heuristic(uint16_t node, uint16_t goal);
 
 //testing purposes

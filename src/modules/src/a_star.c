@@ -163,10 +163,10 @@ uint8_t get_heading(Graph* graph, uint8_t node1, uint8_t node2) {
     bool inverse = false;
     uint8_t edge_nb = 0;
     for (uint16_t i = 0; i < (graph->num_edges); ++i ){
-        if (graph->edges[i][0] == node1 & graph->edges[i][1] == node2){
+        if ((graph->edges[i][0] == node1) & (graph->edges[i][1] == node2)){
             edge_nb = i; 
             break;
-        } else if (graph->edges[i][1] == node1 & graph->edges[i][0] == node2){
+        } else if ((graph->edges[i][1] == node1) & (graph->edges[i][0] == node2)){
             edge_nb = i;
             inverse = true;
             break;

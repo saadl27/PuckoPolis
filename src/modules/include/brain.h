@@ -6,7 +6,7 @@ enum State {
     READING,
     MISSION, 
     INTERMEDIATE,
-    SUCCESS
+    DONE
 };
 
 void brain_init(void);

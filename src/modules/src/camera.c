@@ -3,10 +3,12 @@
 #include <chprintf.h>
 #include <usbcfg.h>
 #include <camera/po8030.h>
+#include <camera/dcmi_camera.h>
 
 #include "modules/include/camera.h"
 #include "modules/include/telemetry.h"
 #include "modules/include/brain.h"
+#include "main.h"
 
 #define INDEX_OFFSET 50
 #define THRESHOLD_SCALE 1.2f

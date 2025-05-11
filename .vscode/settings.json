@@ -6,9 +6,8 @@
     //      -> "com_port": "/dev/ttyACMx"
     // MacOS: use the command "ls /dev/cu.*" and use the lowest one
     //      -> "com_port": "/dev/cu.usbmodemEPUCKx"
-    "com_port": "/dev/cu.usbmodemEPUCK1",
+    "com_port": "\\\\.\\COM4",
     "files.associations": {
-<<<<<<< HEAD
         "memory_protection.h": "c",
         "telemetry.h": "c",
         "vl53l0x.h": "c",
@@ -17,12 +16,10 @@
         "stdbool.h": "c",
         "main.h": "c",
         "a_star.h": "c"
-=======
         "motors.h": "c",
         "telemetry.h": "c",
         "main.h": "c",
         "messagebus.h": "c"
         "brain.h": "c"
->>>>>>> color_pipeline_with_msg_bus
     },
 }
