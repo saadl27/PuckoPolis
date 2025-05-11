@@ -32,11 +32,11 @@ int main(void) {
     epuck_printf("hello\n");
 
 
-    messagebus_topic_t* dist_topic = messagebus_find_topic_blocking(&bus, "/distance");
-    messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_processed");
+    // messagebus_topic_t* dist_topic = messagebus_find_topic_blocking(&bus, "/distance");
+    // tof_msg_t dist;
 
-    tof_msg_t dist = {0};
-    imu_data_t imu = {0};
+    yaw_msg_t angle;
+    messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
 
     systime_t time;
 
@@ -44,8 +44,9 @@ int main(void) {
     while (1) {
         time = chVTGetSystemTime();
 
-        messagebus_topic_wait(dist_topic, &dist, sizeof(tof_msg_t));
-        messagebus_topic_wait(imu_topic, &imu, sizeof(imu_data_t));
+        messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
+
+        epuck_printf("yaw = %f [deg]\n", angle.yaw_rad * RAD2DEG);
 
         chThdSleepUntilWindowed(time, time + LOOP_PERIOD_MS);
     }

@@ -22,5 +22,9 @@
         "inertial.h": "c",
         "stdint.h": "c",
         "math.h": "c"
+        "inertial.h": "c",
+        "stdint.h": "c",
+        "stdlib.h": "c",
+        "math.h": "c"
     },
 }
