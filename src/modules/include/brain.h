@@ -6,6 +6,7 @@ enum State {
     READING,
     MISSION, 
     INTERMEDIATE,
+    STOP,
     DONE
 };
 

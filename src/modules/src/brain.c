@@ -44,10 +44,14 @@ static THD_FUNCTION(FSM, arg) {
         messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
         
         switch (color_values.color) {
-            case RED_COLOR: 
+            case RED_COLOR:
+                state = STOP; 
                 break;
 
             case GREEN_COLOR: 
+                if (state == STOP){
+                    state = MISSION;
+                }
                 break;
 
             case BLUE_COLOR: 
