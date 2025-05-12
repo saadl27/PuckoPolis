@@ -24,6 +24,7 @@ typedef struct {
 } ekf_state_t; // EKF state x and covariance P
 
 void imu_init(void);
+void set_init_yaw(float yaw);
 
 
 #endif /* __INERTIAL_H__ */
