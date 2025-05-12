@@ -14,6 +14,8 @@
 
 #define FSM_THD_LOOP_MS 100
 
+#define OBSTACLE_THRESHOLD_MM 10
+
 static State state = READING;
 
 State get_state() {
@@ -161,6 +163,8 @@ static THD_FUNCTION(DetectObstacle, arg) {
 
         messagebus_topic_wait(dist_topic, &tof_dist, sizeof(tof_msg_t));
         epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
+
+        if (tof_dist.dist_mm)
 
         chThdSleepUntilWindowed(time, time + MS2ST(TOF_THD_PERIOD_MS));
     }
