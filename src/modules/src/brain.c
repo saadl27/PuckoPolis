@@ -55,7 +55,6 @@ static THD_FUNCTION(FSM, arg) {
         messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
 
         if (state == MISSION) {
-            
             switch (color_values.color) {
                 case RED_COLOR:
                     // epuck_printf("color = red\n");
@@ -63,14 +62,14 @@ static THD_FUNCTION(FSM, arg) {
                     stop_motors();
                     break;
 
-                case GREEN_COLOR: 
+                case GREEN_COLOR:
                     // epuck_printf("color = green\n");
                     if (state == STOP){
                         state = MISSION;
                     }
                     break;
 
-                case BLUE_COLOR: 
+                case BLUE_COLOR:
                     //epuck_printf("color = blue\n");
                     state = INTERMEDIATE;
                     ++path_step;
@@ -108,6 +107,39 @@ static THD_FUNCTION(FSM, arg) {
 
         if (state == DONE) {
             stop_motors();
+        }
+
+        if (state == STOP) {
+            switch (color_values.color) {
+                case RED_COLOR:
+                    break;
+
+                case GREEN_COLOR:
+                    state = MISSION;
+                    break;
+
+                case BLUE_COLOR:
+                    state = INTERMEDIATE;
+                    ++path_step;
+                    epuck_printf("=============================================\nPATH STEP = %d | PATH LEN = %d\n", path_step, path->path_len);
+                    if (path_step == path->path_len - 1) {
+                        state = DONE;
+                        stop_motors();
+                        SendNodeToComputer(path->path[path->path_len - 1]);
+                    } else {
+                        float target_heading = (float) get_heading(graph, path->path[path_step],
+                                                path->path[path_step+1]) * M_PI_4;
+                        epuck_printf("[brain] heading = %f\nbefore loop\n", target_heading);
+                        correct_heading(target_heading);
+                        epuck_printf("[brain] AFTER loop\n");
+                        SendNodeToComputer(path->path[path_step]);
+                    }
+                    break;
+
+                case BLACK_COLOR:
+                    state = MISSION;
+                    break;
+            }
         }
         chThdSleepUntilWindowed(time, time + MS2ST(FSM_THD_LOOP_MS));
     }
