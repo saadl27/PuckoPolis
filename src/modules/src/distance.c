@@ -13,12 +13,11 @@
 #include "sensors/VL53L0X/VL53L0X.h"
 
 #define TOF_INIT_TIME_MS 300
-#define TOF_THD_PERIOD_MS 100
 
 /* Kalman calibration (all measured from empirical data) 
    & Kalman filter variables */
 #define DIST_OFFSET_MM 50
-#define PROC_NOISE 5.0f  // process noise (variance)
+#define PROC_NOISE 7.50f  // process noise (variance)
 #define MEAS_NOISE 8.52f // measurement noise (variance)
 
 static float kalman_gain = 0.0f;

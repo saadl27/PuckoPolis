@@ -9,6 +9,7 @@
 #include "modules/include/camera.h"
 #include "modules/include/motor.h"
 #include "modules/include/a_star.h"
+#include "modules/include/distance.h"
 #include "main.h"
 
 #define FSM_THD_LOOP_MS 100
@@ -39,6 +40,9 @@ static THD_FUNCTION(FSM, arg) {
     while (true) {
         time = chVTGetSystemTime();
         epuck_printf("[state] %d\n", state);
+
+        messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
+
         if (state == READING) {
             uint8_t start = ReceiveStartFromComputer();
             uint8_t end = ReceiveDestinationFromComputer();
@@ -49,8 +53,6 @@ static THD_FUNCTION(FSM, arg) {
                 test_path(graph, path, start, end);
             }
         }
-
-        messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
 
         if (state == MISSION) {
             switch (color_values.color) {
@@ -143,6 +145,29 @@ static THD_FUNCTION(FSM, arg) {
     }
 }
 
+static THD_WORKING_AREA(waDetectObstacle, 512);
+static THD_FUNCTION(DetectObstacle, arg) {
+
+    chRegSetThreadName(__FUNCTION__);
+    (void)arg;
+    
+    messagebus_topic_t* dist_topic = messagebus_find_topic_blocking(&bus, "/distance");
+    tof_msg_t tof_dist;
+
+    systime_t time;
+
+    while (true) {
+        time = chVTGetSystemTime();
+
+        messagebus_topic_wait(dist_topic, &tof_dist, sizeof(tof_msg_t));
+        epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
+
+        chThdSleepUntilWindowed(time, time + MS2ST(TOF_THD_PERIOD_MS));
+    }
+
+}
+
 void brain_init(void) {
     chThdCreateStatic(waFSM, sizeof(waFSM), NORMALPRIO, FSM, NULL);
+    chThdCreateStatic(waDetectObstacle, sizeof(waDetectObstacle), NORMALPRIO, DetectObstacle, NULL);
 }
