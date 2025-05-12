@@ -85,7 +85,7 @@ static void translate(void) {
 	right_motor_set_speed(FWD_SPEED);
 	left_motor_set_speed(FWD_SPEED);
 	//about 500ms at 168MHz
-    for(uint32_t i = 0 ; i < 21000000 * 2; i++){
+    for(uint32_t i = 0 ; i < 21000000; i++){
         __asm__ volatile ("nop");
     }
 }

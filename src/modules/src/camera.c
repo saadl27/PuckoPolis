@@ -10,9 +10,14 @@
 #include "modules/include/brain.h"
 #include "main.h"
 
-#define INDEX_OFFSET 50
-#define THRESHOLD_SCALE 1.4f
-#define POLLING_COUNT 5
+#define INDEX_OFFSET                50
+#define THRESHOLD_SCALE             1.4f
+
+#define RED_THRESHOLD_SCALE         0.7f
+#define GREEN_THRESHOLD_SCALE       0.7f
+#define BLUE_THRESHOLD_SCALE        1.35f
+
+#define POLLING_COUNT               5
 
 static float distance_cm = 0;
 static uint16_t line_position = IMAGE_BUFFER_SIZE/2;    //middle
@@ -105,7 +110,7 @@ uint16_t extract_line_width(uint8_t *buffer){
     }
 }
 
-bool detect_color(uint8_t *buffer){
+bool detect_color(uint8_t *buffer, color_detection_t color) {
     uint32_t mean = 0;
     uint16_t i_min = 0;
     uint16_t i_max = 0;
@@ -123,26 +128,29 @@ bool detect_color(uint8_t *buffer){
     mean /= IMAGE_BUFFER_SIZE;
 
     uint32_t drop = (uint32_t) (buffer[i_max] - buffer[i_min]);
-    uint32_t threshold = mean * THRESHOLD_SCALE;
+    float scaler = 0.0f;
+    switch (color) {
+        case RED_COLOR: scaler = RED_THRESHOLD_SCALE; break;
+        case GREEN_COLOR: scaler = GREEN_THRESHOLD_SCALE; break;
+        case BLUE_COLOR: scaler = BLUE_THRESHOLD_SCALE; break;
+        default: break;
+    }
+    uint32_t threshold = scaler * mean;
 
-    //epuck_printf("drop = %lu, threshold = %lu\n", drop, threshold);
+    // epuck_printf("drop = %lu, threshold = %lu\n", drop, threshold);
 
     if (drop > threshold){
-        return 0; 
-    }
-    else {
-        return 1;
+        return false; 
+    } else {
+        return true;
     }
 }
 
 color_detection_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint8_t *blue_buffer){
-    bool red = detect_color(red_buffer);
-    bool green = detect_color(green_buffer);
-    bool blue = detect_color(blue_buffer);
+    bool red = detect_color(red_buffer, RED_COLOR);
+    bool green = detect_color(green_buffer, GREEN_COLOR);
+    bool blue = detect_color(blue_buffer, BLUE_COLOR);
 
-    // bool red = 0;
-    // bool green = 0;
-    // bool blue = 0;
     if (green){
         return GREEN_COLOR;
     }
