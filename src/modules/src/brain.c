@@ -9,6 +9,7 @@
 #include "modules/include/camera.h"
 #include "modules/include/motor.h"
 #include "modules/include/a_star.h"
+#include "modules/include/inertial.h"
 #include "main.h"
 
 #define FSM_THD_LOOP_MS 100
@@ -46,6 +47,7 @@ static THD_FUNCTION(FSM, arg) {
             if (a_star_find_path(graph, path, start, end)){
                 state = MISSION;
                 SendNodeToComputer(start);
+                set_init_yaw(get_heading(graph, path->path[0], path->path[1]) * M_PI_4);
                 test_path(graph, path, start, end);
             }
         }

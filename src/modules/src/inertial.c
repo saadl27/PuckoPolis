@@ -22,6 +22,9 @@
 
 static ekf_state_t ekf;
 
+void set_init_yaw(float yaw){
+    ekf.x[0] = yaw; 
+}
 
 void ekf_init(ekf_state_t* ekf) {
     for (int i = 0; i < IMU_STATE_SIZE; i++) {
