@@ -14,7 +14,7 @@
 
 #define FSM_THD_LOOP_MS 100
 
-#define OBSTACLE_THRESHOLD_MM 10
+#define OBSTACLE_THRESHOLD_MM ((uint16_t) 10)
 
 static State state = READING;
 
@@ -32,7 +32,8 @@ static THD_FUNCTION(FSM, arg) {
     a_star_init(graph);
 
     Path* path = (Path*) malloc(sizeof(Path));
-    uint8_t path_step = 0;
+    int8_t path_step = 0;
+    uint8_t start = 0, end = 0;
 
     messagebus_topic_t* color_topic = messagebus_find_topic_blocking(&bus, "/color");
     color_msg_t color_values;
@@ -46,13 +47,38 @@ static THD_FUNCTION(FSM, arg) {
         messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
 
         if (state == READING) {
-            uint8_t start = ReceiveStartFromComputer();
-            uint8_t end = ReceiveDestinationFromComputer();
+            start = ReceiveStartFromComputer();
+            end = ReceiveDestinationFromComputer();
 
-            if (a_star_find_path(graph, path, start, end)){
+            if (a_star_find_path(graph, path, start, end)) {
                 state = MISSION;
                 SendNodeToComputer(start);
                 test_path(graph, path, start, end);
+            }
+        }
+
+        if (state == RECALCULATING_PATH) {
+            a_star_set_edge_freeness(graph, path->path[path_step], path->path[path_step + 1], false);
+            // test_path(graph, path, start, end);
+
+            start = path->path[path_step];
+            path_step = 0;
+
+            epuck_printf("[recalculating path] start = %u, path step = %u, end = %u\n", start, path_step, end);
+            
+            if (a_star_find_path(graph, path, start, end)) {
+                state = MISSION;
+                epuck_printf("[path] start = %u, end = %u, path len = %u, path cost = %u, path = \n",
+                path->start, path->end, path->path_len, path->path_cost);
+                for (int i = 0; i < 15; ++i) {
+                    epuck_printf("%u ", path->path[i]);
+                }
+                epuck_printf("\n");
+                path_step--;
+                // SendNodeToComputer(start);
+            } else {
+                epuck_printf("No new path found\n");
+                state = READING;
             }
         }
 
@@ -66,9 +92,6 @@ static THD_FUNCTION(FSM, arg) {
 
                 case GREEN_COLOR:
                     // epuck_printf("color = green\n");
-                    if (state == STOP){
-                        state = MISSION;
-                    }
                     break;
 
                 case BLUE_COLOR:
@@ -147,7 +170,7 @@ static THD_FUNCTION(FSM, arg) {
     }
 }
 
-static THD_WORKING_AREA(waDetectObstacle, 512);
+static THD_WORKING_AREA(waDetectObstacle, 1024);
 static THD_FUNCTION(DetectObstacle, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -164,7 +187,11 @@ static THD_FUNCTION(DetectObstacle, arg) {
         messagebus_topic_wait(dist_topic, &tof_dist, sizeof(tof_msg_t));
         epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
 
-        if (tof_dist.dist_mm)
+        if (tof_dist.dist_mm < OBSTACLE_THRESHOLD_MM && state == MISSION) {
+            state = IDLE;
+            rotate_relative(M_PI);
+            state = RECALCULATING_PATH;
+        }
 
         chThdSleepUntilWindowed(time, time + MS2ST(TOF_THD_PERIOD_MS));
     }

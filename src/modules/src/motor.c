@@ -85,7 +85,7 @@ static void translate(void) {
 	right_motor_set_speed(FWD_SPEED);
 	left_motor_set_speed(FWD_SPEED);
 	//about 500ms at 168MHz
-    for(uint32_t i = 0 ; i < 21000000; i++){
+    for(uint32_t i = 0 ; i < 21000000 * 2; i++){
         __asm__ volatile ("nop");
     }
 }
@@ -96,10 +96,10 @@ void stop_motors(void){
 }
 
 //implement thread to rotate using filtered gyro yaw (should take desired heading as input and return true when completed)
-void correct_heading(float target_heading){
-	epuck_printf("[motors] before moving straight\n");
+void correct_heading(float target_heading) {
+	// epuck_printf("[motors] before moving straight\n");
 	translate();
-	epuck_printf("[motors] AFTER moving straight\n");
+	// epuck_printf("[motors] AFTER moving straight\n");
 	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
     yaw_msg_t angle;
 	float error = 0;
@@ -126,6 +126,44 @@ void correct_heading(float target_heading){
 	right_motor_set_speed(FWD_SPEED);
 	left_motor_set_speed(FWD_SPEED);
 }
+
+void rotate_relative(float relative_angle) {
+	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
+    yaw_msg_t angle;
+	float error = 0;
+
+	messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
+	float initial_yaw = angle.yaw_rad;
+
+	float target_heading = initial_yaw + relative_angle;
+
+	while (target_heading >= 2.0f * M_PI)	target_heading -= 2.0f * M_PI;
+	while (target_heading < 0.0f)			target_heading += 2.0f * M_PI;
+
+	while (true) {
+		messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
+		error = angle.yaw_rad - target_heading;
+
+		while (error >= M_PI) error -= 2.0f * M_PI;
+		while (error < -M_PI) error += 2.0f * M_PI;
+
+		epuck_printf("[motors] current = %f, \t target = %f, \t error = %f\n",
+						angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
+
+		if (fabsf(error) < ERROR_ANGLE) break;
+
+		if (error >= 0) {
+			right_motor_set_speed(-ROT_SPEED);
+			left_motor_set_speed(ROT_SPEED);
+		} else {
+			right_motor_set_speed(ROT_SPEED);
+			left_motor_set_speed(-ROT_SPEED);
+		}
+	}
+	right_motor_set_speed(FWD_SPEED);
+	left_motor_set_speed(FWD_SPEED);
+}
+
 
 /* static THD_WORKING_AREA(waRotate, 4096);
 static THD_FUNCTION(Rotate, arg) {

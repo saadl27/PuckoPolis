@@ -3,9 +3,11 @@
 
 
 typedef enum {
-    READING = 0,
+    IDLE = 0,
+    READING,
     MISSION, 
     INTERMEDIATE,
+    RECALCULATING_PATH,
     STOP,
     DONE
 } State;

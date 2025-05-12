@@ -91,10 +91,8 @@ bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end) {
     path->path_len = 0;
     path->path_cost = 0;
 
-    // create node array
     Node nodes[NUM_NODES];
     for (uint8_t i = 0; i < graph->num_nodes; i++) {
-        nodes[i].index = i + 1;
         nodes[i].g_cost = 0xffff; // high value
         nodes[i].h_cost = a_star_calculate_heuristic(i + 1, end);
         nodes[i].f_cost = 0xffff;

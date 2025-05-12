@@ -15,7 +15,7 @@
 
 #define RED_THRESHOLD_SCALE         0.7f
 #define GREEN_THRESHOLD_SCALE       0.7f
-#define BLUE_THRESHOLD_SCALE        1.35f
+#define BLUE_THRESHOLD_SCALE        1.2f
 
 #define POLLING_COUNT               5
 

@@ -21,7 +21,6 @@ typedef enum {
 } Orientation;
 
 typedef struct {
-    uint8_t index;
     uint16_t g_cost; // cost from start to this node
     uint16_t h_cost; // heuristic cost from this node to the end
     uint16_t f_cost; // g + h
