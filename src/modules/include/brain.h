@@ -12,5 +12,6 @@ typedef enum {
 
 void brain_init(void);
 State get_state(void);
+void reset(void);
 
 #endif /* __BRAIN_H__ */

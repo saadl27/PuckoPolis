@@ -11,11 +11,15 @@
 // In order to be able to use the RGB LEDs and User button
 // These funtcions are handled by the ESP32 and the communication with the uC is done via SPI
 #include <spi_comm.h>
+#include "modules/include/telemetry.h"
+#include "modules/include/brain.h"
 
 /*
 	C standard lib-like printf helper wrapper around chprintf 
 	to avoid having to provide stream
 */
+BSEMAPHORE_DECL(reset_sem, TRUE);
+
 
 void epuck_printf(const char *fmt, ...) {
     va_list args;
@@ -96,6 +100,40 @@ uint8_t ReceiveStartFromComputer(void) {
 	return ReceiveFromComputer(str);
 }
 
+static THD_WORKING_AREA(waReceiveReset, 256);
+static THD_FUNCTION(ReceiveReset, arg) {
+
+    chRegSetThreadName(__FUNCTION__);
+    (void)arg;
+
+    const char* prefix = "RESET";
+    const size_t prefix_len = sizeof(prefix) - 1;
+    size_t match_idx = 0;
+    char c;
+
+    BaseSequentialStream *bss = (BaseSequentialStream *)&SD3;
+
+    // Sync on the prefix "DEST:"
+    while (true) {
+        if (get_state() != READING){
+            chSequentialStreamRead(bss, (uint8_t *)&c, 1);
+            if (c == prefix[match_idx]) {
+                match_idx++;
+                if (match_idx == prefix_len) {
+                    chBSemSignal(&reset_sem);
+                    epuck_printf("---------------[RESET]----------------");
+                    // Full prefix matched
+                }
+            }
+            else {
+                // Partial match reset: if this char could be the start of prefix, keep it
+                match_idx = (c == prefix[0]) ? 1 : 0;
+            }
+        }
+        chThdSleepMilliseconds(100);
+    }
+}
+
 static void serial_start(void)
 {
 	static SerialConfig ser_cfg = {
@@ -114,7 +152,8 @@ void telemetry_init(void)
     serial_start();
     //start the USB communication
     usb_start();
-
     //starts RGB LEDS and User button managment
 	spi_comm_start();
+
+    chThdCreateStatic(waReceiveReset, sizeof(waReceiveReset), NORMALPRIO, ReceiveReset, NULL);
 }
