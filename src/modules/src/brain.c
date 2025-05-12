@@ -9,7 +9,6 @@
 #include "modules/include/camera.h"
 #include "modules/include/motor.h"
 #include "modules/include/a_star.h"
-#include "modules/include/inertial.h"
 #include "main.h"
 
 #define FSM_THD_LOOP_MS 100
@@ -47,7 +46,6 @@ static THD_FUNCTION(FSM, arg) {
             if (a_star_find_path(graph, path, start, end)){
                 state = MISSION;
                 SendNodeToComputer(start);
-                set_init_yaw(get_heading(graph, path->path[0], path->path[1]) * M_PI_4);
                 test_path(graph, path, start, end);
             }
         }
@@ -58,8 +56,8 @@ static THD_FUNCTION(FSM, arg) {
             switch (color_values.color) {
                 case RED_COLOR:
                     // epuck_printf("color = red\n");
-                    state = STOP;
-                    stop_motors();
+                    // state = STOP;
+                    // stop_motors();
                     break;
 
                 case GREEN_COLOR:
@@ -89,7 +87,7 @@ static THD_FUNCTION(FSM, arg) {
                     }
                     break;
 
-                case BLACK_COLOR: 
+                case BLACK_COLOR:
                     //epuck_printf("color = black\n");
                     break;
             }
