@@ -81,7 +81,7 @@ class SerialThread(Thread):
 
     def send_start(self, node_id):
         """
-        Send START command to robot; catch and report any Serial errors.
+        Send START command to robot.
         """
         try:
             msg = f'START:{node_id}\n'
@@ -91,13 +91,23 @@ class SerialThread(Thread):
 
     def send_destination(self, node_id):
         """
-        Send DEST command to robot; catch and report any Serial errors.
+        Send DEST command to robot.
         """
         try:
             msg = f'DEST:{node_id}\n'
             self.port.write(msg.encode())
         except serial.SerialException as e:
             print(f"⚠️ Failed to send DEST command (node {node_id}): {e}")
+
+    def send_reset(self):
+        """
+        Send RESET command to robot.
+        """
+        try:
+            msg = 'RESET\n'
+            self.port.write(msg.encode())
+        except serial.SerialException as e:
+            print(f"⚠️ Failed to send RESET command: {e}")
 
     def stop(self):
         self.alive = False
@@ -134,16 +144,20 @@ if __name__ == '__main__':
     dest_text    = panel.text(0.1, 0.55, 'Destination:   --', fontsize=12)
 
     # Start input box and button
-    sb_ax = fig.add_axes([0.05, 0.3, 0.3, 0.05], facecolor='#f0f0f0')
+    sb_ax = fig.add_axes([0.05, 0.28, 0.3, 0.05], facecolor='#f0f0f0')
     start_box = TextBox(sb_ax, 'Set start:', initial='')
-    sb_btn_ax = fig.add_axes([0.05, 0.23, 0.15, 0.05], facecolor='#5c8ebf')
+    sb_btn_ax = fig.add_axes([0.05, 0.21, 0.15, 0.05], facecolor='#5c8ebf')
     start_btn = Button(sb_btn_ax, 'Start', color='#5c8ebf', hovercolor='#4978a2')
 
     # Destination input box and button
-    db_ax = fig.add_axes([0.05, 0.15, 0.3, 0.05], facecolor='#f0f0f0')
+    db_ax = fig.add_axes([0.05, 0.13, 0.3, 0.05], facecolor='#f0f0f0')
     dest_box = TextBox(db_ax, 'Go to node:', initial='')
-    db_btn_ax = fig.add_axes([0.05, 0.08, 0.15, 0.05], facecolor='#66c2a5')
+    db_btn_ax = fig.add_axes([0.05, 0.06, 0.15, 0.05], facecolor='#66c2a5')
     dest_btn = Button(db_btn_ax, 'Go', color='#66c2a5', hovercolor='#4da077')
+
+    # Reset button
+    rb_ax = fig.add_axes([0.22, 0.06, 0.15, 0.05], facecolor='#d9534f')
+    reset_btn = Button(rb_ax, 'Reset', color='#d9534f', hovercolor='#c9302c')
 
     # Map panel
     ax = fig.add_subplot(gs[1])
@@ -206,6 +220,17 @@ if __name__ == '__main__':
         except ValueError:
             print('Enter valid destination ID')
     dest_btn.on_clicked(on_dest)
+
+    def on_reset(event):
+        global start_node, end_node
+        start_node = None
+        end_node = None
+        serial_thread.send_reset()
+        start_text.set_text('Start node:    --')
+        dest_text.set_text('Destination:   --')
+        current_text.set_text('Current node:   --')
+        update_display()
+    reset_btn.on_clicked(on_reset)
 
     def on_pick(event):
         global end_node

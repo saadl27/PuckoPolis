@@ -145,6 +145,20 @@ static THD_FUNCTION(FSM, arg) {
     }
 }
 
+
+static THD_WORKING_AREA(waReset, 256);
+static THD_FUNCTION(Reset, arg) {
+
+    chRegSetThreadName(__FUNCTION__);
+    (void)arg;
+
+    while (true){
+        chBSemWait(&reset_sem);
+        stop_motors();
+        state = READING;
+    }
+}
+
 static THD_WORKING_AREA(waDetectObstacle, 512);
 static THD_FUNCTION(DetectObstacle, arg) {
 
@@ -169,5 +183,6 @@ static THD_FUNCTION(DetectObstacle, arg) {
 
 void brain_init(void) {
     chThdCreateStatic(waFSM, sizeof(waFSM), NORMALPRIO, FSM, NULL);
+    chThdCreateStatic(waReset, sizeof(waReset), NORMALPRIO, Reset, NULL);
     chThdCreateStatic(waDetectObstacle, sizeof(waDetectObstacle), NORMALPRIO, DetectObstacle, NULL);
 }

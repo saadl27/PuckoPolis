@@ -2,6 +2,10 @@
 #define TELEMETRY_H
 
 #include <stdint.h>
+#include <ch.h>
+#include <hal.h>
+
+extern binary_semaphore_t reset_sem;
 
 void telemetry_init(void);
 
