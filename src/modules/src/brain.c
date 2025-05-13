@@ -50,12 +50,15 @@ static THD_FUNCTION(FSM, arg) {
         if (state == READING) {
             start = ReceiveStartFromComputer();
             end = ReceiveDestinationFromComputer();
+            set_init_yaw(ReceiveYawFromComputer());
 
             if (a_star_find_path(graph, path, start, end)) {
-                state = MISSION;
-                set_init_yaw(get_heading(graph, path->path[0], path->path[1]) * M_PI_4);
                 SendNodeToComputer(start);
+                float target_heading = (float) get_heading(graph, path->path[0],
+                                                path->path[1]) * M_PI_4;
+                correct_heading(target_heading);
                 test_path(graph, path, start, end);
+                state = MISSION;
             }
         }
         if (state == RECALCULATING_PATH) {
