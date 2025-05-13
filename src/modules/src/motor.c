@@ -121,8 +121,8 @@ void correct_heading(float target_heading) {
 		while (error >= M_PI) error -= 2.0f * M_PI;
 		while (error < -M_PI) error += 2.0f * M_PI;
 
-		epuck_printf("[motors] current = %f, \t target = %f, \t, error = %f\n",
-						angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
+		//epuck_printf("[motors] current = %f, \t target = %f, \t, error = %f\n",
+						//angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
 
 		if (error >= 0) {
 			right_motor_set_speed(-ROT_SPEED);
@@ -156,8 +156,8 @@ void rotate_relative(float relative_angle) {
 		while (error >= M_PI) error -= 2.0f * M_PI;
 		while (error < -M_PI) error += 2.0f * M_PI;
 
-		epuck_printf("[motors] current = %f, \t target = %f, \t error = %f\n",
-						angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
+		//epuck_printf("[motors] current = %f, \t target = %f, \t error = %f\n",
+					//	angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
 
 		if (fabsf(error) < ERROR_ANGLE) break;
 

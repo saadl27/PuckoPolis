@@ -46,7 +46,7 @@ void SendUint8ToComputer(uint8_t* data, uint16_t size)
 } */
 
 void SendNodeToComputer(uint8_t node) {
-    epuck_printf("SENT NODE: %d\n", node);
+    //epuck_printf("SENT NODE: %d\n", node);
     chprintf((BaseSequentialStream *)&SD3, "CURRENT_NODE:%u\n", node);
 }
 
@@ -124,7 +124,7 @@ static THD_FUNCTION(ReceiveReset, arg) {
                 match_idx++;
                 if (match_idx == prefix_len) {
                     chBSemSignal(&reset_sem);
-                    epuck_printf("---------------[RESET]----------------");
+                    //epuck_printf("---------------[RESET]----------------");
                     // Full prefix matched
                 }
             }

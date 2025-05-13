@@ -292,7 +292,7 @@ static THD_FUNCTION(ProcessImage, arg) {
             blue_count = 0;
             black_count = 0;
 
-            epuck_printf("%s\n", clr);
+            //epuck_printf("%s\n", clr);
 
             messagebus_topic_publish(&color_topic, &color_values, sizeof(color_values));
         }
