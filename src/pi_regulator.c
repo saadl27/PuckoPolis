@@ -85,7 +85,7 @@ static THD_FUNCTION(PiRegulator, arg) {
 }
 
 void pi_regulator_start(void) {
-	chThdCreateStatic(waPiRegulator, sizeof(waPiRegulator), NORMALPRIO, PiRegulator, NULL);
+	//chThdCreateStatic(waPiRegulator, sizeof(waPiRegulator), NORMALPRIO, PiRegulator, NULL);
 }
 
 void set_enabled_motors(bool enable) {
