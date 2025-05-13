@@ -12,13 +12,17 @@
 
 #define INDEX_OFFSET                50
 
-#define RED_THRESHOLD_SCALE         0.6f
+/* #define RED_THRESHOLD_SCALE         0.6f
 #define GREEN_THRESHOLD_SCALE       0.6f
-#define BLUE_THRESHOLD_SCALE        1.4f
+#define BLUE_THRESHOLD_SCALE        1.4f */
 
-#define POLLING_COUNT               5
+#define RED_THRESHOLD_SCALE         1.f
+#define GREEN_THRESHOLD_SCALE       1.f
+#define BLUE_THRESHOLD_SCALE        1000.f
 
-static float distance_cm = 0;
+#define POLLING_COUNT               5                  
+
+
 static uint16_t line_position = IMAGE_BUFFER_SIZE/2;    //middle
 
 
@@ -29,9 +33,9 @@ static BSEMAPHORE_DECL(image_ready_sem, TRUE);
  *  Returns the line's width extracted from the image buffer given
  *  Returns 0 if line not found
  */
-uint16_t extract_line_width(uint8_t *buffer){
+bool detect_color(uint8_t *buffer, color_detection_t color){
 
-    uint16_t i = 0, begin = 0, end = 0, width = 0;
+    uint16_t i = 0, begin = 0, end = 0;
     uint8_t stop = 0, wrong_line = 0, line_not_found = 0;
     uint32_t mean = 0;
 
@@ -40,7 +44,7 @@ uint16_t extract_line_width(uint8_t *buffer){
         mean += buffer[i];
     }
     mean /= IMAGE_BUFFER_SIZE;
-
+    uint8_t hysteresis = mean/100;
     do{
         wrong_line = 0;
         //search for a begin
@@ -48,7 +52,7 @@ uint16_t extract_line_width(uint8_t *buffer){
         { 
             //the slope must at least be WIDTH_SLOPE wide and is compared
             //to the mean of the image
-            if(buffer[i] > mean && buffer[i+WIDTH_SLOPE] < mean)
+            if(buffer[i] > mean + hysteresis && buffer[i+WIDTH_SLOPE] < mean - hysteresis)
             {
                 begin = i;
                 stop = 1;
@@ -62,7 +66,7 @@ uint16_t extract_line_width(uint8_t *buffer){
             
             while(stop == 0 && i < IMAGE_BUFFER_SIZE)
             {
-                if(buffer[i] > mean && buffer[i-WIDTH_SLOPE] < mean)
+                if(buffer[i] > mean + hysteresis && buffer[i-WIDTH_SLOPE] < mean - hysteresis)
                 {
                     end = i;
                     stop = 1;
@@ -93,19 +97,31 @@ uint16_t extract_line_width(uint8_t *buffer){
     if(line_not_found){
         begin = 0;
         end = 0;
+        return false;
     }else{
         line_position = (begin + end)/2; //gives the line position.
-    }
+        uint8_t drop = (buffer[begin] - buffer[line_position]);
+        float scaler = 0.0f;
+        switch (color) {
+            case RED_COLOR: scaler = RED_THRESHOLD_SCALE; break;
+            case GREEN_COLOR: scaler = GREEN_THRESHOLD_SCALE; break;
+            case BLUE_COLOR: scaler = BLUE_THRESHOLD_SCALE; break;
+            default: break;
+        }
+        uint16_t threshold = scaler * mean;
 
-    //sets a maximum width or returns the measured width
-    if((PXTOCM/width) > MAX_DISTANCE){
-        return PXTOCM/MAX_DISTANCE;
-    }else{
-        return width;
+        // epuck_printf("drop = %lu, threshold = %lu\n", drop, threshold);
+
+        if (drop > threshold){
+            return false; 
+        } else {
+            return true;
+        } 
+       //return true;
     }
 }
 
-bool detect_color(uint8_t *buffer, color_detection_t color) {
+/* bool detect_color(uint8_t *buffer, color_detection_t color) {
     uint32_t mean = 0;
     uint16_t i_min = 0;
     uint16_t i_max = 0;
@@ -139,13 +155,13 @@ bool detect_color(uint8_t *buffer, color_detection_t color) {
     } else {
         return true;
     }
-}
+}*/
 
 color_detection_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint8_t *blue_buffer){
     bool red = detect_color(red_buffer, RED_COLOR);
     bool green = detect_color(green_buffer, GREEN_COLOR);
-    bool blue = detect_color(blue_buffer, BLUE_COLOR);
-
+    bool blue = detect_color(blue_buffer, BLUE_COLOR); 
+    
     if (green){
         return GREEN_COLOR;
     }
@@ -158,7 +174,7 @@ color_detection_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint
     else {
         return BLACK_COLOR;
     }
-}
+} 
 
 static THD_WORKING_AREA(waCaptureImage, 256);
 static THD_FUNCTION(CaptureImage, arg) {
@@ -202,7 +218,6 @@ static THD_FUNCTION(ProcessImage, arg) {
     uint8_t green_buffer[IMAGE_BUFFER_SIZE] = {0};
     uint8_t blue_buffer[IMAGE_BUFFER_SIZE] = {0};
 
-    uint16_t lineWidth = 0;
 
     uint8_t counter = 0; // for color polling (filters out random noise)
     uint8_t red_count = 0, green_count = 0, blue_count = 0, black_count = 0;
@@ -234,7 +249,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 
         last_colors[counter++] = extract_color(red_buffer, green_buffer, blue_buffer);
 
-        switch (last_colors[counter - 1]) {
+/*         switch (last_colors[counter - 1]) {
             case RED_COLOR:
                 //Analyze a buffer with a drop in the pixel intensity
                 lineWidth = extract_line_width(green_buffer);
@@ -251,12 +266,12 @@ static THD_FUNCTION(ProcessImage, arg) {
             case BLACK_COLOR:
                 lineWidth = extract_line_width(red_buffer);
                 break;
-        }
+        } */
 
-        if(lineWidth){
+/*         if(lineWidth){
             distance_cm = PXTOCM/lineWidth;
         }
-
+ */
         if (counter == POLLING_COUNT) {
             counter = 0;
             for (size_t i = 0; i < POLLING_COUNT; ++i) {
@@ -294,11 +309,6 @@ static THD_FUNCTION(ProcessImage, arg) {
             messagebus_topic_publish(&color_topic, &color_values, sizeof(color_values));
         }
     }
-}
-
-
-float get_distance_cm(void){
-    return distance_cm;
 }
 
 uint16_t get_line_position(void){
