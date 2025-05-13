@@ -12,7 +12,8 @@
 /* e-puck2 main processor Library */
 #include "sensors/VL53L0X/VL53L0X.h"
 
-#define TOF_INIT_TIME_MS 300
+#define TOF_INIT_TIME_MS        300
+#define DIST_STACK_SIZE         512
 
 /* Kalman calibration (all measured from empirical data) 
    & Kalman filter variables */
@@ -25,7 +26,7 @@ static float estimated_dist = 0.0f;
 static float estimation_err = 100.0f; // high initial uncertainty
 static bool filter_initialized = false;
 
-static THD_WORKING_AREA(waDistanceThd, 512);
+static THD_WORKING_AREA(waDistanceThd, DIST_STACK_SIZE);
 static THD_FUNCTION(DistanceThd, arg)
 {
     (void) arg;

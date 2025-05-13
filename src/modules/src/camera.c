@@ -10,11 +10,14 @@
 #include "modules/include/brain.h"
 #include "main.h"
 
+#define CAPTURE_STACK_SIZE          256
+#define PROCESS_STACK_SIZE          16384
+
 #define INDEX_OFFSET                50
 
 #define RED_THRESHOLD_SCALE         0.6f
 #define GREEN_THRESHOLD_SCALE       0.6f
-#define BLUE_THRESHOLD_SCALE        1.4f
+#define BLUE_THRESHOLD_SCALE        1.2f
 
 #define POLLING_COUNT               5
 
@@ -132,7 +135,7 @@ bool detect_color(uint8_t *buffer, color_detection_t color) {
     }
     uint32_t threshold = scaler * mean;
 
-    // epuck_printf("drop = %lu, threshold = %lu\n", drop, threshold);
+    // if (color == BLUE_COLOR) epuck_printf("drop = %lu, threshold = %lu\n", drop, threshold);
 
     if (drop > threshold){
         return false; 
@@ -160,7 +163,7 @@ color_detection_t extract_color(uint8_t *red_buffer, uint8_t *green_buffer, uint
     }
 }
 
-static THD_WORKING_AREA(waCaptureImage, 256);
+static THD_WORKING_AREA(waCaptureImage, CAPTURE_STACK_SIZE);
 static THD_FUNCTION(CaptureImage, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -182,7 +185,7 @@ static THD_FUNCTION(CaptureImage, arg) {
     }
 }
 
-static THD_WORKING_AREA(waProcessImage, 16384);
+static THD_WORKING_AREA(waProcessImage, PROCESS_STACK_SIZE);
 static THD_FUNCTION(ProcessImage, arg) {
 
     chRegSetThreadName(__FUNCTION__);

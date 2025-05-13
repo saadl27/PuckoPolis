@@ -12,7 +12,9 @@
 #include "modules/include/inertial.h"
 #include "modules/include/telemetry.h"
 
-#define PID_LOOP_MS		10
+#define PID_STACK_SIZE		256
+
+#define PID_LOOP_MS			10
 const float dt = PID_LOOP_MS / 1000.0f;
 
 
@@ -51,7 +53,7 @@ int16_t pid_regulator(float distance, float goal){
     return (int16_t) speed;
 }
 
-static THD_WORKING_AREA(waPidRegulator, 256);
+static THD_WORKING_AREA(waPidRegulator, PID_STACK_SIZE);
 static THD_FUNCTION(PidRegulator, arg) {
 
     chRegSetThreadName(__FUNCTION__);

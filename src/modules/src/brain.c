@@ -13,7 +13,10 @@
 #include "modules/include/inertial.h"
 #include "main.h"
 
-#define FSM_THD_LOOP_MS 100
+#define FSM_THD_LOOP_MS         100
+#define FSM_STACK_SIZE          8192
+#define RST_STACK_SIZE          256
+#define OBS_STACK_SIZE          1024
 
 #define OBSTACLE_THRESHOLD_MM ((uint16_t) 10)
 
@@ -23,7 +26,7 @@ State get_state() {
     return state;
 }
 
-static THD_WORKING_AREA(waFSM, 8192);
+static THD_WORKING_AREA(waFSM, FSM_STACK_SIZE);
 static THD_FUNCTION(FSM, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -46,6 +49,124 @@ static THD_FUNCTION(FSM, arg) {
         epuck_printf("[state] %d\n", state);
 
         messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
+
+        // switch (state) {
+        // case IDLE: break;
+        // case READING:
+        //     start = ReceiveStartFromComputer();
+        //     end = ReceiveDestinationFromComputer();
+
+        //     if (a_star_find_path(graph, path, start, end)) {
+        //         state = MISSION;
+        //         set_init_yaw(get_heading(graph, path->path[0], path->path[1]) * M_PI_4);
+        //         SendNodeToComputer(start);
+        //         test_path(graph, path, start, end);
+        //     }
+
+        // case RECALCULATING_PATH:
+        //     a_star_set_edge_freeness(graph, path->path[path_step], path->path[path_step + 1], false);
+        //     // test_path(graph, path, start, end);
+
+        //     start = path->path[path_step];
+        //     path_step = 0;
+
+        //     epuck_printf("[recalculating path] start = %u, path step = %u, end = %u\n", start, path_step, end);
+            
+        //     if (a_star_find_path(graph, path, start, end)) {
+        //         state = MISSION;
+        //         epuck_printf("[path] start = %u, end = %u, path len = %u, path cost = %u, path = \n",
+        //         path->start, path->end, path->path_len, path->path_cost);
+        //         for (int i = 0; i < 15; ++i) {
+        //             epuck_printf("%u ", path->path[i]);
+        //         }
+        //         epuck_printf("\n");
+        //         path_step--;
+        //         // SendNodeToComputer(start);
+        //     } else {
+        //         epuck_printf("No new path found\n");
+        //         state = READING;
+        //     }
+
+        // case MISSION:
+        //     switch (color_values.color) {
+        //         case RED_COLOR:
+        //             // epuck_printf("color = red\n");
+        //             // state = STOP;
+        //             // stop_motors();
+        //             break;
+
+        //         case GREEN_COLOR:
+        //             // epuck_printf("color = green\n");
+        //             break;
+
+        //         case BLUE_COLOR:
+        //             //epuck_printf("color = blue\n");
+        //             state = INTERMEDIATE;
+        //             ++path_step;
+        //             epuck_printf("=============================================\nPATH STEP = %d | PATH LEN = %d\n", path_step, path->path_len);
+        //             if (path_step == path->path_len - 1) {
+        //                 translate();
+        //                 state = DONE;
+        //                 stop_motors();
+        //                 SendNodeToComputer(path->path[path->path_len - 1]);
+        //             } else {
+        //                 float target_heading = (float) get_heading(graph, path->path[path_step],
+        //                                         path->path[path_step+1]) * M_PI_4;
+        //                 epuck_printf("[brain] heading = %f\nbefore loop\n", target_heading);
+        //                 correct_heading(target_heading);
+        //                 epuck_printf("[brain] AFTER loop\n");
+        //                 // state = MISSION;
+        //                 SendNodeToComputer(path->path[path_step]);
+        //             }
+        //             break;
+
+        //         case BLACK_COLOR:
+        //             //epuck_printf("color = black\n");
+        //             break;
+        //     }
+
+        // case INTERMEDIATE:
+        //     switch (color_values.color) {
+        //         case BLACK_COLOR: {
+        //             state = MISSION;
+        //             break;
+        //         }
+        //         default: break;
+        //     }
+
+        // case DONE: stop_motors();
+        // case STOP:
+        //     switch (color_values.color) {
+        //         case RED_COLOR:
+        //             break;
+
+        //         case GREEN_COLOR:
+        //             state = MISSION;
+        //             break;
+
+        //         case BLUE_COLOR:
+        //             state = INTERMEDIATE;
+        //             ++path_step;
+        //             epuck_printf("=============================================\nPATH STEP = %d | PATH LEN = %d\n", path_step, path->path_len);
+        //             if (path_step == path->path_len - 1) {
+        //                 state = DONE;
+        //                 stop_motors();
+        //                 SendNodeToComputer(path->path[path->path_len - 1]);
+        //             } else {
+        //                 float target_heading = (float) get_heading(graph, path->path[path_step],
+        //                                         path->path[path_step+1]) * M_PI_4;
+        //                 epuck_printf("[brain] heading = %f\nbefore loop\n", target_heading);
+        //                 correct_heading(target_heading);
+        //                 epuck_printf("[brain] AFTER loop\n");
+        //                 SendNodeToComputer(path->path[path_step]);
+        //             }
+        //             break;
+
+        //         case BLACK_COLOR:
+        //             state = MISSION;
+        //             break;
+        //     }
+        // }
 
         if (state == READING) {
             start = ReceiveStartFromComputer();
@@ -173,7 +294,7 @@ static THD_FUNCTION(FSM, arg) {
 }
 
 
-static THD_WORKING_AREA(waReset, 256);
+static THD_WORKING_AREA(waReset, RST_STACK_SIZE);
 static THD_FUNCTION(Reset, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -186,7 +307,7 @@ static THD_FUNCTION(Reset, arg) {
     }
 }
 
-static THD_WORKING_AREA(waDetectObstacle, 1024);
+static THD_WORKING_AREA(waDetectObstacle, OBS_STACK_SIZE);
 static THD_FUNCTION(DetectObstacle, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -217,5 +338,5 @@ static THD_FUNCTION(DetectObstacle, arg) {
 void brain_init(void) {
     chThdCreateStatic(waFSM, sizeof(waFSM), NORMALPRIO, FSM, NULL);
     chThdCreateStatic(waReset, sizeof(waReset), NORMALPRIO, Reset, NULL);
-    chThdCreateStatic(waDetectObstacle, sizeof(waDetectObstacle), NORMALPRIO, DetectObstacle, NULL);
+    // chThdCreateStatic(waDetectObstacle, sizeof(waDetectObstacle), NORMALPRIO, DetectObstacle, NULL);
 }

@@ -27,6 +27,7 @@
         "stdint.h": "c",
         "stdlib.h": "c",
         "parameter.h": "c",
-        "camera.h": "c"
+        "camera.h": "c",
+        "dcmi_camera.h": "c"
     },
 }

@@ -14,11 +14,14 @@
 #include "modules/include/telemetry.h"
 #include "modules/include/brain.h"
 
+#define RECEIVE_RESET_STACK_SIZE        256
+
+BSEMAPHORE_DECL(reset_sem, TRUE);
+
 /*
 	C standard lib-like printf helper wrapper around chprintf 
 	to avoid having to provide stream
 */
-BSEMAPHORE_DECL(reset_sem, TRUE);
 
 
 void epuck_printf(const char *fmt, ...) {
@@ -100,7 +103,7 @@ uint8_t ReceiveStartFromComputer(void) {
 	return ReceiveFromComputer(str);
 }
 
-static THD_WORKING_AREA(waReceiveReset, 256);
+static THD_WORKING_AREA(waReceiveReset, RECEIVE_RESET_STACK_SIZE);
 static THD_FUNCTION(ReceiveReset, arg) {
 
     chRegSetThreadName(__FUNCTION__);
