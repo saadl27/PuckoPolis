@@ -11,11 +11,10 @@
 #include "main.h"
 
 #define INDEX_OFFSET                50
-#define THRESHOLD_SCALE             1.4f
 
-#define RED_THRESHOLD_SCALE         0.7f
-#define GREEN_THRESHOLD_SCALE       0.7f
-#define BLUE_THRESHOLD_SCALE        1.35f
+#define RED_THRESHOLD_SCALE         0.6f
+#define GREEN_THRESHOLD_SCALE       0.6f
+#define BLUE_THRESHOLD_SCALE        1.2f
 
 #define POLLING_COUNT               5
 
@@ -250,14 +249,20 @@ static THD_FUNCTION(ProcessImage, arg) {
                     default: black_count++; break;
                 }
 
+                char* clr = NULL;
+
                 if (red_count > green_count && red_count > blue_count && red_count > black_count) {
                     color_values.color = RED_COLOR;
+                    clr = "red";
                 } else if (green_count > red_count && green_count > blue_count && green_count > black_count) {
                     color_values.color = GREEN_COLOR;
+                    clr = "green";
                 } else if (blue_count > red_count && blue_count > green_count && blue_count > black_count) {
                     color_values.color = BLUE_COLOR;
+                    clr = "blue";
                 } else {
                     color_values.color = BLACK_COLOR;
+                    clr = "black";
                 }
 
                 red_count = 0;
@@ -265,28 +270,30 @@ static THD_FUNCTION(ProcessImage, arg) {
                 blue_count = 0;
                 black_count = 0;
 
+                epuck_printf("%s\n", clr);
+
                 messagebus_topic_publish(&color_topic, &color_values, sizeof(color_values));
 
                 switch (color_values.color) {
                     case RED_COLOR:
                         //Analyze a buffer with a drop in the pixel intensity
                         lineWidth = extract_line_width(green_buffer);
-                        epuck_printf("Red\n");
+                        // epuck_printf("Red\n");
                         break;
                     
                     case GREEN_COLOR:
                         lineWidth = extract_line_width(red_buffer);
-                        epuck_printf("Green\n");
+                        // epuck_printf("Green\n");
                         break;
 
                     case BLUE_COLOR:
                         lineWidth = extract_line_width(red_buffer);
-                        epuck_printf("Blue\n");
+                        // epuck_printf("Blue\n");
                         break;
 
                     case BLACK_COLOR:
                         lineWidth = extract_line_width(red_buffer);
-                        epuck_printf("Black\n");
+                        // epuck_printf("Black\n");
                         break;
                 }
                 // lineWidth = extract_line_width(red_buffer);

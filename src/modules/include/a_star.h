@@ -21,7 +21,6 @@ typedef enum {
 } Orientation;
 
 typedef struct {
-    uint8_t index;
     uint16_t g_cost; // cost from start to this node
     uint16_t h_cost; // heuristic cost from this node to the end
     uint16_t f_cost; // g + h
@@ -41,6 +40,7 @@ typedef struct {
     uint8_t num_nodes;
     uint8_t num_edges;
     uint8_t edges[NUM_NODES * MAX_EDGES_PER_NODE][2]; // each edge is a pair of node indices
+    bool is_free[NUM_NODES * MAX_EDGES_PER_NODE]; // true if edge is free, false if obstacle
     uint16_t weights[NUM_NODES * MAX_EDGES_PER_NODE];
     Orientation angles[NUM_NODES * MAX_EDGES_PER_NODE][2];
     uint8_t adjacency[NUM_NODES][MAX_EDGES_PER_NODE];
@@ -50,7 +50,7 @@ typedef struct {
 void a_star_init(Graph* graph);
 bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end);
 Orientation get_heading(Graph* graph, uint8_t node1, uint8_t node2);
-// uint16_t a_star_calculate_heuristic(uint16_t node, uint16_t goal);
+void a_star_set_edge_freeness(Graph* graph, uint8_t node1, uint8_t node2, bool is_free);
 
 //testing purposes
 void test_path(Graph* graph, Path* path, uint8_t _start, uint8_t _end);

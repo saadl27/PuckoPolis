@@ -12,15 +12,15 @@
 #include "modules/include/inertial.h"
 #include "modules/include/telemetry.h"
 
-//simple PI regulator implementation
-int16_t pi_regulator(float distance, float goal){
+#define PID_LOOP_MS		10
+const float dt = PID_LOOP_MS / 1000.0f;
 
-	float error = 0;
-	float speed = 0;
-
-	static float sum_error = 0;
-
-	error = distance - goal;
+//simple PID regulator implementation
+int16_t pid_regulator(float distance, float goal){
+    float error = distance - goal;
+	static float sum_error = 0.0f;
+    static float prev_error = 0.0f;
+    static float filtered_derivative = 0.0f;
 
 	//disables the PI regulator if the error is to small
 	//this avoids to always move as we cannot exactly be where we want and 
@@ -31,17 +31,23 @@ int16_t pi_regulator(float distance, float goal){
 
 	sum_error += error;
 
-	//we set a maximum and a minimum for the sum to avoid an uncontrolled growth
-	if(sum_error > MAX_SUM_ERROR){
+	if (sum_error > MAX_SUM_ERROR) {
 		sum_error = MAX_SUM_ERROR;
-	}else if(sum_error < -MAX_SUM_ERROR){
+	} else if (sum_error < -MAX_SUM_ERROR) {
 		sum_error = -MAX_SUM_ERROR;
 	}
 
-	//speed = KP * error + KI * sum_error;
-	speed = KP * error;
+	float raw_derivative = (error - prev_error) / dt;
 
-    return (int16_t)speed;
+    if (raw_derivative > MAX_D_ERROR)		raw_derivative = MAX_D_ERROR;
+    else if (raw_derivative < -MAX_D_ERROR) raw_derivative = -MAX_D_ERROR;
+
+    filtered_derivative = LOW_PASS_FACTOR * filtered_derivative + (1.0f - LOW_PASS_FACTOR) * raw_derivative;
+	if (get_state() != MISSION) sum_error = 0.0f;
+    float speed = KP * error + KI * sum_error + KD * filtered_derivative;
+    prev_error = error;
+
+    return (int16_t) speed;
 }
 
 static THD_WORKING_AREA(waPiRegulator, 256);
@@ -61,10 +67,12 @@ static THD_FUNCTION(PiRegulator, arg) {
 		if (get_state() == MISSION) {
 			//computes the speed to give to the motors
 			//distance_cm is modified by the image processing thread
-			//speed = pi_regulator(get_distance_cm(), GOAL_DISTANCE);
+			//speed = pid_regulator(get_distance_cm(), GOAL_DISTANCE);
+			//speed = pid_regulator(get_distance_cm(), GOAL_DISTANCE);
 			speed = FWD_SPEED;
 			//computes a correction factor to let the robot rotate to be in front of the line
-			speed_correction = pi_regulator(get_line_position(), (IMAGE_BUFFER_SIZE/2));
+			speed_correction = pid_regulator(get_line_position(), (IMAGE_BUFFER_SIZE/2));
+			speed_correction = pid_regulator(get_line_position(), (IMAGE_BUFFER_SIZE/2));
 
 			//if the line is nearly in front of the camera, don't rotate
 			if(abs(speed_correction) < ROTATION_THRESHOLD){
@@ -76,7 +84,8 @@ static THD_FUNCTION(PiRegulator, arg) {
 		
 		} 
 		//100Hz
-		chThdSleepUntilWindowed(time, time + MS2ST(10));
+		chThdSleepUntilWindowed(time, time + MS2ST(PID_LOOP_MS));
+		chThdSleepUntilWindowed(time, time + MS2ST(PID_LOOP_MS));
 
     }
 }
@@ -85,7 +94,7 @@ static void translate(void) {
 	right_motor_set_speed(FWD_SPEED);
 	left_motor_set_speed(FWD_SPEED);
 	//about 500ms at 168MHz
-    for(uint32_t i = 0 ; i < 21000000; i++){
+    for(uint32_t i = 0 ; i < 21000000 * 4; i++){
         __asm__ volatile ("nop");
     }
 }
@@ -96,10 +105,10 @@ void stop_motors(void){
 }
 
 //implement thread to rotate using filtered gyro yaw (should take desired heading as input and return true when completed)
-void correct_heading(float target_heading){
-	epuck_printf("[motors] before moving straight\n");
+void correct_heading(float target_heading) {
+	// epuck_printf("[motors] before moving straight\n");
 	translate();
-	epuck_printf("[motors] AFTER moving straight\n");
+	// epuck_printf("[motors] AFTER moving straight\n");
 	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
     yaw_msg_t angle;
 	float error = 0;
@@ -126,6 +135,44 @@ void correct_heading(float target_heading){
 	right_motor_set_speed(FWD_SPEED);
 	left_motor_set_speed(FWD_SPEED);
 }
+
+void rotate_relative(float relative_angle) {
+	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
+    yaw_msg_t angle;
+	float error = 0;
+
+	messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
+	float initial_yaw = angle.yaw_rad;
+
+	float target_heading = initial_yaw + relative_angle;
+
+	while (target_heading >= 2.0f * M_PI)	target_heading -= 2.0f * M_PI;
+	while (target_heading < 0.0f)			target_heading += 2.0f * M_PI;
+
+	while (true) {
+		messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
+		error = angle.yaw_rad - target_heading;
+
+		while (error >= M_PI) error -= 2.0f * M_PI;
+		while (error < -M_PI) error += 2.0f * M_PI;
+
+		epuck_printf("[motors] current = %f, \t target = %f, \t error = %f\n",
+						angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
+
+		if (fabsf(error) < ERROR_ANGLE) break;
+
+		if (error >= 0) {
+			right_motor_set_speed(-ROT_SPEED);
+			left_motor_set_speed(ROT_SPEED);
+		} else {
+			right_motor_set_speed(ROT_SPEED);
+			left_motor_set_speed(-ROT_SPEED);
+		}
+	}
+	right_motor_set_speed(FWD_SPEED);
+	left_motor_set_speed(FWD_SPEED);
+}
+
 
 /* static THD_WORKING_AREA(waRotate, 4096);
 static THD_FUNCTION(Rotate, arg) {
@@ -176,7 +223,7 @@ void rotate_cw(void){
 	rotate(-ROT_SPEED, ROT_SPEED);
 }
 
-static void pi_regulator_start(void) {
+static void pid_regulator_start(void) {
 	chThdCreateStatic(waPiRegulator, sizeof(waPiRegulator), NORMALPRIO, PiRegulator, NULL);
 }
 
@@ -185,6 +232,6 @@ void motor_init(){
 	motors_init();
 
 	//stars the threads for the pi regulator and the processing of the image
-	pi_regulator_start();
+	pid_regulator_start();
 
 }

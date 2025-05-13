@@ -25,6 +25,8 @@ void a_star_add_edge(Graph* graph, uint8_t node1, uint8_t node2, uint16_t weight
     graph->angles[graph->num_edges][0] = angle12;
     graph->angles[graph->num_edges][1] = angle21;
 
+    graph->is_free[graph->num_edges] = true;
+
 
     if (graph->adjacency_count[node1 - 1] < MAX_EDGES_PER_NODE) {
         graph->adjacency[node1 - 1][graph->adjacency_count[node1 - 1]] = node2;
@@ -89,10 +91,8 @@ bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end) {
     path->path_len = 0;
     path->path_cost = 0;
 
-    // create node array
     Node nodes[NUM_NODES];
     for (uint8_t i = 0; i < graph->num_nodes; i++) {
-        nodes[i].index = i + 1;
         nodes[i].g_cost = 0xffff; // high value
         nodes[i].h_cost = a_star_calculate_heuristic(i + 1, end);
         nodes[i].f_cost = 0xffff;
@@ -128,12 +128,18 @@ bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end) {
             }
 
             uint16_t edge_weight = 1; // default weight
+            bool edge_found = false;
             for (uint8_t j = 0; j < graph->num_edges; j++) {
-                if ((graph->edges[j][0] == current && graph->edges[j][1] == neighbor) ||
-                    (graph->edges[j][0] == neighbor && graph->edges[j][1] == current)) {
+                if (((graph->edges[j][0] == current && graph->edges[j][1] == neighbor) ||
+                    (graph->edges[j][0] == neighbor && graph->edges[j][1] == current)) &&
+                    graph->is_free[j]) {
                     edge_weight = graph->weights[j];
+                    edge_found = true;
                     break;
                 }
+            }
+            if (!edge_found) {
+                continue; // skip blocked edges
             }
 
             uint16_t temporary_g_cost = nodes[current - 1].g_cost + edge_weight;
@@ -175,6 +181,16 @@ Orientation get_heading(Graph* graph, uint8_t node1, uint8_t node2) {
         }
     }
     return graph->angles[edge_nb][inverse];
+}
+
+void a_star_set_edge_freeness(Graph* graph, uint8_t node1, uint8_t node2, bool is_free) {
+    for (uint8_t i = 0; i < graph->num_edges; i++) {
+        if ((graph->edges[i][0] == node1 && graph->edges[i][1] == node2) ||
+            (graph->edges[i][0] == node2 && graph->edges[i][1] == node1)) {
+            graph->is_free[i] = is_free;
+            return;
+        }
+    }
 }
 
 void test_path(Graph* graph, Path* path, uint8_t _start, uint8_t _end) {
