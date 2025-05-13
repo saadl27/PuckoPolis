@@ -21,6 +21,15 @@ int16_t pid_regulator(float distance, float goal){
 	static float sum_error = 0.0f;
     static float prev_error = 0.0f;
     static float filtered_derivative = 0.0f;
+#define PID_LOOP_MS		10
+const float dt = PID_LOOP_MS / 1000.0f;
+
+//simple PID regulator implementation
+int16_t pid_regulator(float distance, float goal){
+    float error = distance - goal;
+	static float sum_error = 0.0f;
+    static float prev_error = 0.0f;
+    static float filtered_derivative = 0.0f;
 
 	//disables the PI regulator if the error is to small
 	//this avoids to always move as we cannot exactly be where we want and 
@@ -68,10 +77,8 @@ static THD_FUNCTION(PiRegulator, arg) {
 			//computes the speed to give to the motors
 			//distance_cm is modified by the image processing thread
 			//speed = pid_regulator(get_distance_cm(), GOAL_DISTANCE);
-			//speed = pid_regulator(get_distance_cm(), GOAL_DISTANCE);
 			speed = FWD_SPEED;
 			//computes a correction factor to let the robot rotate to be in front of the line
-			speed_correction = pid_regulator(get_line_position(), (IMAGE_BUFFER_SIZE/2));
 			speed_correction = pid_regulator(get_line_position(), (IMAGE_BUFFER_SIZE/2));
 
 			//if the line is nearly in front of the camera, don't rotate
@@ -84,7 +91,6 @@ static THD_FUNCTION(PiRegulator, arg) {
 		
 		} 
 		//100Hz
-		chThdSleepUntilWindowed(time, time + MS2ST(PID_LOOP_MS));
 		chThdSleepUntilWindowed(time, time + MS2ST(PID_LOOP_MS));
 
     }

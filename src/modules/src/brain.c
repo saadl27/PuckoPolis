@@ -17,6 +17,8 @@
 
 #define OBSTACLE_THRESHOLD_MM ((uint16_t) 10)
 
+#define OBSTACLE_THRESHOLD_MM ((uint16_t) 10)
+
 static State state = READING;
 
 State get_state() {
@@ -33,8 +35,6 @@ static THD_FUNCTION(FSM, arg) {
     a_star_init(graph);
 
     Path* path = (Path*) malloc(sizeof(Path));
-    int8_t path_step = 0;
-    uint8_t start = 0, end = 0;
     int8_t path_step = 0;
     uint8_t start = 0, end = 0;
 
@@ -60,32 +60,6 @@ static THD_FUNCTION(FSM, arg) {
                 test_path(graph, path, start, end);
             }
         }
-
-        if (state == RECALCULATING_PATH) {
-            a_star_set_edge_freeness(graph, path->path[path_step], path->path[path_step + 1], false);
-            // test_path(graph, path, start, end);
-
-            start = path->path[path_step];
-            path_step = 0;
-
-            epuck_printf("[recalculating path] start = %u, path step = %u, end = %u\n", start, path_step, end);
-            
-            if (a_star_find_path(graph, path, start, end)) {
-                state = MISSION;
-                epuck_printf("[path] start = %u, end = %u, path len = %u, path cost = %u, path = \n",
-                path->start, path->end, path->path_len, path->path_cost);
-                for (int i = 0; i < 15; ++i) {
-                    epuck_printf("%u ", path->path[i]);
-                }
-                epuck_printf("\n");
-                path_step--;
-                // SendNodeToComputer(start);
-            } else {
-                epuck_printf("No new path found\n");
-                state = READING;
-            }
-        }
-
         if (state == RECALCULATING_PATH) {
             a_star_set_edge_freeness(graph, path->path[path_step], path->path[path_step + 1], false);
             // test_path(graph, path, start, end);
