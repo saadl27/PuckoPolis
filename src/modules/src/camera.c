@@ -14,7 +14,7 @@
 
 #define RED_THRESHOLD_SCALE         0.6f
 #define GREEN_THRESHOLD_SCALE       0.6f
-#define BLUE_THRESHOLD_SCALE        1.2f
+#define BLUE_THRESHOLD_SCALE        1.4f
 
 #define POLLING_COUNT               5
 
@@ -34,8 +34,6 @@ uint16_t extract_line_width(uint8_t *buffer){
     uint16_t i = 0, begin = 0, end = 0, width = 0;
     uint8_t stop = 0, wrong_line = 0, line_not_found = 0;
     uint32_t mean = 0;
-
-    //static uint16_t last_width = PXTOCM/GOAL_DISTANCE;
 
     //performs an average
     for(uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++){
@@ -95,9 +93,7 @@ uint16_t extract_line_width(uint8_t *buffer){
     if(line_not_found){
         begin = 0;
         end = 0;
-        //width = last_width;
     }else{
-        //last_width = width = (end - begin);
         line_position = (begin + end)/2; //gives the line position.
     }
 
@@ -186,7 +182,7 @@ static THD_FUNCTION(CaptureImage, arg) {
     }
 }
 
-static THD_WORKING_AREA(waProcessImage, 8192);
+static THD_WORKING_AREA(waProcessImage, 16384);
 static THD_FUNCTION(ProcessImage, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -208,7 +204,6 @@ static THD_FUNCTION(ProcessImage, arg) {
 
     uint16_t lineWidth = 0;
 
-    bool send_to_computer = true;
     uint8_t counter = 0; // for color polling (filters out random noise)
     uint8_t red_count = 0, green_count = 0, blue_count = 0, black_count = 0;
     color_detection_t last_colors[POLLING_COUNT];
@@ -239,6 +234,29 @@ static THD_FUNCTION(ProcessImage, arg) {
 
         last_colors[counter++] = extract_color(red_buffer, green_buffer, blue_buffer);
 
+        switch (last_colors[counter - 1]) {
+            case RED_COLOR:
+                //Analyze a buffer with a drop in the pixel intensity
+                lineWidth = extract_line_width(green_buffer);
+                break;
+            
+            case GREEN_COLOR:
+                lineWidth = extract_line_width(red_buffer);
+                break;
+
+            case BLUE_COLOR:
+                lineWidth = extract_line_width(red_buffer);
+                break;
+
+            case BLACK_COLOR:
+                lineWidth = extract_line_width(red_buffer);
+                break;
+        }
+
+        if(lineWidth){
+            distance_cm = PXTOCM/lineWidth;
+        }
+
         if (counter == POLLING_COUNT) {
             counter = 0;
             for (size_t i = 0; i < POLLING_COUNT; ++i) {
@@ -248,67 +266,32 @@ static THD_FUNCTION(ProcessImage, arg) {
                     case BLUE_COLOR: blue_count++; break;
                     default: black_count++; break;
                 }
-
-                char* clr = NULL;
-
-                if (red_count > green_count && red_count > blue_count && red_count > black_count) {
-                    color_values.color = RED_COLOR;
-                    clr = "red";
-                } else if (green_count > red_count && green_count > blue_count && green_count > black_count) {
-                    color_values.color = GREEN_COLOR;
-                    clr = "green";
-                } else if (blue_count > red_count && blue_count > green_count && blue_count > black_count) {
-                    color_values.color = BLUE_COLOR;
-                    clr = "blue";
-                } else {
-                    color_values.color = BLACK_COLOR;
-                    clr = "black";
-                }
-
-                red_count = 0;
-                green_count = 0;
-                blue_count = 0;
-                black_count = 0;
-
-                epuck_printf("%s\n", clr);
-
-                messagebus_topic_publish(&color_topic, &color_values, sizeof(color_values));
-
-                switch (color_values.color) {
-                    case RED_COLOR:
-                        //Analyze a buffer with a drop in the pixel intensity
-                        lineWidth = extract_line_width(green_buffer);
-                        // epuck_printf("Red\n");
-                        break;
-                    
-                    case GREEN_COLOR:
-                        lineWidth = extract_line_width(red_buffer);
-                        // epuck_printf("Green\n");
-                        break;
-
-                    case BLUE_COLOR:
-                        lineWidth = extract_line_width(red_buffer);
-                        // epuck_printf("Blue\n");
-                        break;
-
-                    case BLACK_COLOR:
-                        lineWidth = extract_line_width(red_buffer);
-                        // epuck_printf("Black\n");
-                        break;
-                }
-                // lineWidth = extract_line_width(red_buffer);
-
-                if(lineWidth){
-                    distance_cm = PXTOCM/lineWidth;
-                }
-
-                if(send_to_computer){
-                    // sends to the computer the image
-                    // SendUint8ToComputer(green_buffer, IMAGE_BUFFER_SIZE);
-                }
-                //invert the bool
-                send_to_computer = !send_to_computer;
             }
+            
+            char* clr = NULL;
+
+            if (red_count > green_count && red_count > blue_count && red_count > black_count) {
+                color_values.color = RED_COLOR;
+                clr = "red";
+            } else if (green_count > red_count && green_count > blue_count && green_count > black_count) {
+                color_values.color = GREEN_COLOR;
+                clr = "green";
+            } else if (blue_count > red_count && blue_count > green_count && blue_count > black_count) {
+                color_values.color = BLUE_COLOR;
+                clr = "blue";
+            } else {
+                color_values.color = BLACK_COLOR;
+                clr = "black";
+            }
+
+            red_count = 0;
+            green_count = 0;
+            blue_count = 0;
+            black_count = 0;
+
+            epuck_printf("%s\n", clr);
+
+            messagebus_topic_publish(&color_topic, &color_values, sizeof(color_values));
         }
     }
 }

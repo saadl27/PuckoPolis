@@ -23,7 +23,7 @@ State get_state() {
     return state;
 }
 
-static THD_WORKING_AREA(waFSM, 4096);
+static THD_WORKING_AREA(waFSM, 8192);
 static THD_FUNCTION(FSM, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -101,6 +101,7 @@ static THD_FUNCTION(FSM, arg) {
                     ++path_step;
                     epuck_printf("=============================================\nPATH STEP = %d | PATH LEN = %d\n", path_step, path->path_len);
                     if (path_step == path->path_len - 1) {
+                        translate();
                         state = DONE;
                         stop_motors();
                         SendNodeToComputer(path->path[path->path_len - 1]);
@@ -200,7 +201,7 @@ static THD_FUNCTION(DetectObstacle, arg) {
         time = chVTGetSystemTime();
 
         messagebus_topic_wait(dist_topic, &tof_dist, sizeof(tof_msg_t));
-        epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
+        // epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
 
         if (tof_dist.dist_mm < OBSTACLE_THRESHOLD_MM && state == MISSION) {
             state = IDLE;

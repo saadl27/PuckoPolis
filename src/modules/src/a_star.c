@@ -226,7 +226,7 @@ void a_star_init(Graph* graph){
     a_star_add_edge(graph, 5,  7,  8, SOUTH_WEST, NORTH);
     a_star_add_edge(graph, 7,  8,  30, SOUTH, SOUTH_WEST);
     a_star_add_edge(graph, 6,  8,  17, SOUTH_EAST, NORTH_EAST);
-    a_star_add_edge(graph, 7,  13, 107, EAST, EAST);
+    a_star_add_edge(graph, 7,  13, 107, WEST, WEST);
     a_star_add_edge(graph, 8,  9,  76, SOUTH_EAST, WEST);
     a_star_add_edge(graph, 11, 13, 63, WEST, NORTH);
     a_star_add_edge(graph, 13, 14, 66, SOUTH, WEST);

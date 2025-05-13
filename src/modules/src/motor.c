@@ -51,8 +51,8 @@ int16_t pid_regulator(float distance, float goal){
     return (int16_t) speed;
 }
 
-static THD_WORKING_AREA(waPiRegulator, 256);
-static THD_FUNCTION(PiRegulator, arg) {
+static THD_WORKING_AREA(waPidRegulator, 256);
+static THD_FUNCTION(PidRegulator, arg) {
 
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
@@ -88,11 +88,11 @@ static THD_FUNCTION(PiRegulator, arg) {
     }
 }
 
-static void translate(void) {
+void translate(void) {
 	right_motor_set_speed(FWD_SPEED);
 	left_motor_set_speed(FWD_SPEED);
 	//about 500ms at 168MHz
-    for(uint32_t i = 0 ; i < 21000000 * 4; i++){
+    for(uint32_t i = 0; i < 21000000; i++){
         __asm__ volatile ("nop");
     }
 }
@@ -201,7 +201,7 @@ void rotate_cw(void){
 }
 
 static void pid_regulator_start(void) {
-	chThdCreateStatic(waPiRegulator, sizeof(waPiRegulator), NORMALPRIO, PiRegulator, NULL);
+	chThdCreateStatic(waPidRegulator, sizeof(waPidRegulator), NORMALPRIO, PidRegulator, NULL);
 }
 
 void motor_init(){
