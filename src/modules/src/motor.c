@@ -15,14 +15,6 @@
 #define PID_LOOP_MS		10
 const float dt = PID_LOOP_MS / 1000.0f;
 
-//simple PID regulator implementation
-int16_t pid_regulator(float distance, float goal){
-    float error = distance - goal;
-	static float sum_error = 0.0f;
-    static float prev_error = 0.0f;
-    static float filtered_derivative = 0.0f;
-#define PID_LOOP_MS		10
-const float dt = PID_LOOP_MS / 1000.0f;
 
 //simple PID regulator implementation
 int16_t pid_regulator(float distance, float goal){
@@ -178,27 +170,6 @@ void rotate_relative(float relative_angle) {
 	right_motor_set_speed(FWD_SPEED);
 	left_motor_set_speed(FWD_SPEED);
 }
-
-
-/* static THD_WORKING_AREA(waRotate, 4096);
-static THD_FUNCTION(Rotate, arg) {
-	chRegSetThreadName(__FUNCTION__);
-    (void)arg;
-
-	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
-    yaw_msg_t angle;
-	float error = 0;
-
-	while(1){
-		if (get_state() == INTERMEDIATE){
-			messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
-			error = angle.yaw_rad - 
-			
-
-		}
-
-	}
-} */
 
 static void rotate(int16_t left_speed, int16_t right_speed){
 	right_motor_set_speed(FWD_SPEED);

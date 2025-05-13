@@ -17,8 +17,6 @@
 
 #define OBSTACLE_THRESHOLD_MM ((uint16_t) 10)
 
-#define OBSTACLE_THRESHOLD_MM ((uint16_t) 10)
-
 static State state = READING;
 
 State get_state() {
