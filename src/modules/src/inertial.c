@@ -132,7 +132,7 @@ static THD_FUNCTION(IMUThd, arg)
         ekf_predict(&ekf, raw.ang_vel[2]);
         angle.yaw_rad = ekf.x[0];
 
-        // epuck_printf("[inertial] angle = %f\n", angle.yaw_rad * RAD2DEG);
+        //epuck_printf("[inertial] angle = %f\n", angle.yaw_rad * RAD2DEG);
 
         messagebus_topic_publish(imu_pub, &angle, sizeof(angle));
 

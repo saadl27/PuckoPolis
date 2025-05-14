@@ -172,15 +172,17 @@ static THD_FUNCTION(FSM, arg) {
         if (state == READING) {
             leds_reading();
             path_step = 0;
-            path_step = 0;
             start = ReceiveStartFromComputer();
             end = ReceiveDestinationFromComputer();
-            set_init_yaw(ReceiveYawFromComputer());
+            uint16_t init_yaw = ReceiveYawFromComputer();
+            set_init_yaw((float) init_yaw/RAD2DEG);
+            epuck_printf("[brain] Received Yaw: %u\n", init_yaw);
 
             if (a_star_find_path(graph, path, start, end)) {
                 SendNodeToComputer(start);
                 float target_heading = (float) get_heading(graph, path->path[0],
                                                 path->path[1]) * M_PI_4;
+                epuck_printf("[brain] target heading %f\n", target_heading*RAD2DEG);
                 correct_heading(target_heading);
                 // test_path(graph, path, start, end);
                 state = MISSION;

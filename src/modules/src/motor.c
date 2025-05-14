@@ -19,7 +19,7 @@ const float dt = PID_LOOP_MS / 1000.0f;
 
 #define WHEEL_PERIMETER		13 //cm
 #define STEPS_ONE_TURN		1000
-#define FWD_DISP			1 // forward displacement in cm
+#define FWD_DISP			4 // forward displacement in cm
 
 //simple PID regulator implementation
 int16_t pid_regulator(float distance, float goal){
@@ -94,17 +94,20 @@ static THD_FUNCTION(PidRegulator, arg) {
 }
 
 void advance(void) {
-	uint32_t target_steps_r = (STEPS_ONE_TURN/WHEEL_PERIMETER)*FWD_DISP;
-	uint32_t target_steps_l= (STEPS_ONE_TURN/WHEEL_PERIMETER)*FWD_SPEED;
+	float target_steps_r = (STEPS_ONE_TURN/WHEEL_PERIMETER)*FWD_DISP;
+	float target_steps_l= (STEPS_ONE_TURN/WHEEL_PERIMETER)*FWD_DISP;
 	
-	uint32_t current_steps_r = 0;
-	uint32_t current_steps_l = 0;
+	float current_steps_r = 0;
+	float current_steps_l = 0;
 
 	bool right_position_reached = 0;
 	bool left_position_reached = 0;
 
 	left_motor_set_pos(0);
 	right_motor_set_pos(0);
+
+	left_motor_set_speed(FWD_SPEED);
+	right_motor_set_speed(FWD_SPEED);
 
 	while (1){
 
@@ -146,8 +149,9 @@ void correct_heading(float target_heading) {
 		while (error >= M_PI) error -= 2.0f * M_PI;
 		while (error < -M_PI) error += 2.0f * M_PI;
 
+		
 		//epuck_printf("[motors] current = %f, \t target = %f, \t, error = %f\n",
-						//angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
+		//				angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
 
 		if (error >= 0) {
 			right_motor_set_speed(-ROT_SPEED);

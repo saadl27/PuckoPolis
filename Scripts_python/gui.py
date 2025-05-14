@@ -221,7 +221,7 @@ if __name__ == '__main__':
 
     def on_yaw(event):
         try:
-            angle = float(yaw_box.text.strip()) % 360
+            angle = int(yaw_box.text.strip()) % 360
             serial_thread.send_yaw(angle)
         except ValueError:
             print('Enter valid yaw angle')
