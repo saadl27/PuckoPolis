@@ -235,6 +235,7 @@ static THD_FUNCTION(FSM, arg) {
                         float target_heading = (float) get_heading(graph, path->path[path_step],
                                                 path->path[path_step+1]) * M_PI_4;
                         //epuck_printf("[brain] heading = %f\nbefore loop\n", target_heading);
+                        translate();
                         correct_heading(target_heading);
                         //epuck_printf("[brain] AFTER loop\n");
                         // state = MISSION;
