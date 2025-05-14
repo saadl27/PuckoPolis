@@ -16,7 +16,7 @@
 #define GREEN_THRESHOLD_SCALE       0.6f
 #define BLUE_THRESHOLD_SCALE        1.4f
 
-#define POLLING_COUNT               5
+#define POLLING_COUNT               7
 
 static float distance_cm = 0;
 static uint16_t line_position = IMAGE_BUFFER_SIZE/2;    //middle

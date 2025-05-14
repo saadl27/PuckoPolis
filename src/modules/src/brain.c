@@ -48,6 +48,7 @@ static THD_FUNCTION(FSM, arg) {
         messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
 
         if (state == READING) {
+            path_step = 0;
             start = ReceiveStartFromComputer();
             end = ReceiveDestinationFromComputer();
             set_init_yaw(ReceiveYawFromComputer());
@@ -220,5 +221,5 @@ static THD_FUNCTION(DetectObstacle, arg) {
 void brain_init(void) {
     chThdCreateStatic(waFSM, sizeof(waFSM), NORMALPRIO, FSM, NULL);
     chThdCreateStatic(waReset, sizeof(waReset), NORMALPRIO, Reset, NULL);
-    chThdCreateStatic(waDetectObstacle, sizeof(waDetectObstacle), NORMALPRIO, DetectObstacle, NULL);
+    //chThdCreateStatic(waDetectObstacle, sizeof(waDetectObstacle), NORMALPRIO, DetectObstacle, NULL);
 }
