@@ -6,7 +6,7 @@
     //      -> "com_port": "/dev/ttyACMx"
     // MacOS: use the command "ls /dev/cu.*" and use the lowest one
     //      -> "com_port": "/dev/cu.usbmodemEPUCKx"
-    "com_port": "\\\\.\\COM4",
+    "com_port": "/dev/cu.usbmodemEPUCK1",
     "files.associations": {
         "memory_protection.h": "c",
         "telemetry.h": "c",
@@ -28,6 +28,7 @@
         "stdlib.h": "c",
         "parameter.h": "c",
         "camera.h": "c",
-        "dcmi_camera.h": "c"
+        "dcmi_camera.h": "c",
+        "leds.h": "c"
     },
 }

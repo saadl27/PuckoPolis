@@ -11,6 +11,7 @@
 #include "modules/include/a_star.h"
 #include "modules/include/distance.h"
 #include "modules/include/inertial.h"
+#include "modules/include/leds.h"
 #include "main.h"
 
 #define FSM_THD_LOOP_MS         100
@@ -169,6 +170,7 @@ static THD_FUNCTION(FSM, arg) {
         // }
 
         if (state == READING) {
+            leds_reading();
             path_step = 0;
             path_step = 0;
             start = ReceiveStartFromComputer();
@@ -210,6 +212,7 @@ static THD_FUNCTION(FSM, arg) {
         }
 
         if (state == MISSION) {
+            leds_mission();
             switch (color_values.color) {
                 case RED_COLOR:
                     // epuck_printf("color = red\n");
@@ -250,6 +253,7 @@ static THD_FUNCTION(FSM, arg) {
         }
 
         if (state == INTERMEDIATE) {
+            leds_intersection();
             switch (color_values.color) {
                 case BLACK_COLOR: {
                     state = MISSION;
@@ -260,10 +264,12 @@ static THD_FUNCTION(FSM, arg) {
         }
 
         if (state == DONE) {
+            leds_done();
             stop_motors();
         }
 
         if (state == STOP) {
+            leds_stop();
             switch (color_values.color) {
                 case RED_COLOR:
                     break;
@@ -328,10 +334,11 @@ static THD_FUNCTION(DetectObstacle, arg) {
         time = chVTGetSystemTime();
 
         messagebus_topic_wait(dist_topic, &tof_dist, sizeof(tof_msg_t));
-        // epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
+        epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
 
         if (tof_dist.dist_mm < OBSTACLE_THRESHOLD_MM && state == MISSION) {
             state = IDLE;
+            leds_obstacle();
             rotate_relative(M_PI);
             state = RECALCULATING_PATH;
         }
@@ -344,5 +351,5 @@ static THD_FUNCTION(DetectObstacle, arg) {
 void brain_init(void) {
     chThdCreateStatic(waFSM, sizeof(waFSM), NORMALPRIO, FSM, NULL);
     chThdCreateStatic(waReset, sizeof(waReset), NORMALPRIO, Reset, NULL);
-    //chThdCreateStatic(waDetectObstacle, sizeof(waDetectObstacle), NORMALPRIO, DetectObstacle, NULL);
+    chThdCreateStatic(waDetectObstacle, sizeof(waDetectObstacle), NORMALPRIO, DetectObstacle, NULL);
 }
