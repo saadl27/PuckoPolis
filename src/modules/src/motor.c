@@ -17,6 +17,9 @@
 #define PID_LOOP_MS			10
 const float dt = PID_LOOP_MS / 1000.0f;
 
+#define WHEEL_PERIMETER		13 //cm
+#define STEPS_ONE_TURN		1000
+#define FWD_DISP			1 // forward displacement in cm
 
 //simple PID regulator implementation
 int16_t pid_regulator(float distance, float goal){
@@ -90,13 +93,35 @@ static THD_FUNCTION(PidRegulator, arg) {
     }
 }
 
-void translate(void) {
-	right_motor_set_speed(FWD_SPEED);
-	left_motor_set_speed(FWD_SPEED);
-	//about 500ms at 168MHz
-    for(uint32_t i = 0; i < 21000000; i++){
-        __asm__ volatile ("nop");
-    }
+void advance(void) {
+	uint32_t target_steps_r = (STEPS_ONE_TURN/WHEEL_PERIMETER)*FWD_DISP;
+	uint32_t target_steps_l= (STEPS_ONE_TURN/WHEEL_PERIMETER)*FWD_SPEED;
+	
+	uint32_t current_steps_r = 0;
+	uint32_t current_steps_l = 0;
+
+	bool right_position_reached = 0;
+	bool left_position_reached = 0;
+
+	left_motor_set_pos(0);
+	right_motor_set_pos(0);
+
+	while (1){
+
+		current_steps_r = fabs(right_motor_get_pos());
+		current_steps_l = fabs(left_motor_get_pos());
+
+		if (current_steps_r > target_steps_r) {
+			right_motor_set_speed(0);
+			right_position_reached = 1;
+		}
+
+		if (current_steps_l > target_steps_l) {
+			left_motor_set_speed(0);
+			left_position_reached = 1;
+		}
+		if (right_position_reached && left_position_reached) break;
+	}	
 }
 
 void stop_motors(void){
@@ -171,35 +196,6 @@ void rotate_relative(float relative_angle) {
 	}
 	right_motor_set_speed(FWD_SPEED);
 	left_motor_set_speed(FWD_SPEED);
-}
-
-static void rotate(int16_t left_speed, int16_t right_speed){
-	right_motor_set_speed(FWD_SPEED);
-	left_motor_set_speed(FWD_SPEED);
-	//about 500ms at 168MHz
-    for(uint32_t i = 0 ; i < 21000000 ; i++){
-        __asm__ volatile ("nop");
-    }
-	right_motor_set_speed(right_speed);
-	left_motor_set_speed(left_speed);
-	//about 500ms at 168MHz
-    for(uint32_t i = 0 ; i < 18000000 ; i++){
-        __asm__ volatile ("nop");
-    }
-	right_motor_set_speed(FWD_SPEED);
-	left_motor_set_speed(FWD_SPEED);
-	//about 500ms at 168MHz
-	for(uint32_t i = 0 ; i < 21000000 ; i++){
-        __asm__ volatile ("nop");
-    }
-}
-
-void rotate_ccw(void){
-	rotate(ROT_SPEED, -ROT_SPEED);
-}
-
-void rotate_cw(void){
-	rotate(-ROT_SPEED, ROT_SPEED);
 }
 
 static void pid_regulator_start(void) {

@@ -227,7 +227,7 @@ static THD_FUNCTION(FSM, arg) {
                     ++path_step;
                     //epuck_printf("=============================================\nPATH STEP = %d | PATH LEN = %d\n", path_step, path->path_len);
                     if (path_step == path->path_len - 1) {
-                        translate();
+                        advance();
                         state = DONE;
                         stop_motors();
                         SendNodeToComputer(path->path[path->path_len - 1]);
@@ -235,7 +235,7 @@ static THD_FUNCTION(FSM, arg) {
                         float target_heading = (float) get_heading(graph, path->path[path_step],
                                                 path->path[path_step+1]) * M_PI_4;
                         //epuck_printf("[brain] heading = %f\nbefore loop\n", target_heading);
-                        translate();
+                        advance();
                         correct_heading(target_heading);
                         //epuck_printf("[brain] AFTER loop\n");
                         // state = MISSION;

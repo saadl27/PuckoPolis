@@ -14,11 +14,9 @@
 #define ERROR_ANGLE             0.05f    // rad (roughly +/- 3 deg)
 
 void motor_init(void);
-void rotate_ccw(void);
-void rotate_cw(void);
 void correct_heading(float target);
 void rotate_relative(float relative_angle);
-void translate(void);
+void advance(void);
 void stop_motors(void);
 
 #endif 
