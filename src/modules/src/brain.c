@@ -1,9 +1,13 @@
-#include <ch.h>
-#include <hal.h>
-#include <chprintf.h>
+/* C Standard Library */
 #include <stdbool.h>
 #include <math.h>
 
+/* ChibiOS Library */
+#include <ch.h>
+#include <hal.h>
+
+/* Modules Library */
+#include "main.h"
 #include "modules/include/brain.h"
 #include "modules/include/telemetry.h"
 #include "modules/include/camera.h"
@@ -12,7 +16,6 @@
 #include "modules/include/distance.h"
 #include "modules/include/inertial.h"
 #include "modules/include/ledstates.h"
-#include "main.h"
 
 
 static State state = READING;
@@ -45,122 +48,6 @@ static THD_FUNCTION(FSM, arg) {
 
         messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
 
-        // switch (state) {
-        // case IDLE: break;
-        // case READING:
-        //     start = ReceiveStartFromComputer();
-        //     end = ReceiveDestinationFromComputer();
-
-        //     if (a_star_find_path(graph, path, start, end)) {
-        //         state = MISSION;
-        //         set_init_yaw(get_heading(graph, path->path[0], path->path[1]) * M_PI_4);
-        //         SendNodeToComputer(start);
-        //     }
-
-        // case RECALCULATING_PATH:
-        //     a_star_set_edge_freeness(graph, path->path[path_step], path->path[path_step + 1], false);
-
-        //     start = path->path[path_step];
-        //     path_step = 0;
-
-        //     epuck_printf("[recalculating path] start = %u, path step = %u, end = %u\n", start, path_step, end);
-            
-        //     if (a_star_find_path(graph, path, start, end)) {
-        //         state = MISSION;
-        //         epuck_printf("[path] start = %u, end = %u, path len = %u, path cost = %u, path = \n",
-        //         path->start, path->end, path->path_len, path->path_cost);
-        //         for (int i = 0; i < 15; ++i) {
-        //             epuck_printf("%u ", path->path[i]);
-        //         }
-        //         epuck_printf("\n");
-        //         path_step--;
-        //         // SendNodeToComputer(start);
-        //     } else {
-        //         epuck_printf("No new path found\n");
-        //         state = READING;
-        //     }
-
-        // case MISSION:
-        //     switch (color_values.color) {
-        //         case RED_COLOR:
-        //             // epuck_printf("color = red\n");
-        //             // state = STOP;
-        //             // stop_motors();
-        //             break;
-
-        //         case GREEN_COLOR:
-        //             // epuck_printf("color = green\n");
-        //             break;
-
-        //         case BLUE_COLOR:
-        //             //epuck_printf("color = blue\n");
-        //             state = INTERMEDIATE;
-        //             ++path_step;
-        //             epuck_printf("=============================================\nPATH STEP = %d | PATH LEN = %d\n", path_step, path->path_len);
-        //             if (path_step == path->path_len - 1) {
-        //                 translate();
-        //                 state = DONE;
-        //                 stop_motors();
-        //                 SendNodeToComputer(path->path[path->path_len - 1]);
-        //             } else {
-        //                 float target_heading = (float) get_heading(graph, path->path[path_step],
-        //                                         path->path[path_step+1]) * M_PI_4;
-        //                 epuck_printf("[brain] heading = %f\nbefore loop\n", target_heading);
-        //                 correct_heading(target_heading);
-        //                 epuck_printf("[brain] AFTER loop\n");
-        //                 // state = MISSION;
-        //                 SendNodeToComputer(path->path[path_step]);
-        //             }
-        //             break;
-
-        //         case BLACK_COLOR:
-        //             //epuck_printf("color = black\n");
-        //             break;
-        //     }
-
-        // case INTERMEDIATE:
-        //     switch (color_values.color) {
-        //         case BLACK_COLOR: {
-        //             state = MISSION;
-        //             break;
-        //         }
-        //         default: break;
-        //     }
-
-        // case DONE: stop_motors();
-        // case STOP:
-        //     switch (color_values.color) {
-        //         case RED_COLOR:
-        //             break;
-
-        //         case GREEN_COLOR:
-        //             state = MISSION;
-        //             break;
-
-        //         case BLUE_COLOR:
-        //             state = INTERMEDIATE;
-        //             ++path_step;
-        //             epuck_printf("=============================================\nPATH STEP = %d | PATH LEN = %d\n", path_step, path->path_len);
-        //             if (path_step == path->path_len - 1) {
-        //                 state = DONE;
-        //                 stop_motors();
-        //                 SendNodeToComputer(path->path[path->path_len - 1]);
-        //             } else {
-        //                 float target_heading = (float) get_heading(graph, path->path[path_step],
-        //                                         path->path[path_step+1]) * M_PI_4;
-        //                 epuck_printf("[brain] heading = %f\nbefore loop\n", target_heading);
-        //                 correct_heading(target_heading);
-        //                 epuck_printf("[brain] AFTER loop\n");
-        //                 SendNodeToComputer(path->path[path_step]);
-        //             }
-        //             break;
-
-        //         case BLACK_COLOR:
-        //             state = MISSION;
-        //             break;
-        //     }
-        // }
-
         if (state == READING) {
             leds_reading();
             path_step = 0;
@@ -168,14 +55,12 @@ static THD_FUNCTION(FSM, arg) {
             end = ReceiveDestinationFromComputer();
             uint16_t init_yaw = ReceiveYawFromComputer();
             set_init_yaw((float) init_yaw/RAD2DEG);
-            //epuck_printf("[brain] Received Yaw: %u\n", init_yaw);
 
             if (a_star_find_path(graph, path, start, end)) {
                 SendNodeToComputer(start);
                 float target_heading = (float) get_heading(graph, path->path[0],
                                                 path->path[1]) * M_PI_4;
-                //epuck_printf("[brain] target heading %f\n", target_heading*RAD2DEG);
-                correct_heading(target_heading);
+                rotate_absolute(target_heading);
                 state = MISSION;
             }
         }
@@ -184,18 +69,11 @@ static THD_FUNCTION(FSM, arg) {
 
             start = path->path[path_step];
             path_step = 0;
-
-            //epuck_printf("[recalculating path] start = %u, path step = %u, end = %u\n", start, path_step, end);
             
             if (a_star_find_path(graph, path, start, end)) {
                 state = MISSION;
-                //epuck_printf("[path] start = %u, end = %u, path len = %u, path cost = %u, path = \n",
-                //path->start, path->end, path->path_len, path->path_cost);
-                //epuck_printf("\n");
                 path_step--;
-                // SendNodeToComputer(start);
             } else {
-                //epuck_printf("No new path found\n");
                 state = READING;
             }
         }
@@ -204,20 +82,16 @@ static THD_FUNCTION(FSM, arg) {
             leds_mission();
             switch (color_values.color) {
                 case RED_COLOR:
-                    // epuck_printf("color = red\n");
                     state = STOP;
                     stop_motors();
                     break;
 
                 case GREEN_COLOR:
-                    // epuck_printf("color = green\n");
                     break;
 
                 case BLUE_COLOR:
-                    //epuck_printf("color = blue\n");
                     state = INTERMEDIATE;
                     ++path_step;
-                    //epuck_printf("=============================================\nPATH STEP = %d | PATH LEN = %d\n", path_step, path->path_len);
                     if (path_step == path->path_len - 1) {
                         advance();
                         state = DONE;
@@ -226,20 +100,16 @@ static THD_FUNCTION(FSM, arg) {
                     } else {
                         float target_heading = (float) get_heading(graph, path->path[path_step],
                                                 path->path[path_step+1]) * M_PI_4;
-                        //epuck_printf("[brain] heading = %f\nbefore loop\n", target_heading);
                         advance();
-                        correct_heading(target_heading);
-                        //epuck_printf("[brain] AFTER loop\n");
-                        // state = MISSION;
+                        rotate_absolute(target_heading);
                         SendNodeToComputer(path->path[path_step]);
                     }
                     break;
 
                 case BLACK_COLOR:
-                    //epuck_printf("color = black\n");
                     break;
 
-                case WHITE_COLOR: // TODO: CORRECT ORIENTATION
+                case WHITE_COLOR:
                     rotate_relative(get_last_error_direction() ? -0.35 : 0.35);
                     break;
             }
@@ -311,7 +181,6 @@ static THD_FUNCTION(DetectObstacle, arg) {
         time = chVTGetSystemTime();
 
         messagebus_topic_wait(dist_topic, &tof_dist, sizeof(tof_msg_t));
-        //epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
 
         if (tof_dist.dist_mm < OBSTACLE_THRESHOLD_MM && state == MISSION) {
             state = IDLE;
@@ -322,7 +191,6 @@ static THD_FUNCTION(DetectObstacle, arg) {
 
         chThdSleepUntilWindowed(time, time + MS2ST(TOF_THD_PERIOD_MS));
     }
-
 }
 
 void brain_init(void) {

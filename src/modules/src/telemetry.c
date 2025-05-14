@@ -1,16 +1,20 @@
+/* C Standard Library */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+/* ChibiOS Library */
 #include <ch.h>
 #include <hal.h>
-#include <memory_protection.h>
-#include <usbcfg.h>
 #include <chprintf.h>
 
-// In order to be able to use the RGB LEDs and User button
-// These funtcions are handled by the ESP32 and the communication with the uC is done via SPI
+/* e-puck2 main processor Library */
+#include <memory_protection.h>
+#include <usbcfg.h>
 #include <spi_comm.h>
+
+/* Modules Library */
 #include "modules/include/telemetry.h"
 #include "modules/include/brain.h"
 
@@ -19,10 +23,9 @@ BSEMAPHORE_DECL(reset_sem, TRUE);
 
 /*
 	C standard lib-like printf helper wrapper around chprintf 
-	to avoid having to provide stream
+	to avoid having to provide stream.
+    Only used for debugging
 */
-
-
 void epuck_printf(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -30,22 +33,7 @@ void epuck_printf(const char *fmt, ...) {
     va_end(args);
 }
 
-void SendUint8ToComputer(uint8_t* data, uint16_t size) 
-{
-	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"START", 5);
-	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)&size, sizeof(uint16_t));
-	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)data, size);
-}
-
-/* void SendNodeToComputer(uint8_t* data, uint8_t size) 
-{
-	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"CURRENT_NODE:", 13);
-	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)&size, sizeof(uint8_t));
-	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)data, size);
-} */
-
 void SendNodeToComputer(uint8_t node) {
-    //epuck_printf("SENT NODE: %d\n", node);
     chprintf((BaseSequentialStream *)&SD3, "CURRENT_NODE:%u\n", node);
 }
 
@@ -128,7 +116,6 @@ static THD_FUNCTION(ReceiveReset, arg) {
                 match_idx++;
                 if (match_idx == prefix_len) {
                     chBSemSignal(&reset_sem);
-                    //epuck_printf("---------------[RESET]----------------");
                     // Full prefix matched
                 }
             }
@@ -155,12 +142,9 @@ static void serial_start(void)
 
 void telemetry_init(void)
 {
-    //starts the serial communication
     serial_start();
-    //start the USB communication
     usb_start();
-    //starts RGB LEDS and User button managment
+    // RGB LEDS and User button management
 	spi_comm_start();
-
     chThdCreateStatic(waReceiveReset, sizeof(waReceiveReset), NORMALPRIO, ReceiveReset, NULL);
 }

@@ -19,6 +19,28 @@ static float estimated_dist = 0.0f;
 static float estimation_err = 100.0f; // high initial uncertainty
 static bool filter_initialized = false;
 
+int16_t tof_get_dist_mm(void) {
+    return VL53L0X_get_dist_mm() - DIST_OFFSET_MM;
+}
+
+uint16_t tof_get_filtered_dist_mm(void) {
+    float measurement = (float) tof_get_dist_mm();
+
+    if (!filter_initialized) {
+        estimated_dist = measurement;
+        filter_initialized = true;
+        return (uint16_t)(estimated_dist > 0 ? estimated_dist : 0);
+    }
+
+    estimation_err += PROC_NOISE;
+
+    kalman_gain = estimation_err / (estimation_err + MEAS_NOISE);
+    estimated_dist += kalman_gain * (measurement - estimated_dist);
+    estimation_err = (1 - kalman_gain) * estimation_err;
+
+    return (uint16_t) (estimated_dist > 0 ? estimated_dist : 0);
+}
+
 static THD_WORKING_AREA(waDistanceThd, DIST_STACK_SIZE);
 static THD_FUNCTION(DistanceThd, arg)
 {
@@ -50,24 +72,3 @@ void tof_init(void) {
     chThdCreateStatic(waDistanceThd, sizeof(waDistanceThd), NORMALPRIO, DistanceThd, NULL);
 }
 
-int16_t tof_get_dist_mm(void) {
-    return VL53L0X_get_dist_mm() - DIST_OFFSET_MM;
-}
-
-uint16_t tof_get_filtered_dist_mm(void) {
-    float measurement = (float) tof_get_dist_mm();
-
-    if (!filter_initialized) {
-        estimated_dist = measurement;
-        filter_initialized = true;
-        return (uint16_t)(estimated_dist > 0 ? estimated_dist : 0);
-    }
-
-    estimation_err += PROC_NOISE;
-
-    kalman_gain = estimation_err / (estimation_err + MEAS_NOISE);
-    estimated_dist += kalman_gain * (measurement - estimated_dist);
-    estimation_err = (1 - kalman_gain) * estimation_err;
-
-    return (uint16_t) (estimated_dist > 0 ? estimated_dist : 0);
-}

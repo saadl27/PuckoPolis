@@ -1,9 +1,11 @@
 #ifndef __BRAIN_H__
 #define __BRAIN_H__
 
+/* Constants */
 #include "modules/include/constants.h"
 
 
+//FSM states
 typedef enum {
     IDLE = 0,
     READING,
@@ -16,6 +18,6 @@ typedef enum {
 
 void brain_init(void);
 State get_state(void);
-void reset(void);
+
 
 #endif /* __BRAIN_H__ */

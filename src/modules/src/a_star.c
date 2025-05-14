@@ -1,19 +1,26 @@
+/* C Standard Library */
+#include <string.h>
+#include <stdlib.h>
+
+/* Modules Library */
 #include "modules/include/a_star.h"
 #include "modules/include/telemetry.h"
-#include <stdlib.h>
-#include <string.h>
 
+/*
+    initializes the graph struct by setting the number of nodes and edges to 0,
+    and resetting the adjacency counts of all nodes
+*/
 void a_star_init_graph(Graph* graph, uint8_t num_nodes) {
     graph->num_nodes = num_nodes;
     graph->num_edges = 0;
 
-    for (uint8_t i = 0; i < NUM_NODES; i++) {
+    for (uint8_t i = 0; i < MAX_NUM_NODES; i++) {
         graph->adjacency_count[i] = 0;
     }
 }
 
 void a_star_add_edge(Graph* graph, uint8_t node1, uint8_t node2, uint16_t weight, uint8_t angle12, uint8_t angle21) {
-    if (graph->num_edges >= NUM_NODES * MAX_EDGES_PER_NODE) {
+    if (graph->num_edges >= MAX_NUM_NODES * MAX_EDGES_PER_NODE) {
         return;
     }
 
@@ -41,8 +48,16 @@ void a_star_add_edge(Graph* graph, uint8_t node1, uint8_t node2, uint16_t weight
     graph->num_edges++;
 }
 
+/* 
+    This function was initially created to be able to play with different heuristic functions,
+    including a few interesting ones such as Euclidean distance and the Manhattan heuristic.
+    This is why it takes in as arguments 2 nodes (their indices).
+    We settled down with a Djikstra heuristic which just returns 0, hence we had to suppress warnings
+    by voiding out both arguments.
+    We kept the arguments so that it is much easier later on to play with other heuristics without having
+    to change a bunch of stuff, but they're effectively useless with this implementation
+ */
 uint16_t a_star_calculate_heuristic(uint8_t node, uint8_t goal) {
-    // return (node > goal) ? (node - goal) : (goal - node);
     (void) node;
     (void) goal;
     return 0; // djikstra heuristic
@@ -59,12 +74,12 @@ uint8_t find_lowest_f_cost(Node* nodes, bool* open_set, uint8_t num_nodes) {
         }
     }
 
-    return lowest_index + 1; // return 1-based node index
+    return lowest_index + 1; // 1-based node index
 }
 
 void reconstruct_path(Path* path, Node* nodes, uint8_t current) {
     uint8_t count = 0;
-    uint8_t path_reverse[NUM_NODES];
+    uint8_t path_reverse[MAX_NUM_NODES];
     uint16_t path_cost = 0;
 
     while (current != path->start) {
@@ -91,12 +106,11 @@ bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end) {
     path->path_len = 0;
     path->path_cost = 0;
 
-    Node nodes[NUM_NODES];
+    Node nodes[MAX_NUM_NODES];
     for (uint8_t i = 0; i < graph->num_nodes; i++) {
-        nodes[i].g_cost = 0xffff; // high value
+        nodes[i].g_cost = 0xffff; // max value for uint16_t
         nodes[i].h_cost = a_star_calculate_heuristic(i + 1, end);
         nodes[i].f_cost = 0xffff;
-        nodes[i].visited = false;
     }
 
     // init start node
@@ -104,8 +118,8 @@ bool a_star_find_path(Graph* graph, Path* path, uint8_t start, uint8_t end) {
     nodes[start - 1].f_cost = nodes[start - 1].h_cost;
 
     // create open and closed sets
-    bool open_set[NUM_NODES] = {0};
-    bool closed_set[NUM_NODES] = {0};
+    bool open_set[MAX_NUM_NODES] = {0};
+    bool closed_set[MAX_NUM_NODES] = {0};
 
     open_set[start - 1] = true;
 

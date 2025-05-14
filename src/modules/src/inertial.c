@@ -1,6 +1,7 @@
 /* C Standard Library */
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <math.h>
 
 /* ChibiOS Library */
@@ -11,13 +12,10 @@
 #include "modules/include/telemetry.h"
 #include "modules/include/inertial.h"
 
-/* e-puck2 main processor Library */
-#include "sensors/imu.h"
-
 
 static ekf_state_t ekf;
 
-void set_init_yaw(float yaw){
+void set_init_yaw(float yaw) {
     ekf.x[0] = yaw; 
 }
 
@@ -25,7 +23,7 @@ void ekf_init(ekf_state_t* ekf) {
     for (int i = 0; i < IMU_STATE_SIZE; i++) {
         ekf->x[i] = 0.0f;
         for (int j = 0; j < IMU_STATE_SIZE; j++) {
-            ekf->P[i][j] = (i == j) ? 0.01f : 0.0f;
+            ekf->P[i][j] = (i == j) ? GZ_PROC_NOISE : 0.0f;
         }
     }
 }
@@ -44,11 +42,11 @@ static void compute_jacobians(float F[IMU_STATE_SIZE][IMU_STATE_SIZE], float Q[I
     }
 
     // dtheta/dbgz = -dt
-    F[0][1] = -DT;
+    F[0][1] = -IMU_DT;
 
     // process noise Q: gyro noise + bias walk
     Q[0][0] = GZ_MEAS_NOISE; // variance of gz
-    Q[1][1] = 1e-7f;         // variance of gyro bias random walk (models slow drift of bias over time)
+    Q[1][1] = GZ_BIAS_VARIANCE;         // variance of gyro bias random walk (models slow drift of bias over time)
 }
 
 
@@ -57,7 +55,7 @@ void ekf_predict(ekf_state_t* ekf, float wz) {
     float theta_dot = wz - bgz;
 
     // state prediction
-    ekf->x[0] += theta_dot * DT;
+    ekf->x[0] += theta_dot * IMU_DT;
     // bias remains unchanged (random walk, zero mean gaussian)
 
     // cov prediction
@@ -124,8 +122,6 @@ static THD_FUNCTION(IMUThd, arg)
 
         ekf_predict(&ekf, raw.ang_vel[2]);
         angle.yaw_rad = ekf.x[0];
-
-        //epuck_printf("[inertial] angle = %f\n", angle.yaw_rad * RAD2DEG);
 
         messagebus_topic_publish(imu_pub, &angle, sizeof(angle));
 

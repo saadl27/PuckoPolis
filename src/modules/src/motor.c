@@ -1,22 +1,21 @@
+/* C Standard Library */
+#include <math.h>
+
+/* ChibiOS Library */
 #include <ch.h>
 #include <hal.h>
-#include <math.h>
-#include <usbcfg.h>
-#include <chprintf.h>
-#include <motors.h>
 
-#include "modules/include/motor.h"
+/* Modules Library */
 #include "main.h"
+#include "modules/include/motor.h"
 #include "modules/include/camera.h"
 #include "modules/include/brain.h"
 #include "modules/include/inertial.h"
 #include "modules/include/telemetry.h"
 
-const float dt = PID_LOOP_MS / 1000.0f;
+/* e-puck2 main processor Library */
+#include <motors.h>
 
-#define WHEEL_PERIMETER		13 //cm
-#define STEPS_ONE_TURN		1000
-#define FWD_DISP			4 // forward displacement in cm
 
 static float prev_error = 0.0f;
 
@@ -26,7 +25,7 @@ int16_t pid_regulator(float distance, float goal){
 	static float sum_error = 0.0f;
     static float filtered_derivative = 0.0f;
 
-	//disables the PI regulator if the error is to small
+	//disables the PID regulator if the error is to small
 	//this avoids to always move as we cannot exactly be where we want and 
 	//the camera is a bit noisy
 	if(fabs(error) < ERROR_THRESHOLD){
@@ -41,7 +40,7 @@ int16_t pid_regulator(float distance, float goal){
 		sum_error = -MAX_SUM_ERROR;
 	}
 
-	float raw_derivative = (error - prev_error) / dt;
+	float raw_derivative = (error - prev_error) / MOT_DT;
 
     if (raw_derivative > MAX_D_ERROR)		raw_derivative = MAX_D_ERROR;
     else if (raw_derivative < -MAX_D_ERROR) raw_derivative = -MAX_D_ERROR;
@@ -51,7 +50,7 @@ int16_t pid_regulator(float distance, float goal){
     float speed = KP * error + KI * sum_error + KD * filtered_derivative;
     prev_error = error;
 
-	epuck_printf("[PID] line position = %u,\t error = %f,\t sign = %d\n", (uint16_t)distance, error, error > 0 ? 1 : -1);
+	// epuck_printf("[PID] line position = %u,\t error = %f,\t sign = %d\n", (uint16_t)distance, error, error > 0 ? 1 : -1);
 
     return (int16_t) speed;
 }
@@ -113,19 +112,19 @@ void advance(void) {
 	left_motor_set_speed(FWD_SPEED);
 	right_motor_set_speed(FWD_SPEED);
 
-	while (1){
+	while (true) {
 
 		current_steps_r = fabs(right_motor_get_pos());
 		current_steps_l = fabs(left_motor_get_pos());
 
 		if (current_steps_r > target_steps_r) {
 			right_motor_set_speed(0);
-			right_position_reached = 1;
+			right_position_reached = true;
 		}
 
 		if (current_steps_l > target_steps_l) {
 			left_motor_set_speed(0);
-			left_position_reached = 1;
+			left_position_reached = true;
 		}
 		if (right_position_reached && left_position_reached) break;
 	}	
@@ -137,10 +136,7 @@ void stop_motors(void){
 }
 
 //implement thread to rotate using filtered gyro yaw (should take desired heading as input and return true when completed)
-void correct_heading(float target_heading) {
-	// epuck_printf("[motors] before moving straight\n");
-	//translate();
-	// epuck_printf("[motors] AFTER moving straight\n");
+void rotate_absolute(float target_heading) {
 	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
     yaw_msg_t angle;
 	float error = 0;
@@ -152,10 +148,6 @@ void correct_heading(float target_heading) {
 		if (fabsf(error) < ERROR_ANGLE) break;
 		while (error >= M_PI) error -= 2.0f * M_PI;
 		while (error < -M_PI) error += 2.0f * M_PI;
-
-		
-		//epuck_printf("[motors] current = %f, \t target = %f, \t, error = %f\n",
-		//				angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
 
 		if (error >= 0) {
 			right_motor_set_speed(-ROT_SPEED);
@@ -171,52 +163,53 @@ void correct_heading(float target_heading) {
 
 void rotate_relative(float relative_angle) {
 	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
-    yaw_msg_t angle;
-	float error = 0;
+	yaw_msg_t initial_angle;
+	messagebus_topic_wait(imu_topic, &initial_angle, sizeof(yaw_msg_t));
 
-	messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
-	float initial_yaw = angle.yaw_rad;
-
-	float target_heading = initial_yaw + relative_angle;
-
-	while (target_heading >= 2.0f * M_PI)	target_heading -= 2.0f * M_PI;
-	while (target_heading < 0.0f)			target_heading += 2.0f * M_PI;
-
-	while (true) {
-		messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
-		error = angle.yaw_rad - target_heading;
-
-		while (error >= M_PI) error -= 2.0f * M_PI;
-		while (error < -M_PI) error += 2.0f * M_PI;
-
-		//epuck_printf("[motors] current = %f, \t target = %f, \t error = %f\n",
-					//	angle.yaw_rad * RAD2DEG, target_heading * RAD2DEG, error * RAD2DEG);
-
-		if (fabsf(error) < ERROR_ANGLE) break;
-
-		if (error >= 0) {
-			right_motor_set_speed(-ROT_SPEED);
-			left_motor_set_speed(ROT_SPEED);
-		} else {
-			right_motor_set_speed(ROT_SPEED);
-			left_motor_set_speed(-ROT_SPEED);
-		}
-	}
-	right_motor_set_speed(FWD_SPEED);
-	left_motor_set_speed(FWD_SPEED);
+	rotate_absolute(relative_angle + initial_angle.yaw_rad);
 }
+
+// void rotate_relative(float relative_angle) {
+// 	messagebus_topic_t* imu_topic = messagebus_find_topic_blocking(&bus, "/imu_yaw");
+//     yaw_msg_t angle;
+// 	float error = 0;
+
+// 	messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
+// 	float initial_yaw = angle.yaw_rad;
+
+// 	float target_heading = initial_yaw + relative_angle;
+
+// 	while (target_heading >= 2.0f * M_PI)	target_heading -= 2.0f * M_PI;
+// 	while (target_heading < 0.0f)			target_heading += 2.0f * M_PI;
+
+// 	while (true) {
+// 		messagebus_topic_wait(imu_topic, &angle, sizeof(yaw_msg_t));
+// 		error = angle.yaw_rad - target_heading;
+
+// 		while (error >= M_PI) error -= 2.0f * M_PI;
+// 		while (error < -M_PI) error += 2.0f * M_PI;
+
+// 		if (fabsf(error) < ERROR_ANGLE) break;
+
+// 		if (error >= 0) {
+// 			right_motor_set_speed(-ROT_SPEED);
+// 			left_motor_set_speed(ROT_SPEED);
+// 		} else {
+// 			right_motor_set_speed(ROT_SPEED);
+// 			left_motor_set_speed(-ROT_SPEED);
+// 		}
+// 	}
+// 	right_motor_set_speed(FWD_SPEED);
+// 	left_motor_set_speed(FWD_SPEED);
+// }
 
 static void pid_regulator_start(void) {
 	chThdCreateStatic(waPidRegulator, sizeof(waPidRegulator), NORMALPRIO, PidRegulator, NULL);
 }
 
 void motor_init(){
-    //inits the motors
 	motors_init();
-
-	//stars the threads for the pi regulator and the processing of the image
 	pid_regulator_start();
-
 }
 
 bool get_last_error_direction(void) {

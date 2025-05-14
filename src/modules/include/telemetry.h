@@ -1,9 +1,13 @@
 #ifndef TELEMETRY_H
 #define TELEMETRY_H
 
+/* C Standard Library */
 #include <stdint.h>
+
+/* ChibiOS Library */
 #include <ch.h>
-#include <hal.h>
+
+/* Constants */
 #include "modules/include/constants.h"
 
 extern binary_semaphore_t reset_sem;
@@ -11,7 +15,6 @@ extern binary_semaphore_t reset_sem;
 void telemetry_init(void);
 
 void epuck_printf(const char *fmt, ...);
-void SendUint8ToComputer(uint8_t* data, uint16_t size);
 void SendNodeToComputer(uint8_t node);
 uint8_t ReceiveDestinationFromComputer(void);
 uint8_t ReceiveStartFromComputer(void);

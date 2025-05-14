@@ -29,6 +29,14 @@
         "parameter.h": "c",
         "camera.h": "c",
         "dcmi_camera.h": "c",
-        "leds.h": "c"
+        "leds.h": "c",
+        "memory": "c",
+        "optional": "c",
+        "po8030.h": "c",
+        "constants.h": "c",
+        "motors.h": "c",
+        "string.h": "c",
+        "usbcfg.h": "c",
+        "spi_comm.h": "c"
     },
 }

@@ -4,7 +4,7 @@
 #define RAD2DEG                     57.2957795131f
 
 /* A* constants */
-#define NUM_NODES                   15
+#define MAX_NUM_NODES               15
 #define MAX_EDGES_PER_NODE          4
 
 
@@ -50,15 +50,18 @@
 /* Constants used by Kalman orientation estimation thread */
 #define IMU_STACK_SIZE              512
 #define IMU_THD_PERIOD_MS           4
-#define IMU_DT                      IMU_THD_PERIOD_MS / 1000.0f
+#define IMU_DT                      (IMU_THD_PERIOD_MS / 1000.0f)
 
 #define IMU_STATE_SIZE              2       // [theta, bgz]
 #define GZ_MEAS_NOISE               0.0000051610f
+#define GZ_PROC_NOISE               1e-2f
+#define GZ_BIAS_VARIANCE            1e-7f
 
 
 /* Constants used for motors */
 #define PID_STACK_SIZE		        256
 #define PID_LOOP_MS			        10
+#define MOT_DT                      (PID_LOOP_MS / 1000.0f)
 
 #define ROT_SPEED                   250
 #define FWD_SPEED                   500

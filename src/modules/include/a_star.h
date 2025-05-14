@@ -1,9 +1,11 @@
 #ifndef __A_STAR__
 #define __A_STAR__
 
+/* C Standard Library */
 #include <stdint.h>
 #include <stdbool.h>
 
+/* Constants */
 #include "modules/include/constants.h"
 
 // A* algorithm for pathfinding for the robot
@@ -24,13 +26,12 @@ typedef struct {
     uint16_t h_cost; // heuristic cost from this node to the end
     uint16_t f_cost; // g + h
     uint8_t parent; // idx of parent node in path
-    bool visited;
 } Node;
 
 typedef struct {
     uint8_t start;
     uint8_t end;
-    uint8_t path[NUM_NODES];
+    uint8_t path[MAX_NUM_NODES];
     uint8_t path_len;
     uint16_t path_cost; // total weight of the path
 } Path;
@@ -38,12 +39,12 @@ typedef struct {
 typedef struct {
     uint8_t num_nodes;
     uint8_t num_edges;
-    uint8_t edges[NUM_NODES * MAX_EDGES_PER_NODE][2]; // each edge is a pair of node indices
-    bool is_free[NUM_NODES * MAX_EDGES_PER_NODE]; // true if edge is free, false if obstacle
-    uint16_t weights[NUM_NODES * MAX_EDGES_PER_NODE];
-    Orientation angles[NUM_NODES * MAX_EDGES_PER_NODE][2];
-    uint8_t adjacency[NUM_NODES][MAX_EDGES_PER_NODE];
-    uint8_t adjacency_count[NUM_NODES];
+    uint8_t edges[MAX_NUM_NODES * MAX_EDGES_PER_NODE][2]; // each edge is a pair of node indices
+    bool is_free[MAX_NUM_NODES * MAX_EDGES_PER_NODE]; // true if edge is free, false if obstacle
+    uint16_t weights[MAX_NUM_NODES * MAX_EDGES_PER_NODE];
+    Orientation angles[MAX_NUM_NODES * MAX_EDGES_PER_NODE][2];
+    uint8_t adjacency[MAX_NUM_NODES][MAX_EDGES_PER_NODE];
+    uint8_t adjacency_count[MAX_NUM_NODES];
 } Graph;
 
 void a_star_init(Graph* graph);

@@ -1,6 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+/* Constants */
 #include "modules/include/constants.h"
 
 //List of detection color
@@ -20,8 +21,6 @@ typedef struct {
 typedef struct {
 	uint16_t position;
 } line_msg_t;
-
-uint16_t get_line_position(void);
 
 void camera_init(void);
 
