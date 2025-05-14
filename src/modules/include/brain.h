@@ -1,6 +1,8 @@
 #ifndef __BRAIN_H__
 #define __BRAIN_H__
 
+#include "modules/include/constants.h"
+
 
 typedef enum {
     IDLE = 0,

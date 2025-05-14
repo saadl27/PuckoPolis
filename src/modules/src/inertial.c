@@ -14,13 +14,6 @@
 /* e-puck2 main processor Library */
 #include "sensors/imu.h"
 
-#define IMU_STACK_SIZE              512
-
-#define IMU_THD_PERIOD_MS           4
-#define DT                          IMU_THD_PERIOD_MS / 1000.0f
-
-#define GZ_MEAS_NOISE               0.0000051610f
-
 
 static ekf_state_t ekf;
 

@@ -14,12 +14,6 @@
 #include "modules/include/ledstates.h"
 #include "main.h"
 
-#define FSM_THD_LOOP_MS         100
-#define FSM_STACK_SIZE          8192
-#define RST_STACK_SIZE          256
-#define OBS_STACK_SIZE          1024
-
-#define OBSTACLE_THRESHOLD_MM ((uint16_t) 10)
 
 static State state = READING;
 
@@ -47,7 +41,6 @@ static THD_FUNCTION(FSM, arg) {
 
     while (true) {
         time = chVTGetSystemTime();
-        //epuck_printf("[state] %d\n", state);
 
         messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
 
@@ -61,12 +54,10 @@ static THD_FUNCTION(FSM, arg) {
         //         state = MISSION;
         //         set_init_yaw(get_heading(graph, path->path[0], path->path[1]) * M_PI_4);
         //         SendNodeToComputer(start);
-        //         test_path(graph, path, start, end);
         //     }
 
         // case RECALCULATING_PATH:
         //     a_star_set_edge_freeness(graph, path->path[path_step], path->path[path_step + 1], false);
-        //     // test_path(graph, path, start, end);
 
         //     start = path->path[path_step];
         //     path_step = 0;
@@ -184,13 +175,11 @@ static THD_FUNCTION(FSM, arg) {
                                                 path->path[1]) * M_PI_4;
                 epuck_printf("[brain] target heading %f\n", target_heading*RAD2DEG);
                 correct_heading(target_heading);
-                // test_path(graph, path, start, end);
                 state = MISSION;
             }
         }
         if (state == RECALCULATING_PATH) {
             a_star_set_edge_freeness(graph, path->path[path_step], path->path[path_step + 1], false);
-            // test_path(graph, path, start, end);
 
             start = path->path[path_step];
             path_step = 0;

@@ -12,14 +12,7 @@
 #include "modules/include/inertial.h"
 #include "modules/include/telemetry.h"
 
-#define PID_STACK_SIZE		256
-
-#define PID_LOOP_MS			10
 const float dt = PID_LOOP_MS / 1000.0f;
-
-#define WHEEL_PERIMETER		13 //cm
-#define STEPS_ONE_TURN		1000
-#define FWD_DISP			4 // forward displacement in cm
 
 //simple PID regulator implementation
 int16_t pid_regulator(float distance, float goal){

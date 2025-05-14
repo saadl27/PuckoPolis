@@ -14,7 +14,6 @@
 #include "modules/include/telemetry.h"
 #include "modules/include/brain.h"
 
-#define RECEIVE_RESET_STACK_SIZE        256
 
 BSEMAPHORE_DECL(reset_sem, TRUE);
 

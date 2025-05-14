@@ -2,8 +2,8 @@
 #define DISTANCE_H
 
 #include <stdint.h>
+#include "modules/include/constants.h"
 
-#define TOF_THD_PERIOD_MS 100
 
 typedef struct {
     uint16_t dist_mm;

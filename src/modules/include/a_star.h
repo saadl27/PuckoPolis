@@ -4,10 +4,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-// A* algorithm for pathfinding for the robot
+#include "modules/include/constants.h"
 
-#define NUM_NODES 15
-#define MAX_EDGES_PER_NODE 4
+// A* algorithm for pathfinding for the robot
 
 typedef enum {
     EAST = 0,
@@ -17,7 +16,7 @@ typedef enum {
     WEST,
     SOUTH_WEST,
     SOUTH,
-    SOUTH_EAST 
+    SOUTH_EAST
 } Orientation;
 
 typedef struct {

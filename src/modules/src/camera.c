@@ -10,16 +10,6 @@
 #include "modules/include/brain.h"
 #include "main.h"
 
-#define CAPTURE_STACK_SIZE          256
-#define PROCESS_STACK_SIZE          16384
-
-#define INDEX_OFFSET                50
-
-#define RED_THRESHOLD_SCALE         0.6f
-#define GREEN_THRESHOLD_SCALE       0.6f
-#define BLUE_THRESHOLD_SCALE        1.2f
-
-#define POLLING_COUNT               7
 
 static float distance_cm = 0;
 static uint16_t line_position = IMAGE_BUFFER_SIZE/2;    //middle

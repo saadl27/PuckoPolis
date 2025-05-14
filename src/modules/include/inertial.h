@@ -3,11 +3,8 @@
 
 #include <stdint.h>
 #include "sensors/imu.h"
+#include "modules/include/constants.h"
 
-#define GRAVITY_CONST 9.80665f // m/s^2
-#define IMU_STATE_SIZE 2       // [theta, bgz]
-
-#define RAD2DEG 57.2957795131f
 
 typedef struct {
     float yaw_rad;
