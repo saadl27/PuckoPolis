@@ -29,8 +29,8 @@
 
 #define INDEX_OFFSET                50
 
-#define RED_THRESHOLD_SCALE         0.6f
-#define GREEN_THRESHOLD_SCALE       0.6f
+#define RED_THRESHOLD_SCALE         1.4f
+#define GREEN_THRESHOLD_SCALE       1.2f
 #define BLUE_THRESHOLD_SCALE        1.2f
 
 #define POLLING_COUNT               7
