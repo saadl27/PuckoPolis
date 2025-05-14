@@ -30,7 +30,6 @@ def load_city(filename):
         data = json.load(f)
     return {int(n['id']): (float(n['x']), float(n['y'])) for n in data['nodes']}
 
-
 def load_and_clean_svg(svg_path):
     """
     Read SVG, remove percent-based rects, parse via svg2paths.
@@ -47,7 +46,6 @@ def load_and_clean_svg(svg_path):
         paths, _ = svg2paths(tmp.name)
     return paths
 
-
 def draw_svg_background(ax, paths):
     for path in paths:
         for seg in path:
@@ -58,7 +56,6 @@ def draw_svg_background(ax, paths):
             ax.plot(x, y, color='black', linewidth=1, zorder=0)
     ax.invert_yaxis()
     ax.axis('off')
-
 
 class SerialThread(Thread):
     def __init__(self, port, baudrate=115200):
@@ -80,32 +77,26 @@ class SerialThread(Thread):
             time.sleep(0.1)
 
     def send_start(self, node_id):
-        """
-        Send START command to robot.
-        """
         try:
-            msg = f'START:{node_id}\n'
-            self.port.write(msg.encode())
+            self.port.write(f'START:{node_id}\n'.encode())
         except serial.SerialException as e:
-            print(f"⚠️ Failed to send START command (node {node_id}): {e}")
+            print(f"⚠️ Failed to send START command: {e}")
 
     def send_destination(self, node_id):
-        """
-        Send DEST command to robot.
-        """
         try:
-            msg = f'DEST:{node_id}\n'
-            self.port.write(msg.encode())
+            self.port.write(f'DEST:{node_id}\n'.encode())
         except serial.SerialException as e:
-            print(f"⚠️ Failed to send DEST command (node {node_id}): {e}")
+            print(f"⚠️ Failed to send DEST command: {e}")
+
+    def send_yaw(self, angle):
+        try:
+            self.port.write(f'YAW:{angle}\n'.encode())
+        except serial.SerialException as e:
+            print(f"⚠️ Failed to send YAW command: {e}")
 
     def send_reset(self):
-        """
-        Send RESET command to robot.
-        """
         try:
-            msg = 'RESET\n'
-            self.port.write(msg.encode())
+            self.port.write(b'RESET\n')
         except serial.SerialException as e:
             print(f"⚠️ Failed to send RESET command: {e}")
 
@@ -113,7 +104,6 @@ class SerialThread(Thread):
         self.alive = False
         if self.port.is_open:
             self.port.close()
-
 
 if __name__ == '__main__':
     import argparse, sys
@@ -143,21 +133,27 @@ if __name__ == '__main__':
     start_text   = panel.text(0.1, 0.65, 'Start node:    --', fontsize=12)
     dest_text    = panel.text(0.1, 0.55, 'Destination:   --', fontsize=12)
 
-    # Start input box and button
-    sb_ax = fig.add_axes([0.05, 0.28, 0.3, 0.05], facecolor='#f0f0f0')
+    # Start input box and button (moved higher)
+    sb_ax = fig.add_axes([0.05, 0.38, 0.3, 0.05], facecolor='#f0f0f0')
     start_box = TextBox(sb_ax, 'Set start:', initial='')
-    sb_btn_ax = fig.add_axes([0.05, 0.21, 0.15, 0.05], facecolor='#5c8ebf')
+    sb_btn_ax = fig.add_axes([0.05, 0.31, 0.15, 0.05], facecolor='#5c8ebf')
     start_btn = Button(sb_btn_ax, 'Start', color='#5c8ebf', hovercolor='#4978a2')
 
-    # Destination input box and button
-    db_ax = fig.add_axes([0.05, 0.13, 0.3, 0.05], facecolor='#f0f0f0')
+    # Destination input box and button (moved higher)
+    db_ax = fig.add_axes([0.05, 0.23, 0.3, 0.05], facecolor='#f0f0f0')
     dest_box = TextBox(db_ax, 'Go to node:', initial='')
-    db_btn_ax = fig.add_axes([0.05, 0.06, 0.15, 0.05], facecolor='#66c2a5')
+    db_btn_ax = fig.add_axes([0.05, 0.16, 0.15, 0.05], facecolor='#66c2a5')
     dest_btn = Button(db_btn_ax, 'Go', color='#66c2a5', hovercolor='#4da077')
 
-    # Reset button
-    rb_ax = fig.add_axes([0.22, 0.06, 0.15, 0.05], facecolor='#d9534f')
+    # Reset button (slightly higher)
+    rb_ax = fig.add_axes([0.22, 0.16, 0.15, 0.05], facecolor='#d9534f')
     reset_btn = Button(rb_ax, 'Reset', color='#d9534f', hovercolor='#c9302c')
+
+    # Yaw input box and button (below Go/Reset, moved up)
+    yb_ax = fig.add_axes([0.05, 0.08, 0.3, 0.05], facecolor='#f7f7bb')
+    yaw_box = TextBox(yb_ax, 'Init yaw:', initial='0')
+    yb_btn_ax = fig.add_axes([0.35, 0.08, 0.15, 0.05], facecolor='#f0ad4e')
+    yaw_btn = Button(yb_btn_ax, 'Set Yaw', color='#f0ad4e', hovercolor='#ec971f')
 
     # Map panel
     ax = fig.add_subplot(gs[1])
@@ -166,10 +162,12 @@ if __name__ == '__main__':
 
     node_patches = {}
     for nid, (x, y) in positions.items():
-        circ = plt.Circle((x, y), 8, facecolor='white', edgecolor='#004d99', lw=1.5,
-                           zorder=1, picker=5)
+        circ = plt.Circle((x, y), 8, facecolor='white',
+                          edgecolor='#004d99', lw=1.5,
+                          zorder=1, picker=5)
         ax.add_patch(circ)
-        ax.text(x, y, str(nid), fontsize=8, ha='center', va='center', zorder=2)
+        ax.text(x, y, str(nid), fontsize=8,
+                ha='center', va='center', zorder=2)
         node_patches[nid] = circ
 
     ax.set_aspect('equal')
@@ -221,6 +219,14 @@ if __name__ == '__main__':
             print('Enter valid destination ID')
     dest_btn.on_clicked(on_dest)
 
+    def on_yaw(event):
+        try:
+            angle = float(yaw_box.text.strip()) % 360
+            serial_thread.send_yaw(angle)
+        except ValueError:
+            print('Enter valid yaw angle')
+    yaw_btn.on_clicked(on_yaw)
+
     def on_reset(event):
         global start_node, end_node
         start_node = None
@@ -228,7 +234,7 @@ if __name__ == '__main__':
         serial_thread.send_reset()
         start_text.set_text('Start node:    --')
         dest_text.set_text('Destination:   --')
-        current_text.set_text('Current node:   --')
+        current_text.set_text('Current node: --')
         update_display()
     reset_btn.on_clicked(on_reset)
 

@@ -90,7 +90,12 @@ static uint8_t ReceiveFromComputer(const char* mess) {
     numbuf[num_idx] = '\0';
 
     // Convert to integer and return
-    return (uint8_t)atoi(numbuf);
+    return (uint16_t)atoi(numbuf);
+}
+
+uint16_t ReceiveYawFromComputer(void){
+    const char* str = "YAW";
+    return ReceiveFromComputer(str);
 }
 
 uint8_t ReceiveDestinationFromComputer(void) {
