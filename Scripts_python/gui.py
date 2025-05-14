@@ -14,21 +14,26 @@ import time
 
 # Paths to your data files
 CITY_JSON_PATH = os.path.expanduser('gui_files/city.json')
-CITY_SVG_PATH  = os.path.expanduser('gui_files/city.drawio.svg')
+CITY_SVG_PATH = os.path.expanduser('gui_files/city.drawio.svg')
 
 # Global nodes
 start_node = None
-end_node   = None
+end_node = None
 
 def load_city(filename):
+    """
+    Load city nodes from a JSON file.
+    """
     if not os.path.isfile(filename):
         raise FileNotFoundError(f"City JSON file not found: {filename}")
     with open(filename, 'r') as f:
         data = json.load(f)
-    return {int(n['id']): (float(n['x']), float(n['y']))
-            for n in data['nodes']}
+    return {int(n['id']): (float(n['x']), float(n['y'])) for n in data['nodes']}
 
 def load_and_clean_svg(svg_path):
+    """
+    Read SVG, remove percent-based rects, parse via svg2paths.
+    """
     with open(svg_path, 'r') as f:
         content = f.read()
     root = ET.fromstring(content)
@@ -44,7 +49,7 @@ def load_and_clean_svg(svg_path):
 def draw_svg_background(ax, paths):
     for path in paths:
         for seg in path:
-            t = np.linspace(0, 1, 100)
+            t = np.linspace(0,1,100)
             pts = [seg.point(tt) for tt in t]
             x = [p.real for p in pts]
             y = [p.imag for p in pts]
@@ -57,8 +62,8 @@ class SerialThread(Thread):
         super().__init__()
         self.port = serial.Serial(port, baudrate=baudrate, timeout=1)
         self.current_node = None
-        self.need_update   = False
-        self.alive         = True
+        self.need_update = False
+        self.alive = True
 
     def run(self):
         while self.alive:
@@ -66,7 +71,7 @@ class SerialThread(Thread):
                 line = self.port.readline().decode().strip()
                 if line.startswith('CURRENT_NODE:'):
                     self.current_node = int(line.split(':')[1])
-                    self.need_update   = True
+                    self.need_update = True
             except Exception:
                 pass
             time.sleep(0.1)
@@ -75,25 +80,25 @@ class SerialThread(Thread):
         try:
             self.port.write(f'START:{node_id}\n'.encode())
         except serial.SerialException as e:
-            print(f"⚠️ Failed to send START: {e}")
+            print(f"⚠️ Failed to send START command: {e}")
 
     def send_destination(self, node_id):
         try:
             self.port.write(f'DEST:{node_id}\n'.encode())
         except serial.SerialException as e:
-            print(f"⚠️ Failed to send DEST: {e}")
+            print(f"⚠️ Failed to send DEST command: {e}")
 
     def send_yaw(self, angle):
         try:
             self.port.write(f'YAW:{angle}\n'.encode())
         except serial.SerialException as e:
-            print(f"⚠️ Failed to send YAW: {e}")
+            print(f"⚠️ Failed to send YAW command: {e}")
 
     def send_reset(self):
         try:
             self.port.write(b'RESET\n')
         except serial.SerialException as e:
-            print(f"⚠️ Failed to send RESET: {e}")
+            print(f"⚠️ Failed to send RESET command: {e}")
 
     def stop(self):
         self.alive = False
@@ -102,12 +107,12 @@ class SerialThread(Thread):
 
 if __name__ == '__main__':
     import argparse, sys
-    parser = argparse.ArgumentParser(description='PUCKOPOLIS - GUI')
+    parser = argparse.ArgumentParser(description='EPUCK CITY - GUI')
     parser.add_argument('serial_port', help='Serial port for robot')
     args = parser.parse_args()
 
     positions = load_city(CITY_JSON_PATH)
-    paths     = load_and_clean_svg(CITY_SVG_PATH)
+    paths = load_and_clean_svg(CITY_SVG_PATH)
 
     try:
         serial_thread = SerialThread(args.serial_port)
@@ -117,65 +122,52 @@ if __name__ == '__main__':
         sys.exit(1)
 
     fig = plt.figure(figsize=(12, 6))
-    fig.suptitle('PUCKOPOLIS', fontsize=16, fontweight='bold')
-    gs  = fig.add_gridspec(1, 2, width_ratios=[1, 2], wspace=0.3)
+    fig.suptitle('EPUCK CITY', fontsize=16, fontweight='bold')
+    gs = fig.add_gridspec(1, 2, width_ratios=[1, 2], wspace=0.3)
 
-    # --- Controls panel ---
+    # Controls panel
     panel = fig.add_subplot(gs[0])
     panel.axis('off')
     panel.set_title('Status & Controls', color='#004d99', fontsize=14)
+    current_text = panel.text(0.1, 0.75, 'Current node: --', fontsize=12)
+    start_text   = panel.text(0.1, 0.65, 'Start node:    --', fontsize=12)
+    dest_text    = panel.text(0.1, 0.55, 'Destination:   --', fontsize=12)
 
-    # Status texts (using axes coordinates)
-    current_text = panel.text(
-        0.05, 0.92, 'Current node:   --',
-        transform=panel.transAxes, fontsize=12
-    )
-    start_text = panel.text(
-        0.05, 0.84, 'Start node:     --',
-        transform=panel.transAxes, fontsize=12
-    )
-    dest_text = panel.text(
-        0.05, 0.76, 'Destination:    --',
-        transform=panel.transAxes, fontsize=12
-    )
-
-    # Set start
-    sb_ax     = fig.add_axes([0.02, 0.68, 0.30, 0.05], facecolor='#f0f0f0')
+    # Start input box and button (moved higher)
+    sb_ax = fig.add_axes([0.05, 0.38, 0.3, 0.05], facecolor='#f0f0f0')
     start_box = TextBox(sb_ax, 'Set start:', initial='')
-    sb_btn_ax = fig.add_axes([0.33, 0.68, 0.18, 0.05], facecolor='#5c8ebf')
+    sb_btn_ax = fig.add_axes([0.05, 0.31, 0.15, 0.05], facecolor='#5c8ebf')
     start_btn = Button(sb_btn_ax, 'Start', color='#5c8ebf', hovercolor='#4978a2')
 
-    # Go to destination
-    db_ax     = fig.add_axes([0.02, 0.60, 0.30, 0.05], facecolor='#f0f0f0')
-    dest_box  = TextBox(db_ax, 'Go to node:', initial='')
-    db_btn_ax = fig.add_axes([0.33, 0.60, 0.18, 0.05], facecolor='#66c2a5')
-    dest_btn  = Button(db_btn_ax, 'Go', color='#66c2a5', hovercolor='#4da077')
+    # Destination input box and button (moved higher)
+    db_ax = fig.add_axes([0.05, 0.23, 0.3, 0.05], facecolor='#f0f0f0')
+    dest_box = TextBox(db_ax, 'Go to node:', initial='')
+    db_btn_ax = fig.add_axes([0.05, 0.16, 0.15, 0.05], facecolor='#66c2a5')
+    dest_btn = Button(db_btn_ax, 'Go', color='#66c2a5', hovercolor='#4da077')
 
-    # Init yaw
-    yb_ax     = fig.add_axes([0.02, 0.52, 0.30, 0.05], facecolor='#f7f7bb')
-    yaw_box   = TextBox(yb_ax, 'Init yaw:', initial='0')
-    yb_btn_ax = fig.add_axes([0.33, 0.52, 0.18, 0.05], facecolor='#f0ad4e')
-    yaw_btn   = Button(yb_btn_ax, 'Set Yaw', color='#f0ad4e', hovercolor='#ec971f')
-
-    # Reset
-    rb_ax     = fig.add_axes([0.33, 0.44, 0.18, 0.05], facecolor='#d9534f')
+    # Reset button (slightly higher)
+    rb_ax = fig.add_axes([0.22, 0.16, 0.15, 0.05], facecolor='#d9534f')
     reset_btn = Button(rb_ax, 'Reset', color='#d9534f', hovercolor='#c9302c')
 
-    # --- Map panel ---
+    # Yaw input box and button (below Go/Reset, moved up)
+    yb_ax = fig.add_axes([0.05, 0.08, 0.3, 0.05], facecolor='#f7f7bb')
+    yaw_box = TextBox(yb_ax, 'Init yaw:', initial='0')
+    yb_btn_ax = fig.add_axes([0.35, 0.08, 0.15, 0.05], facecolor='#f0ad4e')
+    yaw_btn = Button(yb_btn_ax, 'Set Yaw', color='#f0ad4e', hovercolor='#ec971f')
+
+    # Map panel
     ax = fig.add_subplot(gs[1])
     ax.set_title('City Map', color='#333', fontsize=14)
     draw_svg_background(ax, paths)
 
     node_patches = {}
     for nid, (x, y) in positions.items():
-        circ = plt.Circle((x, y), 8,
-                          facecolor='white',
-                          edgecolor='#004d99',
-                          lw=1.5, zorder=1, picker=5)
+        circ = plt.Circle((x, y), 8, facecolor='white',
+                          edgecolor='#004d99', lw=1.5,
+                          zorder=1, picker=5)
         ax.add_patch(circ)
-        ax.text(x, y, str(nid),
-                fontsize=8, ha='center', va='center',
-                zorder=2)
+        ax.text(x, y, str(nid), fontsize=8,
+                ha='center', va='center', zorder=2)
         node_patches[nid] = circ
 
     ax.set_aspect('equal')
@@ -193,7 +185,7 @@ if __name__ == '__main__':
             else:
                 circ.set_facecolor('white')
         if curr is not None:
-            current_text.set_text(f'Current node:   {curr}')
+            current_text.set_text(f'Current node: {curr}')
         fig.canvas.draw_idle()
         serial_thread.need_update = False
 
@@ -204,8 +196,10 @@ if __name__ == '__main__':
             if nid in node_patches:
                 start_node = nid
                 serial_thread.send_start(nid)
-                start_text.set_text(f'Start node:     {nid}')
+                start_text.set_text(f'Start node:    {nid}')
                 update_display()
+            else:
+                print(f'Node {nid} not in city')
         except ValueError:
             print('Enter valid start ID')
     start_btn.on_clicked(on_start)
@@ -217,18 +211,18 @@ if __name__ == '__main__':
             if nid in node_patches:
                 end_node = nid
                 serial_thread.send_destination(nid)
-                dest_text.set_text(f'Destination:    {nid}')
+                dest_text.set_text(f'Destination:   {nid}')
                 update_display()
+            else:
+                print(f'Node {nid} not in city')
         except ValueError:
             print('Enter valid destination ID')
     dest_btn.on_clicked(on_dest)
 
     def on_yaw(event):
         try:
-            raw   = yaw_box.text.strip()
-            angle = float(raw) % 360.0
+            angle = float(yaw_box.text.strip()) % 360
             serial_thread.send_yaw(angle)
-            yaw_box.set_val(f"{angle:.1f}")
         except ValueError:
             print('Enter valid yaw angle')
     yaw_btn.on_clicked(on_yaw)
@@ -236,11 +230,11 @@ if __name__ == '__main__':
     def on_reset(event):
         global start_node, end_node
         start_node = None
-        end_node   = None
+        end_node = None
         serial_thread.send_reset()
-        start_text.set_text('Start node:     --')
-        dest_text.set_text('Destination:    --')
-        current_text.set_text('Current node:   --')
+        start_text.set_text('Start node:    --')
+        dest_text.set_text('Destination:   --')
+        current_text.set_text('Current node: --')
         update_display()
     reset_btn.on_clicked(on_reset)
 
@@ -251,7 +245,7 @@ if __name__ == '__main__':
             if circ == artist:
                 end_node = nid
                 serial_thread.send_destination(nid)
-                dest_text.set_text(f'Destination:    {nid}')
+                dest_text.set_text(f'Destination:   {nid}')
                 update_display()
                 break
     fig.canvas.mpl_connect('pick_event', on_pick)
