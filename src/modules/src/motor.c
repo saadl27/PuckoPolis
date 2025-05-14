@@ -67,16 +67,21 @@ static THD_FUNCTION(PidRegulator, arg) {
     int16_t speed = 0;
     int16_t speed_correction = 0;
 
+	messagebus_topic_t* line_topic = messagebus_find_topic_blocking(&bus, "/line");
+    line_msg_t line_values;
+
     while(1){
-        time = chVTGetSystemTime();
-        
+        //time = chVTGetSystemTime();
+
+        messagebus_topic_wait(line_topic, &line_values, sizeof(line_msg_t));
+
 		if (get_state() == MISSION) {
 			//computes the speed to give to the motors
 			//distance_cm is modified by the image processing thread
 			//speed = pid_regulator(get_distance_cm(), GOAL_DISTANCE);
 			speed = FWD_SPEED;
 			//computes a correction factor to let the robot rotate to be in front of the line
-			speed_correction = pid_regulator(get_line_position(), (IMAGE_BUFFER_SIZE/2));
+			speed_correction = pid_regulator(line_values.position, (IMAGE_BUFFER_SIZE/2));
 
 			//if the line is nearly in front of the camera, don't rotate
 			if(abs(speed_correction) < ROTATION_THRESHOLD){
@@ -88,8 +93,7 @@ static THD_FUNCTION(PidRegulator, arg) {
 		
 		} 
 		//100Hz
-		chThdSleepUntilWindowed(time, time + MS2ST(PID_LOOP_MS));
-
+		//chThdSleepUntilWindowed(time, time + MS2ST(PID_LOOP_MS));
     }
 }
 

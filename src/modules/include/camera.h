@@ -27,6 +27,9 @@ typedef struct {
 	color_detection_t color;
 } color_msg_t;
 
+typedef struct {
+	uint16_t position;
+} line_msg_t;
 
 uint16_t get_line_position(void);
 
