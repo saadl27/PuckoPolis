@@ -9,6 +9,7 @@ typedef enum {
 	GREEN_COLOR,
 	BLUE_COLOR,
 	BLACK_COLOR,
+	WHITE_COLOR
 } color_detection_t;
 
 
@@ -17,7 +18,6 @@ typedef struct {
 } color_msg_t;
 
 
-float get_distance_cm(void);
 uint16_t get_line_position(void);
 
 void camera_init(void);
