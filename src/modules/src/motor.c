@@ -12,7 +12,7 @@
 #include "modules/include/inertial.h"
 #include "modules/include/telemetry.h"
 
-#define PID_STACK_SIZE		256
+#define PID_STACK_SIZE		512
 
 #define PID_LOOP_MS			10
 const float dt = PID_LOOP_MS / 1000.0f;
@@ -21,11 +21,12 @@ const float dt = PID_LOOP_MS / 1000.0f;
 #define STEPS_ONE_TURN		1000
 #define FWD_DISP			4 // forward displacement in cm
 
+static float prev_error = 0.0f;
+
 //simple PID regulator implementation
 int16_t pid_regulator(float distance, float goal){
     float error = distance - goal;
 	static float sum_error = 0.0f;
-    static float prev_error = 0.0f;
     static float filtered_derivative = 0.0f;
 
 	//disables the PI regulator if the error is to small
@@ -52,6 +53,8 @@ int16_t pid_regulator(float distance, float goal){
 	if (get_state() != MISSION) sum_error = 0.0f;
     float speed = KP * error + KI * sum_error + KD * filtered_derivative;
     prev_error = error;
+
+	epuck_printf("[PID] line position = %u,\t error = %f,\t sign = %d\n", (uint16_t)distance, error, error > 0 ? 1 : -1);
 
     return (int16_t) speed;
 }
@@ -95,7 +98,7 @@ static THD_FUNCTION(PidRegulator, arg) {
 
 void advance(void) {
 	float target_steps_r = (STEPS_ONE_TURN/WHEEL_PERIMETER)*FWD_DISP;
-	float target_steps_l= (STEPS_ONE_TURN/WHEEL_PERIMETER)*FWD_DISP;
+	float target_steps_l = (STEPS_ONE_TURN/WHEEL_PERIMETER)*FWD_DISP;
 	
 	float current_steps_r = 0;
 	float current_steps_l = 0;
@@ -213,4 +216,8 @@ void motor_init(){
 	//stars the threads for the pi regulator and the processing of the image
 	pid_regulator_start();
 
+}
+
+bool get_last_error_direction(void) {
+	return prev_error > 0;
 }

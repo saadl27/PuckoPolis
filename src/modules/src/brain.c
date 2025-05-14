@@ -252,7 +252,9 @@ static THD_FUNCTION(FSM, arg) {
                     //epuck_printf("color = black\n");
                     break;
 
-                default : break;
+                case WHITE_COLOR: // TODO: CORRECT ORIENTATION
+                    rotate_relative(get_last_error_direction() ? -0.35 : 0.35);
+                    break;
             }
         }
 
