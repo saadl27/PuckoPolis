@@ -21,9 +21,6 @@ start_node = None
 end_node   = None
 
 def load_city(filename):
-    """
-    Load city nodes from a JSON file.
-    """
     if not os.path.isfile(filename):
         raise FileNotFoundError(f"City JSON file not found: {filename}")
     with open(filename, 'r') as f:
@@ -32,9 +29,6 @@ def load_city(filename):
             for n in data['nodes']}
 
 def load_and_clean_svg(svg_path):
-    """
-    Read SVG, remove percent-based rects, parse via svg2paths.
-    """
     with open(svg_path, 'r') as f:
         content = f.read()
     root = ET.fromstring(content)
@@ -79,22 +73,19 @@ class SerialThread(Thread):
 
     def send_start(self, node_id):
         try:
-            msg = f'START:{node_id}\n'
-            self.port.write(msg.encode())
+            self.port.write(f'START:{node_id}\n'.encode())
         except serial.SerialException as e:
             print(f"⚠️ Failed to send START: {e}")
 
     def send_destination(self, node_id):
         try:
-            msg = f'DEST:{node_id}\n'
-            self.port.write(msg.encode())
+            self.port.write(f'DEST:{node_id}\n'.encode())
         except serial.SerialException as e:
             print(f"⚠️ Failed to send DEST: {e}")
 
     def send_yaw(self, angle):
         try:
-            msg = f'YAW:{angle}\n'
-            self.port.write(msg.encode())
+            self.port.write(f'YAW:{angle}\n'.encode())
         except serial.SerialException as e:
             print(f"⚠️ Failed to send YAW: {e}")
 
@@ -111,7 +102,7 @@ class SerialThread(Thread):
 
 if __name__ == '__main__':
     import argparse, sys
-    parser = argparse.ArgumentParser(description='EPUCK CITY - GUI')
+    parser = argparse.ArgumentParser(description='PUCKOPOLIS - GUI')
     parser.add_argument('serial_port', help='Serial port for robot')
     args = parser.parse_args()
 
@@ -126,40 +117,51 @@ if __name__ == '__main__':
         sys.exit(1)
 
     fig = plt.figure(figsize=(12, 6))
-    fig.suptitle('EPUCK CITY', fontsize=16, fontweight='bold')
+    fig.suptitle('PUCKOPOLIS', fontsize=16, fontweight='bold')
     gs  = fig.add_gridspec(1, 2, width_ratios=[1, 2], wspace=0.3)
 
-    # Controls panel
+    # --- Controls panel ---
     panel = fig.add_subplot(gs[0])
     panel.axis('off')
     panel.set_title('Status & Controls', color='#004d99', fontsize=14)
-    current_text = panel.text(0.1, 0.80, 'Current node: --', fontsize=12)
-    start_text   = panel.text(0.1, 0.67, 'Start node:    --', fontsize=12)
-    dest_text    = panel.text(0.1, 0.54, 'Destination:   --', fontsize=12)
 
-    # Start input box & button
-    sb_ax    = fig.add_axes([0.05, 0.60, 0.38, 0.05], facecolor='#f0f0f0')
-    start_box= TextBox(sb_ax, 'Set start:', initial='')
-    sb_btn_ax= fig.add_axes([0.05, 0.54, 0.18, 0.05], facecolor='#5c8ebf')
-    start_btn= Button(sb_btn_ax, 'Start', color='#5c8ebf', hovercolor='#4978a2')
+    # Status texts (using axes coordinates)
+    current_text = panel.text(
+        0.05, 0.92, 'Current node:   --',
+        transform=panel.transAxes, fontsize=12
+    )
+    start_text = panel.text(
+        0.05, 0.84, 'Start node:     --',
+        transform=panel.transAxes, fontsize=12
+    )
+    dest_text = panel.text(
+        0.05, 0.76, 'Destination:    --',
+        transform=panel.transAxes, fontsize=12
+    )
 
-    # Destination input box & button
-    db_ax    = fig.add_axes([0.05, 0.43, 0.38, 0.05], facecolor='#f0f0f0')
-    dest_box = TextBox(db_ax, 'Go to node:', initial='')
-    db_btn_ax= fig.add_axes([0.25, 0.37, 0.18, 0.05], facecolor='#66c2a5')
-    dest_btn = Button(db_btn_ax, 'Go', color='#66c2a5', hovercolor='#4da077')
+    # Set start
+    sb_ax     = fig.add_axes([0.02, 0.68, 0.30, 0.05], facecolor='#f0f0f0')
+    start_box = TextBox(sb_ax, 'Set start:', initial='')
+    sb_btn_ax = fig.add_axes([0.33, 0.68, 0.18, 0.05], facecolor='#5c8ebf')
+    start_btn = Button(sb_btn_ax, 'Start', color='#5c8ebf', hovercolor='#4978a2')
 
-    # Yaw input box & button
-    yb_ax    = fig.add_axes([0.05, 0.26, 0.38, 0.05], facecolor='#f7f7bb')
-    yaw_box  = TextBox(yb_ax, 'Init yaw:', initial='0')
-    yb_btn_ax= fig.add_axes([0.05, 0.20, 0.18, 0.05], facecolor='#f0ad4e')
-    yaw_btn  = Button(yb_btn_ax, 'Set Yaw', color='#f0ad4e', hovercolor='#ec971f')
+    # Go to destination
+    db_ax     = fig.add_axes([0.02, 0.60, 0.30, 0.05], facecolor='#f0f0f0')
+    dest_box  = TextBox(db_ax, 'Go to node:', initial='')
+    db_btn_ax = fig.add_axes([0.33, 0.60, 0.18, 0.05], facecolor='#66c2a5')
+    dest_btn  = Button(db_btn_ax, 'Go', color='#66c2a5', hovercolor='#4da077')
 
-    # Reset button
-    rb_ax     = fig.add_axes([0.25, 0.20, 0.18, 0.05], facecolor='#d9534f')
-    reset_btn = Button(rb_ax,   'Reset', color='#d9534f', hovercolor='#c9302c')
+    # Init yaw
+    yb_ax     = fig.add_axes([0.02, 0.52, 0.30, 0.05], facecolor='#f7f7bb')
+    yaw_box   = TextBox(yb_ax, 'Init yaw:', initial='0')
+    yb_btn_ax = fig.add_axes([0.33, 0.52, 0.18, 0.05], facecolor='#f0ad4e')
+    yaw_btn   = Button(yb_btn_ax, 'Set Yaw', color='#f0ad4e', hovercolor='#ec971f')
 
-    # Map panel
+    # Reset
+    rb_ax     = fig.add_axes([0.33, 0.44, 0.18, 0.05], facecolor='#d9534f')
+    reset_btn = Button(rb_ax, 'Reset', color='#d9534f', hovercolor='#c9302c')
+
+    # --- Map panel ---
     ax = fig.add_subplot(gs[1])
     ax.set_title('City Map', color='#333', fontsize=14)
     draw_svg_background(ax, paths)
@@ -191,7 +193,7 @@ if __name__ == '__main__':
             else:
                 circ.set_facecolor('white')
         if curr is not None:
-            current_text.set_text(f'Current node: {curr}')
+            current_text.set_text(f'Current node:   {curr}')
         fig.canvas.draw_idle()
         serial_thread.need_update = False
 
@@ -202,7 +204,7 @@ if __name__ == '__main__':
             if nid in node_patches:
                 start_node = nid
                 serial_thread.send_start(nid)
-                start_text.set_text(f'Start node:    {nid}')
+                start_text.set_text(f'Start node:     {nid}')
                 update_display()
         except ValueError:
             print('Enter valid start ID')
@@ -215,7 +217,7 @@ if __name__ == '__main__':
             if nid in node_patches:
                 end_node = nid
                 serial_thread.send_destination(nid)
-                dest_text.set_text(f'Destination:   {nid}')
+                dest_text.set_text(f'Destination:    {nid}')
                 update_display()
         except ValueError:
             print('Enter valid destination ID')
@@ -236,9 +238,9 @@ if __name__ == '__main__':
         start_node = None
         end_node   = None
         serial_thread.send_reset()
-        start_text.set_text('Start node:    --')
-        dest_text.set_text('Destination:   --')
-        current_text.set_text('Current node: --')
+        start_text.set_text('Start node:     --')
+        dest_text.set_text('Destination:    --')
+        current_text.set_text('Current node:   --')
         update_display()
     reset_btn.on_clicked(on_reset)
 
@@ -249,7 +251,7 @@ if __name__ == '__main__':
             if circ == artist:
                 end_node = nid
                 serial_thread.send_destination(nid)
-                dest_text.set_text(f'Destination:   {nid}')
+                dest_text.set_text(f'Destination:    {nid}')
                 update_display()
                 break
     fig.canvas.mpl_connect('pick_event', on_pick)
