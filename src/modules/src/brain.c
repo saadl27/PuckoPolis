@@ -19,7 +19,7 @@
 #define RST_STACK_SIZE          256
 #define OBS_STACK_SIZE          1024
 
-#define OBSTACLE_THRESHOLD_MM ((uint16_t) 10)
+#define OBSTACLE_THRESHOLD_MM ((uint16_t) 25)
 
 static State state = READING;
 
@@ -176,13 +176,13 @@ static THD_FUNCTION(FSM, arg) {
             end = ReceiveDestinationFromComputer();
             uint16_t init_yaw = ReceiveYawFromComputer();
             set_init_yaw((float) init_yaw/RAD2DEG);
-            epuck_printf("[brain] Received Yaw: %u\n", init_yaw);
+            //epuck_printf("[brain] Received Yaw: %u\n", init_yaw);
 
             if (a_star_find_path(graph, path, start, end)) {
                 SendNodeToComputer(start);
                 float target_heading = (float) get_heading(graph, path->path[0],
                                                 path->path[1]) * M_PI_4;
-                epuck_printf("[brain] target heading %f\n", target_heading*RAD2DEG);
+                //epuck_printf("[brain] target heading %f\n", target_heading*RAD2DEG);
                 correct_heading(target_heading);
                 // test_path(graph, path, start, end);
                 state = MISSION;
@@ -218,8 +218,8 @@ static THD_FUNCTION(FSM, arg) {
             switch (color_values.color) {
                 case RED_COLOR:
                     // epuck_printf("color = red\n");
-                    // state = STOP;
-                    // stop_motors();
+                    state = STOP;
+                    stop_motors();
                     break;
 
                 case GREEN_COLOR:
@@ -251,6 +251,8 @@ static THD_FUNCTION(FSM, arg) {
                 case BLACK_COLOR:
                     //epuck_printf("color = black\n");
                     break;
+
+                default : break;
             }
         }
 
@@ -301,6 +303,8 @@ static THD_FUNCTION(FSM, arg) {
                 case BLACK_COLOR:
                     state = MISSION;
                     break;
+
+                default : break;
             }
         }
         chThdSleepUntilWindowed(time, time + MS2ST(FSM_THD_LOOP_MS));
@@ -336,7 +340,7 @@ static THD_FUNCTION(DetectObstacle, arg) {
         time = chVTGetSystemTime();
 
         messagebus_topic_wait(dist_topic, &tof_dist, sizeof(tof_msg_t));
-        // epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
+        //epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
 
         if (tof_dist.dist_mm < OBSTACLE_THRESHOLD_MM && state == MISSION) {
             state = IDLE;
