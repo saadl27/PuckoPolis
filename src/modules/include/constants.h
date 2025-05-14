@@ -21,8 +21,7 @@
 #define IMAGE_BUFFER_SIZE		    640
 #define WIDTH_SLOPE				    5
 #define MIN_LINE_WIDTH			    40
-#define MAX_DISTANCE 			    25.0f
-#define PXTOCM					    1570.0f
+#define NO_LINE                     0
 
 #define CAPTURE_STACK_SIZE          256
 #define PROCESS_STACK_SIZE          16384
@@ -51,7 +50,7 @@
 /* Constants used by Kalman orientation estimation thread */
 #define IMU_STACK_SIZE              512
 #define IMU_THD_PERIOD_MS           4
-#define DT                          IMU_THD_PERIOD_MS / 1000.0f
+#define IMU_DT                      IMU_THD_PERIOD_MS / 1000.0f
 
 #define IMU_STATE_SIZE              2       // [theta, bgz]
 #define GZ_MEAS_NOISE               0.0000051610f
@@ -77,6 +76,7 @@
 #define STEPS_ONE_TURN		        1000
 #define FWD_DISP			        4 // forward displacement in cm
 
+
 /* Constant used by telemetry reset thread */
 #define RECEIVE_RESET_STACK_SIZE    256
 
@@ -85,7 +85,6 @@
 #define RED_INTENSITY               255 // max uint8_t
 #define GREEN_INTENSITY             255
 #define BLUE_INTENSITY              255
-
 
 
 #endif /* __CONSTANTS_H__ */

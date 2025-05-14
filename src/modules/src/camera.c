@@ -10,7 +10,6 @@
 #include "modules/include/brain.h"
 #include "main.h"
 
-#define NO_LINE                     0
 
 //static uint16_t line_position = IMAGE_BUFFER_SIZE/2;    //middle
 
