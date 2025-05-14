@@ -10,8 +10,9 @@
 #include "modules/include/brain.h"
 #include "main.h"
 
+#define NO_LINE                     0
 
-static uint16_t line_position = IMAGE_BUFFER_SIZE/2;    //middle
+//static uint16_t line_position = IMAGE_BUFFER_SIZE/2;    //middle
 
 
 //semaphore
@@ -21,9 +22,9 @@ static BSEMAPHORE_DECL(image_ready_sem, TRUE);
  *  Returns the line's width extracted from the image buffer given
  *  Returns 0 if line not found
  */
-static void extract_line_width(uint8_t *buffer){
+static uint16_t extract_line_pos(uint8_t *buffer){
 
-    uint16_t i = 0, begin = 0, end = 0;
+    uint16_t i = 0, begin = 0, end = 0, line_position = 0;
     uint8_t stop = 0, wrong_line = 0, line_not_found = 0;
     uint32_t mean = 0;
 
@@ -85,16 +86,11 @@ static void extract_line_width(uint8_t *buffer){
     if(line_not_found){
         begin = 0;
         end = 0;
+        return NO_LINE;
     }else{
         line_position = (begin + end)/2; //gives the line position.
+        return line_position;
     }
-
-    /* //sets a maximum width or returns the measured width
-    if((PXTOCM/width) > MAX_DISTANCE){
-        return PXTOCM/MAX_DISTANCE;
-    }else{
-        return width;
-    } */
 }
 
 bool detect_color(uint8_t *buffer, color_detection_t color) {
@@ -191,6 +187,13 @@ static THD_FUNCTION(ProcessImage, arg) {
     messagebus_topic_init(&color_topic, &color_topic_lock, &color_topic_condvar, &color_values, sizeof(color_values));
     messagebus_advertise_topic(&bus, &color_topic, "/color");
 
+    messagebus_topic_t line_topic;
+    line_msg_t line_values;
+
+    MUTEX_DECL(line_topic_lock);
+    CONDVAR_DECL(line_topic_condvar);
+    messagebus_topic_init(&line_topic, &line_topic_lock, &line_topic_condvar, &line_values, sizeof(line_values));
+    messagebus_advertise_topic(&bus, &line_topic, "/line");
 
     uint8_t *img_buff_ptr;
     uint8_t red_buffer[IMAGE_BUFFER_SIZE] = {0};
@@ -230,26 +233,25 @@ static THD_FUNCTION(ProcessImage, arg) {
         switch (last_colors[counter - 1]) {
             case RED_COLOR:
                 //Analyze a buffer with a drop in the pixel intensity
-                extract_line_width(green_buffer);
+                line_values.position = extract_line_pos(green_buffer);
                 break;
             
             case GREEN_COLOR:
-                extract_line_width(red_buffer);
+                line_values.position = extract_line_pos(red_buffer);
                 break;
 
             case BLUE_COLOR:
-                extract_line_width(red_buffer);
+                line_values.position = extract_line_pos(red_buffer);
                 break;
 
             case BLACK_COLOR:
-                extract_line_width(red_buffer);
+                line_values.position = extract_line_pos(red_buffer);
                 break;
+
             default: break;
         }
 
-   /*      if(lineWidth){
-            distance_cm = PXTOCM/lineWidth;
-        } */
+        if (line_values.position) messagebus_topic_publish(&line_topic, &line_values, sizeof(line_values));
 
         if (counter == POLLING_COUNT) {
             counter = 0;
@@ -299,9 +301,9 @@ static THD_FUNCTION(ProcessImage, arg) {
     }
 }
 
-uint16_t get_line_position(void){
+/* uint16_t get_line_position(void){
     return line_position;
-}
+} */
 
 void process_image_start(void){
     chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);

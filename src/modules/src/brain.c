@@ -40,7 +40,8 @@ static THD_FUNCTION(FSM, arg) {
     systime_t time;
 
     while (true) {
-        time = chVTGetSystemTime();
+        //time = chVTGetSystemTime();
+        //epuck_printf("[state] %d\n", state);
 
         messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
 
@@ -190,9 +191,6 @@ static THD_FUNCTION(FSM, arg) {
                 state = MISSION;
                 //epuck_printf("[path] start = %u, end = %u, path len = %u, path cost = %u, path = \n",
                 //path->start, path->end, path->path_len, path->path_cost);
-                for (int i = 0; i < 15; ++i) {
-                    //epuck_printf("%u ", path->path[i]);
-                }
                 //epuck_printf("\n");
                 path_step--;
                 // SendNodeToComputer(start);
@@ -273,24 +271,6 @@ static THD_FUNCTION(FSM, arg) {
                     state = MISSION;
                     break;
 
-                case BLUE_COLOR:
-                    state = INTERMEDIATE;
-                    ++path_step;
-                    //epuck_printf("=============================================\nPATH STEP = %d | PATH LEN = %d\n", path_step, path->path_len);
-                    if (path_step == path->path_len - 1) {
-                        state = DONE;
-                        stop_motors();
-                        SendNodeToComputer(path->path[path->path_len - 1]);
-                    } else {
-                        float target_heading = (float) get_heading(graph, path->path[path_step],
-                                                path->path[path_step+1]) * M_PI_4;
-                        //epuck_printf("[brain] heading = %f\nbefore loop\n", target_heading);
-                        correct_heading(target_heading);
-                        //epuck_printf("[brain] AFTER loop\n");
-                        SendNodeToComputer(path->path[path_step]);
-                    }
-                    break;
-
                 case BLACK_COLOR:
                     state = MISSION;
                     break;
@@ -298,7 +278,7 @@ static THD_FUNCTION(FSM, arg) {
                 default: break;
             }
         }
-        chThdSleepUntilWindowed(time, time + MS2ST(FSM_THD_LOOP_MS));
+        //chThdSleepUntilWindowed(time, time + MS2ST(FSM_THD_LOOP_MS));
     }
 }
 
