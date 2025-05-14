@@ -1,4 +1,4 @@
-#include "modules/include/leds.h"
+#include "modules/include/ledstates.h"
 #include "leds.h"
 
 void leds_reading(void) {
@@ -38,8 +38,8 @@ void leds_done(void) {
 
 void leds_obstacle(void) {
     clear_leds();
-    set_rgb_led(LED2, 255, 0, 0); // red
-    set_rgb_led(LED4, 255, 0, 0); // red
-    set_rgb_led(LED6, 255, 0, 0); // red
-    set_rgb_led(LED8, 255, 0, 0); // red
+    set_rgb_led(LED2, 255, 0, 255); // red
+    set_rgb_led(LED4, 255, 0, 255); // red
+    set_rgb_led(LED6, 255, 0, 255); // red
+    set_rgb_led(LED8, 255, 0, 255); // red
 }

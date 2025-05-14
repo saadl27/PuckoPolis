@@ -11,7 +11,7 @@
 #include "modules/include/a_star.h"
 #include "modules/include/distance.h"
 #include "modules/include/inertial.h"
-#include "modules/include/leds.h"
+#include "modules/include/ledstates.h"
 #include "main.h"
 
 #define FSM_THD_LOOP_MS         100
@@ -182,7 +182,7 @@ static THD_FUNCTION(FSM, arg) {
                 float target_heading = (float) get_heading(graph, path->path[0],
                                                 path->path[1]) * M_PI_4;
                 correct_heading(target_heading);
-                test_path(graph, path, start, end);
+                // test_path(graph, path, start, end);
                 state = MISSION;
             }
         }
@@ -334,7 +334,7 @@ static THD_FUNCTION(DetectObstacle, arg) {
         time = chVTGetSystemTime();
 
         messagebus_topic_wait(dist_topic, &tof_dist, sizeof(tof_msg_t));
-        epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
+        // epuck_printf("distance = %u [mm]\n", tof_dist.dist_mm);
 
         if (tof_dist.dist_mm < OBSTACLE_THRESHOLD_MM && state == MISSION) {
             state = IDLE;
