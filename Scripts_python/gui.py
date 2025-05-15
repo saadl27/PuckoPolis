@@ -107,12 +107,12 @@ class SerialThread(Thread):
 
 if __name__ == '__main__':
     import argparse, sys
-    parser = argparse.ArgumentParser(description='EPUCK CITY - GUI')
+    parser = argparse.ArgumentParser(description='PUCKOPOLIS - GUI')
     parser.add_argument('serial_port', help='Serial port for robot')
     args = parser.parse_args()
 
     positions = load_city(CITY_JSON_PATH)
-    paths = load_and_clean_svg(CITY_SVG_PATH)
+    paths     = load_and_clean_svg(CITY_SVG_PATH)
 
     try:
         serial_thread = SerialThread(args.serial_port)
@@ -122,7 +122,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     fig = plt.figure(figsize=(12, 6))
-    fig.suptitle('EPUCK CITY', fontsize=16, fontweight='bold')
+    fig.suptitle('PUCKOPOLIS', fontsize=16, fontweight='bold')
     gs = fig.add_gridspec(1, 2, width_ratios=[1, 2], wspace=0.3)
 
     # Controls panel
@@ -133,27 +133,27 @@ if __name__ == '__main__':
     start_text   = panel.text(0.1, 0.65, 'Start node:    --', fontsize=12)
     dest_text    = panel.text(0.1, 0.55, 'Destination:   --', fontsize=12)
 
-    # Start input box and button (moved higher)
-    sb_ax = fig.add_axes([0.05, 0.38, 0.3, 0.05], facecolor='#f0f0f0')
+    # Start input box and button (moved right)
+    sb_ax     = fig.add_axes([0.15, 0.38, 0.3, 0.05], facecolor='#f0f0f0')
     start_box = TextBox(sb_ax, 'Set start:', initial='')
-    sb_btn_ax = fig.add_axes([0.05, 0.31, 0.15, 0.05], facecolor='#5c8ebf')
+    sb_btn_ax = fig.add_axes([0.15, 0.31, 0.15, 0.05], facecolor='#5c8ebf')
     start_btn = Button(sb_btn_ax, 'Start', color='#5c8ebf', hovercolor='#4978a2')
 
-    # Destination input box and button (moved higher)
-    db_ax = fig.add_axes([0.05, 0.23, 0.3, 0.05], facecolor='#f0f0f0')
-    dest_box = TextBox(db_ax, 'Go to node:', initial='')
-    db_btn_ax = fig.add_axes([0.05, 0.16, 0.15, 0.05], facecolor='#66c2a5')
-    dest_btn = Button(db_btn_ax, 'Go', color='#66c2a5', hovercolor='#4da077')
+    # Destination input box and button (moved right)
+    db_ax     = fig.add_axes([0.15, 0.23, 0.3, 0.05], facecolor='#f0f0f0')
+    dest_box  = TextBox(db_ax, 'Go to node:', initial='')
+    db_btn_ax = fig.add_axes([0.15, 0.16, 0.15, 0.05], facecolor='#66c2a5')
+    dest_btn  = Button(db_btn_ax, 'Go', color='#66c2a5', hovercolor='#4da077')
 
-    # Reset button (slightly higher)
-    rb_ax = fig.add_axes([0.22, 0.16, 0.15, 0.05], facecolor='#d9534f')
+    # Reset button (shifted right)
+    rb_ax     = fig.add_axes([0.32, 0.16, 0.15, 0.05], facecolor='#d9534f')
     reset_btn = Button(rb_ax, 'Reset', color='#d9534f', hovercolor='#c9302c')
 
-    # Yaw input box and button (below Go/Reset, moved up)
-    yb_ax = fig.add_axes([0.05, 0.08, 0.3, 0.05], facecolor='#f7f7bb')
-    yaw_box = TextBox(yb_ax, 'Init yaw:', initial='0')
-    yb_btn_ax = fig.add_axes([0.35, 0.08, 0.15, 0.05], facecolor='#f0ad4e')
-    yaw_btn = Button(yb_btn_ax, 'Set Yaw', color='#f0ad4e', hovercolor='#ec971f')
+    # Yaw input box and button (moved right)
+    yb_ax     = fig.add_axes([0.15, 0.08, 0.3, 0.05], facecolor='#f7f7bb')
+    yaw_box   = TextBox(yb_ax, 'Init yaw:', initial='0')
+    yb_btn_ax = fig.add_axes([0.45, 0.08, 0.15, 0.05], facecolor='#f0ad4e')
+    yaw_btn   = Button(yb_btn_ax, 'Set Yaw', color='#f0ad4e', hovercolor='#ec971f')
 
     # Map panel
     ax = fig.add_subplot(gs[1])
@@ -162,12 +162,14 @@ if __name__ == '__main__':
 
     node_patches = {}
     for nid, (x, y) in positions.items():
-        circ = plt.Circle((x, y), 8, facecolor='white',
-                          edgecolor='#004d99', lw=1.5,
-                          zorder=1, picker=5)
+        # increased circle radius from 8 to 12
+        circ = plt.Circle((x, y), 12,
+                          facecolor='white',
+                          edgecolor='#004d99',
+                          lw=1.5, zorder=1, picker=5)
         ax.add_patch(circ)
-        ax.text(x, y, str(nid), fontsize=8,
-                ha='center', va='center', zorder=2)
+        ax.text(x, y, str(nid),
+                fontsize=8, ha='center', va='center', zorder=2)
         node_patches[nid] = circ
 
     ax.set_aspect('equal')
@@ -176,14 +178,10 @@ if __name__ == '__main__':
     def update_display():
         curr = serial_thread.current_node
         for nid, circ in node_patches.items():
-            if nid == curr:
-                circ.set_facecolor('#fee08b')
-            elif nid == start_node:
-                circ.set_facecolor('#74add1')
-            elif nid == end_node:
-                circ.set_facecolor('#a6d96a')
-            else:
-                circ.set_facecolor('white')
+            if   nid == curr:       circ.set_facecolor('#fee08b')
+            elif nid == start_node: circ.set_facecolor('#74add1')
+            elif nid == end_node:   circ.set_facecolor('#a6d96a')
+            else:                   circ.set_facecolor('white')
         if curr is not None:
             current_text.set_text(f'Current node: {curr}')
         fig.canvas.draw_idle()
@@ -221,7 +219,7 @@ if __name__ == '__main__':
 
     def on_yaw(event):
         try:
-            angle = int(yaw_box.text.strip()) % 360
+            angle = float(yaw_box.text.strip()) % 360
             serial_thread.send_yaw(angle)
         except ValueError:
             print('Enter valid yaw angle')
@@ -230,7 +228,7 @@ if __name__ == '__main__':
     def on_reset(event):
         global start_node, end_node
         start_node = None
-        end_node = None
+        end_node   = None
         serial_thread.send_reset()
         start_text.set_text('Start node:    --')
         dest_text.set_text('Destination:   --')

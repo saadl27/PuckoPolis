@@ -7,6 +7,23 @@
 #define MAX_NUM_NODES               15
 #define MAX_EDGES_PER_NODE          4
 
+// graph nodes
+#define NODE_01                      1
+#define NODE_02                      2
+#define NODE_03                      3
+#define NODE_04                      4
+#define NODE_05                      5
+#define NODE_06                      6
+#define NODE_07                      7
+#define NODE_08                      8
+#define NODE_09                      9
+#define NODE_10                     10
+#define NODE_11                     11
+#define NODE_12                     12
+#define NODE_13                     13
+#define NODE_14                     14
+#define NODE_15                     15
+
 // edge weights
 #define WEIGHT_01_05                550 // mm, distance between nodes 1 and 5
 #define WEIGHT_01_03                380
