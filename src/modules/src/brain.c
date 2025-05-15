@@ -40,7 +40,7 @@ static THD_FUNCTION(FSM, arg) {
     messagebus_topic_t* color_topic = messagebus_find_topic_blocking(&bus, "/color");
     color_msg_t color_values;
 
-    systime_t time;
+    // systime_t time;
 
     while (true) {
         //time = chVTGetSystemTime();

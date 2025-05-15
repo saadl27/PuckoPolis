@@ -29,6 +29,17 @@ void ekf_init(ekf_state_t* ekf) {
 }
 
 // compute Jacobian F and process noise Q
+/* with the current model, this returns a constant matrix
+    F = [
+            [1, -IMU_DT],
+            [0, 1]
+        ],
+    but it was kept as it inherits from legacy code that used to estimate a larger state vector
+    that estimated position (x,y,z), velocity(x_dot, y_dot, z_dot) and rpy. now it only does yaw, with
+    a random walk bias, hence only 2 states.
+    * it would be nice to test in a later version a more accurate model taking into account all acc and gyro data,
+    as well as motor odometry and other sensors eventually (proximity?)
+ */
 static void compute_jacobians(float F[IMU_STATE_SIZE][IMU_STATE_SIZE], float Q[IMU_STATE_SIZE][IMU_STATE_SIZE]) {
     /* 
         zero F and Q

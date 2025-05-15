@@ -61,7 +61,7 @@ static THD_FUNCTION(PidRegulator, arg) {
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
-    systime_t time;
+    // systime_t time;
 
     int16_t speed = 0;
     int16_t speed_correction = 0;

@@ -23,6 +23,19 @@ int16_t tof_get_dist_mm(void) {
     return VL53L0X_get_dist_mm() - DIST_OFFSET_MM;
 }
 
+/* 
+    simple Kalman filter implementation over ToF readings
+    MEAS_NOISE (defined in modules/include/constants.h) is the noise covariance
+    ad was estimated from >500 samples taken.
+    PROC_NOISE depends on the environment and is more or less a degree of freedom in our implementation. In our
+    case, it was used to tune how much we trust the sensor's values compared to the history of readings.
+    It was initially set low but the robot was too sluggish/slow and didn't respond fast enough to sudden
+    obstacles, hence it was increased (at the cost of letting a bit more noise through). It now sits at a
+    sweet point where erroneous sensor readings don't affect the filtered data much but the sensor still
+    responds fast to sudden real changes.
+
+    math used for reference: https://www.kalmanfilter.net/kalman1d.html
+ */
 uint16_t tof_get_filtered_dist_mm(void) {
     float measurement = (float) tof_get_dist_mm();
 
