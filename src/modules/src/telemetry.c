@@ -45,7 +45,6 @@ static uint16_t ReceiveFromComputer(const char* mess) {
 
     BaseSequentialStream *bss = (BaseSequentialStream *)&SD3;
 
-    // Sync on the prefix "DEST:"
     while (true) {
         chSequentialStreamRead(bss, (uint8_t *)&c, 1);
         if (c == prefix[match_idx]) {
@@ -56,7 +55,6 @@ static uint16_t ReceiveFromComputer(const char* mess) {
             }
         }
         else {
-            // Partial match reset: if this char could be the start of prefix
             match_idx = (c == prefix[0]) ? 1 : 0;
         }
     }
@@ -108,7 +106,6 @@ static THD_FUNCTION(ReceiveReset, arg) {
 
     BaseSequentialStream *bss = (BaseSequentialStream *)&SD3;
 
-    // Sync on the prefix "DEST:"
     while (true) {
         if (get_state() != READING){
             chSequentialStreamRead(bss, (uint8_t *)&c, 1);
@@ -120,7 +117,6 @@ static THD_FUNCTION(ReceiveReset, arg) {
                 }
             }
             else {
-                // Partial match reset: if this char could be the start of prefix, keep it
                 match_idx = (c == prefix[0]) ? 1 : 0;
             }
         }

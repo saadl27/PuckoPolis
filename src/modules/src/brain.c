@@ -100,6 +100,7 @@ static THD_FUNCTION(FSM, arg) {
                     break;
 
                 case WHITE_COLOR:
+                    state = CHANGING_PATH;
                     rotate_relative(get_last_error_direction() ? -ROT_CORRECTION : ROT_CORRECTION);
                     break;
                 
@@ -134,7 +135,15 @@ static THD_FUNCTION(FSM, arg) {
             }
             break;
 
-        default: break;
+        case CHANGING_PATH:
+            switch (color_values.color) {
+                case BLACK_COLOR:
+                    state = MISSION;
+                    break;
+
+                default: break;
+            }
+            break;
         }
     }
 }
