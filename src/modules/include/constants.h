@@ -32,7 +32,7 @@
 #define GREEN_THRESHOLD_SCALE       1.2f
 #define BLUE_THRESHOLD_SCALE        1.2f
 
-#define POLLING_COUNT               7
+#define POOLING_COUNT               7
 
 
 /* Constants used by ToF thread */

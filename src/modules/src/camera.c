@@ -186,9 +186,9 @@ static THD_FUNCTION(ProcessImage, arg) {
     uint8_t green_buffer[IMAGE_BUFFER_SIZE] = {0};
     uint8_t blue_buffer[IMAGE_BUFFER_SIZE] = {0};
 
-    uint8_t counter = 0; // for color polling (filters out random noise)
+    uint8_t counter = 0; // for color pooling (filters out random noise)
     uint8_t red_count = 0, green_count = 0, blue_count = 0, black_count = 0, white_count = 0;
-    color_detection_t last_colors[POLLING_COUNT];
+    color_detection_t last_colors[POOLING_COUNT];
 
     while(1){
         //waits until an image has been captured
@@ -233,9 +233,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 
         if (line_values.position) messagebus_topic_publish(&line_topic, &line_values, sizeof(line_values));
 
-        if (counter == POLLING_COUNT) {
+        if (counter == POOLING_COUNT) {
             counter = 0;
-            for (size_t i = 0; i < POLLING_COUNT; ++i) {
+            for (size_t i = 0; i < POOLING_COUNT; ++i) {
                 switch (last_colors[i]) {
                     case RED_COLOR: red_count++; break;
                     case GREEN_COLOR: green_count++; break;
