@@ -13,9 +13,8 @@ typedef struct {
 } yaw_msg_t;
 
 typedef struct {
-    float acc[NB_AXIS];      // ax, ay, az
     float ang_vel[NB_AXIS];  // gx, gy, gz
-} imu_data_t;
+} gyro_data_t;
 
 /* 
     The following struct name is inherited from an earlier version of the algorithm which was

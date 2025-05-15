@@ -7,6 +7,31 @@
 #define MAX_NUM_NODES               15
 #define MAX_EDGES_PER_NODE          4
 
+// edge weights
+#define WEIGHT_01_05                550 // mm, distance between nodes 1 and 5
+#define WEIGHT_01_03                380
+#define WEIGHT_01_02                85
+#define WEIGHT_02_06                200
+#define WEIGHT_02_04                170
+#define WEIGHT_04_10                365
+#define WEIGHT_04_09                235
+#define WEIGHT_05_06                220
+#define WEIGHT_05_07                110
+#define WEIGHT_07_08                330
+#define WEIGHT_06_08                220
+#define WEIGHT_07_13                550
+#define WEIGHT_08_09                200
+#define WEIGHT_11_13                340
+#define WEIGHT_13_14                340
+#define WEIGHT_14_15                145
+#define WEIGHT_09_10                102
+#define WEIGHT_10_12                305
+#define WEIGHT_03_12                495
+#define WEIGHT_12_15                240
+#define WEIGHT_03_15                1100
+#define WEIGHT_11_14                155
+#define WEIGHT_09_11                95
+
 
 /* Constants for FSM and Obstacle Detection threads */
 #define FSM_THD_LOOP_MS             100
@@ -77,7 +102,8 @@
 
 #define WHEEL_PERIMETER		        13 //cm
 #define STEPS_ONE_TURN		        1000
-#define FWD_DISP			        4 // forward displacement in cm
+#define FWD_DISP			        3.5f // forward displacement in cm
+#define ROT_CORRECTION              0.35f // rad (roughly 20 deg)
 
 
 /* Constant used by telemetry reset thread */
@@ -85,9 +111,9 @@
 
 
 /* Constants used by LED functions */
-#define RED_INTENSITY               255 // max uint8_t
-#define GREEN_INTENSITY             255
-#define BLUE_INTENSITY              255
+#define RED_INTENSITY               100
+#define GREEN_INTENSITY             100
+#define BLUE_INTENSITY              100
 
 
 #endif /* __CONSTANTS_H__ */

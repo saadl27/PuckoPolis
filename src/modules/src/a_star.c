@@ -225,31 +225,31 @@ void test_path(Graph* graph, Path* path, uint8_t _start, uint8_t _end) {
     }
 }
 
-void a_star_init(Graph* graph){
+void a_star_init(Graph* graph) {
 
-    a_star_init_graph(graph, 15);
+    a_star_init_graph(graph, MAX_NUM_NODES);
 
-    a_star_add_edge(graph, 1,  5,  120, SOUTH, NORTH_WEST);
-    a_star_add_edge(graph, 1,  3,  90, EAST, NORTH);
-    a_star_add_edge(graph, 1,  2,  7, SOUTH, NORTH);
-    a_star_add_edge(graph, 2,  6,  60, WEST, NORTH_EAST);
-    a_star_add_edge(graph, 2,  4,  35, SOUTH, WEST);
-    a_star_add_edge(graph, 4,  10, 95, EAST, EAST);
-    a_star_add_edge(graph, 4,  9,  120, SOUTH, NORTH);
-    a_star_add_edge(graph, 5,  6,  15, NORTH_EAST, NORTH_WEST);
-    a_star_add_edge(graph, 5,  7,  8, SOUTH_WEST, NORTH);
-    a_star_add_edge(graph, 7,  8,  30, SOUTH, SOUTH_WEST);
-    a_star_add_edge(graph, 6,  8,  17, SOUTH_EAST, NORTH_EAST);
-    a_star_add_edge(graph, 7,  13, 107, WEST, WEST);
-    a_star_add_edge(graph, 8,  9,  76, SOUTH_EAST, WEST);
-    a_star_add_edge(graph, 11, 13, 63, WEST, NORTH);
-    a_star_add_edge(graph, 13, 14, 66, SOUTH, WEST);
-    a_star_add_edge(graph, 14, 15, 36, EAST, WEST);
-    a_star_add_edge(graph, 9,  10, 20, EAST, WEST);
-    a_star_add_edge(graph, 10, 12, 47, SOUTH, WEST);
-    a_star_add_edge(graph, 3,  12, 90, SOUTH, NORTH);
-    a_star_add_edge(graph, 12, 15, 25, SOUTH, EAST);
-    a_star_add_edge(graph, 3,  15, 235, EAST, SOUTH);
-    a_star_add_edge(graph, 11, 14, 15, SOUTH, NORTH);
-    a_star_add_edge(graph, 9,  11, 9, SOUTH, NORTH);
+    a_star_add_edge(graph, 1,  5,  WEIGHT_01_05, SOUTH, NORTH_WEST);
+    a_star_add_edge(graph, 1,  3,  WEIGHT_01_03, EAST, NORTH);
+    a_star_add_edge(graph, 1,  2,  WEIGHT_01_02, SOUTH, NORTH);
+    a_star_add_edge(graph, 2,  6,  WEIGHT_02_06, WEST, NORTH_EAST);
+    a_star_add_edge(graph, 2,  4,  WEIGHT_02_04, SOUTH, WEST);
+    a_star_add_edge(graph, 4,  10, WEIGHT_04_10, EAST, EAST);
+    a_star_add_edge(graph, 4,  9,  WEIGHT_04_09, SOUTH, NORTH);
+    a_star_add_edge(graph, 5,  6,  WEIGHT_05_06, NORTH_EAST, NORTH_WEST);
+    a_star_add_edge(graph, 5,  7,  WEIGHT_05_07, SOUTH_WEST, NORTH);
+    a_star_add_edge(graph, 7,  8,  WEIGHT_07_08, SOUTH, SOUTH_WEST);
+    a_star_add_edge(graph, 6,  8,  WEIGHT_06_08, SOUTH_EAST, NORTH_EAST);
+    a_star_add_edge(graph, 7,  13, WEIGHT_07_13, WEST, WEST);
+    a_star_add_edge(graph, 8,  9,  WEIGHT_08_09, SOUTH_EAST, WEST);
+    a_star_add_edge(graph, 11, 13, WEIGHT_11_13, WEST, NORTH);
+    a_star_add_edge(graph, 13, 14, WEIGHT_13_14, SOUTH, WEST);
+    a_star_add_edge(graph, 14, 15, WEIGHT_14_15, EAST, WEST);
+    a_star_add_edge(graph, 9,  10, WEIGHT_09_10, EAST, WEST);
+    a_star_add_edge(graph, 10, 12, WEIGHT_10_12, SOUTH, WEST);
+    a_star_add_edge(graph, 3,  12, WEIGHT_03_12, SOUTH, NORTH);
+    a_star_add_edge(graph, 12, 15, WEIGHT_12_15, SOUTH, EAST);
+    a_star_add_edge(graph, 3,  15, WEIGHT_03_15, EAST, SOUTH);
+    a_star_add_edge(graph, 11, 14, WEIGHT_11_14, SOUTH, NORTH);
+    a_star_add_edge(graph, 9,  11, WEIGHT_09_11, SOUTH, NORTH);
 }

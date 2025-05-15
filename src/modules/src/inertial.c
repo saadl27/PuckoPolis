@@ -110,7 +110,7 @@ static THD_FUNCTION(IMUThd, arg)
     messagebus_topic_t* imu_sub = messagebus_find_topic_blocking(&bus, "/imu");
     messagebus_topic_t* imu_pub = (messagebus_topic_t*)malloc(sizeof(messagebus_topic_t));
 
-    imu_data_t raw;
+    gyro_data_t raw;
     yaw_msg_t angle;
     messagebus_topic_init(imu_pub, &imu_pub_lock, &imu_pub_condvar, &angle, sizeof(yaw_msg_t));
     messagebus_advertise_topic(&bus, imu_pub, "/imu_yaw");
@@ -124,9 +124,6 @@ static THD_FUNCTION(IMUThd, arg)
         imu_msg_t in = {0};
         messagebus_topic_wait(imu_sub, &in, sizeof(in));
 
-        raw.acc[0]     = in.acceleration[0];
-        raw.acc[1]     = in.acceleration[1];
-        raw.acc[2]     = in.acceleration[2];
         raw.ang_vel[0] = in.gyro_rate[0];
         raw.ang_vel[1] = in.gyro_rate[1];
         raw.ang_vel[2] = in.gyro_rate[2];
@@ -142,7 +139,6 @@ static THD_FUNCTION(IMUThd, arg)
 
 void imu_init(void) {
     imu_start();
-    calibrate_acc();
     calibrate_gyro();
     chThdCreateStatic(waIMUThd, sizeof(waIMUThd), HIGHPRIO, IMUThd, NULL);
 }

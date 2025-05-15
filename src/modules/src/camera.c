@@ -245,36 +245,36 @@ static THD_FUNCTION(ProcessImage, arg) {
                 }
             }
             
-            // char* clr = NULL;
+            char* clr = NULL;
 
             if (red_count > green_count && red_count > blue_count && 
                 red_count > black_count && red_count > white_count) {
                 color_values.color = RED_COLOR;
-                // clr = "red";
+                clr = "red";
             } else if (green_count > red_count && green_count > blue_count &&
                  green_count > black_count && green_count > white_count) {
                 color_values.color = GREEN_COLOR;
-                // clr = "green";
+                clr = "green";
             } else if (blue_count > red_count && blue_count > green_count &&
                  blue_count > black_count && blue_count > white_count) {
                 color_values.color = BLUE_COLOR;
-                // clr = "blue";
+                clr = "blue";
             } else if  (black_count > red_count && black_count > green_count &&
                  black_count > blue_count && black_count > white_count){
                 color_values.color = BLACK_COLOR;
-                // clr = "black";
+                clr = "black";
             } else {
                 color_values.color = WHITE_COLOR;
-                // clr = "white";
+                clr = "white";
             }
+
+            epuck_printf("%s\n", clr);
 
             red_count = 0;
             green_count = 0;
             blue_count = 0;
             black_count = 0;
             white_count = 0;
-
-            // epuck_printf("%s\n", clr);
 
             messagebus_topic_publish(&color_topic, &color_values, sizeof(color_values));
         }

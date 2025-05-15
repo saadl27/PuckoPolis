@@ -110,7 +110,7 @@ static THD_FUNCTION(FSM, arg) {
                     break;
 
                 case WHITE_COLOR:
-                    rotate_relative(get_last_error_direction() ? -0.35 : 0.35);
+                    rotate_relative(get_last_error_direction() ? -ROT_CORRECTION : ROT_CORRECTION);
                     break;
             }
         }
