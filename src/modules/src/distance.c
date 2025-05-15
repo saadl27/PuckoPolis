@@ -16,7 +16,7 @@
 /* Kalman filter variables */
 static float kalman_gain = 0.0f;
 static float estimated_dist = 0.0f;
-static float estimation_err = 100.0f; // high initial uncertainty
+static float estimation_err = INIT_ESTIMATION_ERROR; // high initial uncertainty
 static bool filter_initialized = false;
 
 int16_t tof_get_dist_mm(void) {

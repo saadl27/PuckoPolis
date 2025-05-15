@@ -80,25 +80,25 @@ class SerialThread(Thread):
         try:
             self.port.write(f'START:{node_id}\n'.encode())
         except serial.SerialException as e:
-            print(f"⚠️ Failed to send START command: {e}")
+            print(f"Failed to send START command: {e}")
 
     def send_destination(self, node_id):
         try:
             self.port.write(f'DEST:{node_id}\n'.encode())
         except serial.SerialException as e:
-            print(f"⚠️ Failed to send DEST command: {e}")
+            print(f"Failed to send DEST command: {e}")
 
     def send_yaw(self, angle):
         try:
             self.port.write(f'YAW:{angle}\n'.encode())
         except serial.SerialException as e:
-            print(f"⚠️ Failed to send YAW command: {e}")
+            print(f"Failed to send YAW command: {e}")
 
     def send_reset(self):
         try:
             self.port.write(b'RESET\n')
         except serial.SerialException as e:
-            print(f"⚠️ Failed to send RESET command: {e}")
+            print(f"Failed to send RESET command: {e}")
 
     def stop(self):
         self.alive = False
@@ -133,23 +133,23 @@ if __name__ == '__main__':
     start_text   = panel.text(0.1, 0.65, 'Start node:    --', fontsize=12)
     dest_text    = panel.text(0.1, 0.55, 'Destination:   --', fontsize=12)
 
-    # Start input box and button (moved right)
+    # Start input box and button 
     sb_ax     = fig.add_axes([0.15, 0.38, 0.3, 0.05], facecolor='#f0f0f0')
     start_box = TextBox(sb_ax, 'Set start:', initial='')
     sb_btn_ax = fig.add_axes([0.15, 0.31, 0.15, 0.05], facecolor='#5c8ebf')
     start_btn = Button(sb_btn_ax, 'Start', color='#5c8ebf', hovercolor='#4978a2')
 
-    # Destination input box and button (moved right)
+    # Destination input box and button 
     db_ax     = fig.add_axes([0.15, 0.23, 0.3, 0.05], facecolor='#f0f0f0')
     dest_box  = TextBox(db_ax, 'Go to node:', initial='')
     db_btn_ax = fig.add_axes([0.15, 0.16, 0.15, 0.05], facecolor='#66c2a5')
     dest_btn  = Button(db_btn_ax, 'Go', color='#66c2a5', hovercolor='#4da077')
 
-    # Reset button (shifted right)
+    # Reset button
     rb_ax     = fig.add_axes([0.32, 0.16, 0.15, 0.05], facecolor='#d9534f')
     reset_btn = Button(rb_ax, 'Reset', color='#d9534f', hovercolor='#c9302c')
 
-    # Yaw input box and button (moved right)
+    # Yaw input box and button 
     yb_ax     = fig.add_axes([0.15, 0.08, 0.3, 0.05], facecolor='#f7f7bb')
     yaw_box   = TextBox(yb_ax, 'Init yaw:', initial='0')
     yb_btn_ax = fig.add_axes([0.45, 0.08, 0.15, 0.05], facecolor='#f0ad4e')
@@ -162,7 +162,6 @@ if __name__ == '__main__':
 
     node_patches = {}
     for nid, (x, y) in positions.items():
-        # increased circle radius from 8 to 12
         circ = plt.Circle((x, y), 12,
                           facecolor='white',
                           edgecolor='#004d99',

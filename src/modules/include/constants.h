@@ -87,6 +87,7 @@
 #define DIST_OFFSET_MM              50
 #define PROC_NOISE                  7.50f  // process noise (variance)
 #define MEAS_NOISE                  8.52f // measurement noise (variance)
+#define INIT_ESTIMATION_ERROR       100.0f
 
 
 /* Constants used by Kalman orientation estimation thread */

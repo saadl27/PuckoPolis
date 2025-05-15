@@ -56,7 +56,7 @@ static uint16_t ReceiveFromComputer(const char* mess) {
             }
         }
         else {
-            // Partial match reset: if this char could be the start of prefix, keep it
+            // Partial match reset: if this char could be the start of prefix
             match_idx = (c == prefix[0]) ? 1 : 0;
         }
     }
@@ -80,7 +80,7 @@ static uint16_t ReceiveFromComputer(const char* mess) {
     return (uint16_t)atoi(numbuf);
 }
 
-uint16_t ReceiveYawFromComputer(void){
+uint16_t ReceiveYawFromComputer(void) {
     const char* str = "YAW";
     return ReceiveFromComputer(str);
 }

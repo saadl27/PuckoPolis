@@ -7,11 +7,11 @@
 
 //FSM states
 typedef enum {
-    IDLE = 0,
     READING,
     MISSION, 
-    INTERMEDIATE,
+    INTERSECTION,
     RECALCULATING_PATH,
+    CHANGING_PATH,
     STOP,
     DONE
 } State;

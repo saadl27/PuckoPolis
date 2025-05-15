@@ -40,15 +40,10 @@ static THD_FUNCTION(FSM, arg) {
     messagebus_topic_t* color_topic = messagebus_find_topic_blocking(&bus, "/color");
     color_msg_t color_values;
 
-    // systime_t time;
-
     while (true) {
-        //time = chVTGetSystemTime();
-        //epuck_printf("[state] %d\n", state);
-
         messagebus_topic_wait(color_topic, &color_values, sizeof(color_msg_t));
-
-        if (state == READING) {
+        switch (state) {
+        case READING:
             leds_reading();
             path_step = 0;
             start = ReceiveStartFromComputer();
@@ -63,8 +58,9 @@ static THD_FUNCTION(FSM, arg) {
                 rotate_absolute(target_heading);
                 state = MISSION;
             }
-        }
-        if (state == RECALCULATING_PATH) {
+            break;
+    
+        case RECALCULATING_PATH: 
             a_star_set_edge_freeness(graph, path->path[path_step], path->path[path_step + 1], false);
 
             start = path->path[path_step];
@@ -76,9 +72,9 @@ static THD_FUNCTION(FSM, arg) {
             } else {
                 state = READING;
             }
-        }
-
-        if (state == MISSION) {
+            break;
+    
+        case MISSION: 
             leds_mission();
             switch (color_values.color) {
                 case RED_COLOR:
@@ -86,11 +82,8 @@ static THD_FUNCTION(FSM, arg) {
                     stop_motors();
                     break;
 
-                case GREEN_COLOR:
-                    break;
-
                 case BLUE_COLOR:
-                    state = INTERMEDIATE;
+                    state = INTERSECTION;
                     ++path_step;
                     if (path_step == path->path_len - 1) {
                         advance();
@@ -98,24 +91,23 @@ static THD_FUNCTION(FSM, arg) {
                         stop_motors();
                         SendNodeToComputer(path->path[path->path_len - 1]);
                     } else {
+                        advance();
                         float target_heading = (float) get_heading(graph, path->path[path_step],
                                                 path->path[path_step+1]) * M_PI_4;
-                        advance();
                         rotate_absolute(target_heading);
                         SendNodeToComputer(path->path[path_step]);
                     }
                     break;
 
-                case BLACK_COLOR:
-                    break;
-
                 case WHITE_COLOR:
                     rotate_relative(get_last_error_direction() ? -ROT_CORRECTION : ROT_CORRECTION);
                     break;
+                
+                default: break;
             }
-        }
+            break;
 
-        if (state == INTERMEDIATE) {
+        case INTERSECTION:
             leds_intersection();
             switch (color_values.color) {
                 case BLACK_COLOR: {
@@ -124,31 +116,26 @@ static THD_FUNCTION(FSM, arg) {
                 }
                 default: break;
             }
-        }
+            break;
 
-        if (state == DONE) {
+        case DONE:
             leds_done();
             stop_motors();
-        }
+            break;
 
-        if (state == STOP) {
+        case STOP:
             leds_stop();
             switch (color_values.color) {
-                case RED_COLOR:
-                    break;
-
                 case GREEN_COLOR:
-                    state = MISSION;
-                    break;
-
-                case BLACK_COLOR:
                     state = MISSION;
                     break;
 
                 default: break;
             }
+            break;
+
+        default: break;
         }
-        //chThdSleepUntilWindowed(time, time + MS2ST(FSM_THD_LOOP_MS));
     }
 }
 
@@ -183,7 +170,7 @@ static THD_FUNCTION(DetectObstacle, arg) {
         messagebus_topic_wait(dist_topic, &tof_dist, sizeof(tof_msg_t));
 
         if (tof_dist.dist_mm < OBSTACLE_THRESHOLD_MM && state == MISSION) {
-            state = IDLE;
+            state = CHANGING_PATH;
             leds_obstacle();
             rotate_relative(M_PI);
             state = RECALCULATING_PATH;

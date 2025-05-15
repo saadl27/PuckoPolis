@@ -13,7 +13,7 @@ typedef struct {
 } yaw_msg_t;
 
 typedef struct {
-    float ang_vel[NB_AXIS];  // gx, gy, gz
+    float ang_vel_z;  // gz
 } gyro_data_t;
 
 /* 

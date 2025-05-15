@@ -124,11 +124,9 @@ static THD_FUNCTION(IMUThd, arg)
         imu_msg_t in = {0};
         messagebus_topic_wait(imu_sub, &in, sizeof(in));
 
-        raw.ang_vel[0] = in.gyro_rate[0];
-        raw.ang_vel[1] = in.gyro_rate[1];
-        raw.ang_vel[2] = in.gyro_rate[2];
+        raw.ang_vel_z = in.gyro_rate[2];
 
-        ekf_predict(&ekf, raw.ang_vel[2]);
+        ekf_predict(&ekf, raw.ang_vel_z);
         angle.yaw_rad = ekf.x[0];
 
         messagebus_topic_publish(imu_pub, &angle, sizeof(angle));

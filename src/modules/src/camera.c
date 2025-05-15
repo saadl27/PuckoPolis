@@ -110,8 +110,6 @@ bool detect_color(uint8_t *buffer, color_detection_t color) {
     }
     uint16_t threshold = scaler * mean;
 
-    // if (color == BLUE_COLOR) epuck_printf("drop = %lu, threshold = %lu\n", drop, threshold);
-
     if (drop > threshold) {
         return false; 
     } else {
@@ -179,7 +177,7 @@ static THD_FUNCTION(ProcessImage, arg) {
     MUTEX_DECL(line_topic_lock);
     CONDVAR_DECL(line_topic_condvar);
     messagebus_topic_init(&line_topic, &line_topic_lock, &line_topic_condvar, &line_values, sizeof(line_values));
-    messagebus_advertise_topic(&bus, &line_topic, "/line");
+    messagebus_advertise_topic(&bus, &line_topic, "/line_pos");
 
     uint8_t *img_buff_ptr;
     uint8_t red_buffer[IMAGE_BUFFER_SIZE] = {0};
@@ -244,31 +242,26 @@ static THD_FUNCTION(ProcessImage, arg) {
                     case WHITE_COLOR: white_count++; break;
                 }
             }
-            
-            // char* clr = NULL;
 
             if (red_count > green_count && red_count > blue_count && 
                 red_count > black_count && red_count > white_count) {
                 color_values.color = RED_COLOR;
-                // clr = "red";
+
             } else if (green_count > red_count && green_count > blue_count &&
                  green_count > black_count && green_count > white_count) {
                 color_values.color = GREEN_COLOR;
-                // clr = "green";
+
             } else if (blue_count > red_count && blue_count > green_count &&
                  blue_count > black_count && blue_count > white_count) {
                 color_values.color = BLUE_COLOR;
-                // clr = "blue";
+
             } else if  (black_count > red_count && black_count > green_count &&
                  black_count > blue_count && black_count > white_count){
                 color_values.color = BLACK_COLOR;
-                // clr = "black";
+
             } else {
                 color_values.color = WHITE_COLOR;
-                // clr = "white";
             }
-
-            // epuck_printf("%s\n", clr);
 
             red_count = 0;
             green_count = 0;

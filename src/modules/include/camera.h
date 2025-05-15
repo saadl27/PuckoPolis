@@ -4,7 +4,7 @@
 /* Constants */
 #include "modules/include/constants.h"
 
-//List of detection color
+/* List of detection color */
 typedef enum {
 	RED_COLOR,
 	GREEN_COLOR,
